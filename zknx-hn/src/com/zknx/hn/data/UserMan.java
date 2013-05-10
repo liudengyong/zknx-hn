@@ -27,6 +27,8 @@ public class UserMan {
 		String userId; // 用户id
 		String userName; // 用户注册名字
 		String addrId; // 用户注册地址
+		String address; // 用户注册地址
+		String phone; // 电话
 	}
 	
 	// 当前用户信息
@@ -55,23 +57,43 @@ public class UserMan {
 	 * @return
 	 * 如果用户已经登录，则返回用户地址id
 	 */
-	public static String GetCurrentUserAddress() {
+	public static String GetCurrentUserAddressId() {
 		return (mUserInfo != null) ? mUserInfo.addrId : null;
 	}
 
 	/**
+	 * 获取当前用户地址
+	 * @return
+	 * 如果用户已经登录，则返回用户地址
+	 */
+	public static String GetCurrentUserAddress() {
+		return (mUserInfo != null) ? mUserInfo.address : null;
+	}
+	
+	/**
+	 * 获取当前用户电话
+	 * @return
+	 * 如果用户已经登录，则返回用户电话
+	 */
+	public static String GetCurrentUserPhone() {
+		return (mUserInfo != null) ? mUserInfo.phone : null;
+	}
+	/**
 	 * 设置当前用户信息
 	 * @param userId
 	 * @param addrId
-	 * @param protectionZoneId
+	 * @param addressId
+	 * @param phone
 	 */
-	public static void SetUserInfo(String userId, String userName, String addrId) {
+	public static void SetUserInfo(String userId, String userName, String addrId, String address, String phone) {
 		if (mUserInfo == null)
 			mUserInfo = new UserInfo();
 		
 		mUserInfo.userId = userId;
 		mUserInfo.userName = userName;
 		mUserInfo.addrId = addrId;
+		mUserInfo.address = address;
+		mUserInfo.phone= phone;
 		
 		/* TODO A 完善用户信息
 		
@@ -200,7 +222,8 @@ public class UserMan {
             
             br.close();
             
-            SetUserInfo(key[0], key[1], key[3]);
+            // TODO interface 暂无详细地址
+            SetUserInfo(key[0], key[1], key[3], null, key[2]);
 
             return true;
         } catch (FileNotFoundException e) {
