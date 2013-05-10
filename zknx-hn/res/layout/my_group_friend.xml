@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical" >
+    
+    <LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal" >
+		<Button
+		    android:id="@+id/my_goup_friend_all"
+		    android:layout_width="match_parent"
+		    android:layout_height="wrap_content"
+		    android:text="@string/all"
+		    style="@style/ClassBtn" />
+	</LinearLayout>
+
+    <LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal" >
+		<Button
+		    android:id="@+id/my_goup_friend_rich_planter"
+		    android:layout_width="0dip"
+		    android:layout_height="wrap_content"
+		    android:layout_weight="1"
+		    android:text="@string/rich_planter"
+		    style="@style/ClassBtn" />
+		
+		<Button
+		    android:id="@+id/my_goup_friend_rich_culturists"
+		    android:layout_width="0dip"
+		    android:layout_height="wrap_content"
+		    android:layout_weight="1"
+		    android:text="@string/rich_culturists"
+		    style="@style/ClassBtn" />
+	</LinearLayout>
+	
+    <LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal" >
+		<Button
+		    android:id="@+id/my_goup_friend_middleman"
+		    android:layout_width="0dip"
+		    android:layout_height="wrap_content"
+		    android:layout_weight="1"
+		    android:text="@string/middleman"
+		    style="@style/ClassBtn" />
+		
+		<Button
+		    android:id="@+id/my_goup_friend_cooperation"
+		    android:layout_width="0dip"
+		    android:layout_height="wrap_content"
+		    android:layout_weight="1"
+		    android:text="@string/cooperation"
+		    style="@style/ClassBtn" />
+	</LinearLayout>
+
+</LinearLayout>

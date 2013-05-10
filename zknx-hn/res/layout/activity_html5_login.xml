@@ -1,0 +1,22 @@
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="470sp"
+    android:layout_height="240sp"
+    android:orientation="vertical"
+    android:background="#00000000" >
+
+    <TextView
+        android:id="@+id/login_title_tv"
+        android:textIsSelectable="true"
+        android:background="@drawable/menu_title"
+        android:text="@string/please_login"
+        android:layout_gravity="top"
+        style="@style/TitleText" />
+        
+	<ViewFlipper
+	    android:id="@+id/login_flipper"
+	    android:layout_width="fill_parent"
+	    android:layout_height="fill_parent">
+	</ViewFlipper>
+
+</LinearLayout>

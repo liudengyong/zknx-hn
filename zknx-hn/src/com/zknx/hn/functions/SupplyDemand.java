@@ -1,0 +1,233 @@
+package com.zknx.hn.functions;
+
+import java.util.Map;
+
+import android.content.Context;
+import android.text.util.Linkify;
+import android.view.Gravity;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.ViewGroup.LayoutParams;
+import android.widget.AdapterView;
+import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.ListView;
+import android.widget.TableLayout;
+import android.widget.TableRow;
+import android.widget.TextView;
+
+import com.zknx.hn.R;
+import com.zknx.hn.common.Debug;
+import com.zknx.hn.common.UIConst;
+import com.zknx.hn.common.UIConst.L_LAYOUT_TYPE;
+import com.zknx.hn.data.DataMan;
+import com.zknx.hn.functions.common.CommonList;
+import com.zknx.hn.functions.common.CommonListAdapter;
+import com.zknx.hn.functions.common.FunctionView;
+import com.zknx.hn.functions.common.CommonList.CommonListParams;
+import com.zknx.hn.functions.common.ListItemClickListener;
+
+public class SupplyDemand extends FunctionView {
+	
+	CommonListAdapter mAdapterProductClass; // 产品分类
+	CommonListAdapter mAdapterInfo; // 供求信息
+	
+	ListView mListViewInfo;
+	Button mBtnSupply;
+	Button mBtnDemand;
+	
+	private static final String LEVEL1_TITLE = "供求信息";
+
+	public SupplyDemand(LayoutInflater inflater, LinearLayout frameRoot, int frameResId) {
+		super(inflater, frameRoot, frameResId);
+		
+		initProductClassList();
+	}
+	
+	/**
+	 * 初始化产品分类
+	 */
+	void initProductClassList() {
+		mAdapterProductClass = new CommonListAdapter(mContext, DataMan.GetProductClassList());
+		
+		CommonListParams listParams = new CommonListParams(mInflater, mContentFrame[0], mAdapterProductClass, mOnProductClassClick);
+		
+		CommonList.Init(listParams, LEVEL1_TITLE);
+		
+		// 初始化信息分类框架
+		initInfoFrame();
+		
+		// 默认第一类产品, 供应信息
+		initInfoList(0, mIsCurrentSuply);
+	}
+	
+	ListItemClickListener mOnProductClassClick = new ListItemClickListener() {
+		@Override
+		public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+			super.onItemClick(parent, view, position, id);
+			
+			// 默认初始化供应信息
+			initInfoList(position, true);
+			
+			mCurrentProductClassPosition = position;
+		}
+	};
+	
+	/**
+	 * 初始化信息分类框架
+	 */
+	void initInfoFrame() {
+		// 信息分类（供应信息或者求购信息）
+		LinearLayout infoType = (LinearLayout)mInflater.inflate(R.layout.supply_demand_class, null);
+		infoType.setLayoutParams(UIConst.GetLayoutParams(L_LAYOUT_TYPE.FULL));
+		
+		mBtnSupply = (Button)infoType.findViewById(R.id.supply_demand_btn_supply);
+		mBtnDemand = (Button)infoType.findViewById(R.id.supply_demand_btn_demand);
+		
+		mBtnSupply.setOnClickListener(OnClickInfoType);
+		mBtnDemand.setOnClickListener(OnClickInfoType);
+		
+		// 初始化信息列表
+		CommonListParams listParams = new CommonListParams(mInflater, mContentFrame[1], mAdapterInfo, mOnInfoClick);
+		mListViewInfo = CommonList.Init(listParams, "供求分类", infoType);
+	}
+	
+	OnClickListener OnClickInfoType = new OnClickListener() {
+
+		@Override
+		public void onClick(View view) {
+			int id = view.getId();
+
+			switch (id) {
+			case R.id.supply_demand_btn_supply:
+				mIsCurrentSuply = true;
+				break;
+			case R.id.supply_demand_btn_demand:
+				mIsCurrentSuply = false;
+				break;
+			default:
+				Debug.Log("严重错误：OnClickInfoType");
+				return;
+			}
+
+			initInfoList(mCurrentProductClassPosition, mIsCurrentSuply);
+		}
+	};
+
+	ListItemClickListener mOnInfoClick = new ListItemClickListener() {
+		@Override
+		public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+			super.onItemClick(parent, view, position, id);
+			
+			initSupplyDemandView(position, mIsCurrentSuply);
+		}
+	};
+	
+	private int mCurrentProductClassPosition = 0;
+	private boolean mIsCurrentSuply = true;
+	
+	/**
+	 * 初始化供应或者求购信息
+	 * @param suppy
+	 */
+	void initInfoList(int position, boolean supply) {
+		int product_class_id = mAdapterProductClass.getItemMapInt(position, DataMan.KEY_PRODUCT_CLASS_ID);
+		
+		mAdapterInfo = new CommonListAdapter(mContext, DataMan.GetSupplyDemandList(product_class_id, supply));
+
+		mListViewInfo.setAdapter(mAdapterInfo);
+		
+		mBtnSupply.setEnabled(!supply);
+		mBtnDemand.setEnabled(supply);
+		
+		// 默认第一个信息
+		initSupplyDemandView(0, supply);
+	}
+	
+	void initSupplyDemandView(int position, boolean supply) {
+		
+		int supply_demand_id = mAdapterInfo.getItemMapInt(position, DataMan.KEY_SUPPLY_DEMAND_INFO_ID);
+		
+		// 新建TableLayout 实例  
+        TableLayout tableLayout = new TableLayout(mContext);
+        
+        String title = GetSupplyDemandInfo(supply_demand_id, tableLayout);
+        
+		initContent(title, tableLayout, mContentFrame[2]);
+	}
+	
+	/**
+	 * 获取供求信息视图
+	 * @return
+	 * 无论是否成功，都返回标题，如果成功，则添加视图到TableLayout，否则不添加
+	 */
+	public static String GetSupplyDemandInfo(int supply_demand_id, TableLayout tableLayout) {
+		Context context = tableLayout.getContext();
+		
+		String title = "无信息";
+		Map<String, Object> info = DataMan.GetSupplyDemandInfo(supply_demand_id);
+        
+        if (info != null) {
+	        // 添加列表数据
+        	title = info.get(DataMan.SUPPLY_DEMAND_INFO_KEY_TITLE).toString();
+        	LayoutParams params = new TableLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
+        	
+        	// 全部列自动填充空白处
+            tableLayout.setStretchAllColumns(true);
+        	
+	        tableLayout.addView(GetTableRow(context, "内容", info.get(DataMan.SUPPLY_DEMAND_INFO_KEY_MESSAGE).toString()), params);
+	        tableLayout.addView(GetTableRow(context, "发布时间", info.get(DataMan.SUPPLY_DEMAND_INFO_KEY_POST_TIME).toString()), params);
+	        tableLayout.addView(GetTableRow(context, "有效期", info.get(DataMan.SUPPLY_DEMAND_INFO_KEY_INVALIDATE_DATE).toString()), params);
+	        tableLayout.addView(GetTableRow(context, "数量", info.get(DataMan.SUPPLY_DEMAND_INFO_KEY_AMOUNT).toString()), params);
+	        tableLayout.addView(GetTableRow(context, "单价", info.get(DataMan.SUPPLY_DEMAND_INFO_KEY_PRICE).toString()), params);
+	        tableLayout.addView(GetTableRow(context, "产地", info.get(DataMan.SUPPLY_DEMAND_INFO_KEY_HOST).toString()), params);
+	        tableLayout.addView(GetTableRow(context, "联系人", info.get(DataMan.SUPPLY_DEMAND_INFO_KEY_CONTACT_NAME).toString()), params);
+	        tableLayout.addView(GetTableRow(context, "联系电话", info.get(DataMan.SUPPLY_DEMAND_INFO_KEY_CONTACT_TEL).toString()), params);
+	        tableLayout.addView(GetTableRow(context, "手机", info.get(DataMan.SUPPLY_DEMAND_INFO_KEY_CONTACT_PHONE).toString()), params);
+	        tableLayout.addView(GetTableRow(context, "地址", info.get(DataMan.SUPPLY_DEMAND_INFO_KEY_CONTACT_ADDRESS).toString()), params);
+	        
+	        /*
+	        tableLayout.addView(GetTableRow("地址", "http://1.2.3.4"), params);
+	        tableLayout.addView(GetTableRow("电话", "13839312345"), params);
+	        tableLayout.addView(GetTableRow("地址", "http://1.2.3.4 nihao nihao 你好好好阿豪阿斯兰剪短发了卡时间段方了撒旦飞adsl开发"), params);
+	        tableLayout.addView(GetTableRow("电话", "13839312345"), params);
+	        tableLayout.addView(GetTableRow("地址", "http://1.2.3.4"), params);
+	        tableLayout.addView(GetTableRow("电话", "13839312345"), params);
+	        tableLayout.addView(GetTableRow("地址", "http://1.2.3.4"), params);
+	        */
+
+	        tableLayout.setGravity(Gravity.CENTER);
+        }
+        
+        return title;
+	}
+	
+	static TableRow GetTableRow(Context context, String label, String data) {
+		
+		TableRow tableRow = new TableRow(context);
+        // 显示标签
+        TextView tv = new TextView(context);
+        
+        tv.setGravity(Gravity.RIGHT);
+        tv.setText(label);
+        tv.setMinimumWidth(100);
+        tv.setPadding(0, 0, 10, 0); // 右边padding 10
+        
+        tableRow.addView(tv);
+        
+        // 显示数据
+        tv = new TextView(context);
+        // tv.setGravity(Gravity.CENTER);
+        tv.setAutoLinkMask(Linkify.ALL);
+        tv.setSingleLine(false);
+        //tv.setMaxWidth(300);
+        
+        tv.setText(data);
+        //tv.setMovementMethod(LinkMovementMethod.getInstance());
+        
+        tableRow.addView(tv);
+        
+        return tableRow;
+	}
+}

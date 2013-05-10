@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+    
+    <LinearLayout style="@style/FriendInfo" >
+		<TextView
+		    android:text="@string/name"
+		    style="@style/FriendInfoLabel" />
+		
+		<TextView
+		    android:id="@+id/my_friend_info_name"
+		    style="@style/FriendInfoLabel" />
+	</LinearLayout>
+	
+    <LinearLayout style="@style/FriendInfo" >
+		<TextView
+		    android:text="@string/major"
+		    style="@style/FriendInfoLabel" />
+		
+		<TextView
+		    android:id="@+id/my_friend_info_major"
+		    style="@style/FriendInfoValue" />
+	</LinearLayout>
+	
+    <LinearLayout style="@style/FriendInfo" >
+		<TextView
+		    android:text="@string/address"
+		    style="@style/FriendInfoLabel" />
+		
+		<TextView
+		    android:id="@+id/my_friend_info_address"
+		    style="@style/FriendInfoValue" />
+	</LinearLayout>
+
+    <LinearLayout style="@style/FriendInfo" >
+		<TextView
+		    android:text="@string/telephone"
+		    style="@style/FriendInfoLabel" />
+
+		<TextView
+		    android:id="@+id/my_friend_info_telephone"
+		    style="@style/FriendInfoValue" />
+	</LinearLayout>
+
+</LinearLayout>

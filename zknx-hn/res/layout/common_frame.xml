@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content" >
+    
+    <View android:id="@+id/common_frame_divider_left"
+	   android:layout_width="1dip"
+	   android:layout_height="fill_parent"
+	   android:background="@drawable/list_divider_vertical"
+	   android:layout_alignParentLeft="true"
+	   android:layout_above="@+id/common_frame_divider_bottom"
+	   android:layout_marginTop="10dip" />
+    
+    <TextView
+        android:id="@+id/common_frame_title"
+        android:textIsSelectable="true"
+        android:background="@drawable/menu_title"
+        style="@style/TitleText">
+	</TextView>
+
+    <LinearLayout
+        android:id="@+id/common_frame_custom"
+	    android:layout_width="match_parent"
+	    android:layout_height="wrap_content"
+	    android:layout_below="@+id/common_frame_title"
+	    android:orientation="horizontal" >
+	    
+	    <!-- TO BE ADD IN CODE FOR CUSTOM -->
+	    
+	</LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/common_frame_content"
+	    android:layout_width="match_parent"
+	    android:layout_height="match_parent"
+	    android:layout_below="@+id/common_frame_custom"
+	    android:layout_above="@+id/common_frame_custom_bottom"
+	    android:orientation="horizontal" >
+	    
+	    <!-- TO BE ADD IN CODE FOR CUSTOM -->
+	    
+	</LinearLayout>
+	
+    <View android:id="@+id/common_frame_divider_right"
+	   android:layout_width="1dip"
+	   android:layout_height="fill_parent"
+	   android:background="@drawable/list_divider_vertical"
+	   android:layout_alignParentRight="true"
+	   android:layout_above="@+id/common_frame_custom_bottom"
+	   android:layout_marginTop="10dip" />
+    
+    <LinearLayout
+        android:id="@+id/common_frame_custom_bottom"
+	    android:layout_width="match_parent"
+	    android:layout_height="wrap_content"
+	    android:layout_above="@+id/common_frame_divider_bottom"
+	    android:orientation="horizontal" >
+	    
+	    <!-- TO BE ADD IN CODE FOR CUSTOM -->
+	    
+	</LinearLayout>
+	
+	<View android:id="@+id/common_frame_divider_bottom"
+	   android:layout_width="fill_parent"
+	   android:layout_height="1dip"
+	   android:background="@drawable/list_divider"
+	   android:layout_alignParentBottom="true" />
+
+</RelativeLayout>

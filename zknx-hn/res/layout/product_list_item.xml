@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" 
+	android:layout_width="fill_parent" 
+	android:layout_height="63sp"
+	android:layout_gravity="center|center_vertical" >
+
+	<TextView
+	    android:id="@+id/product_list_item_name"
+	    android:layout_width="0dip" 
+	    android:layout_height="fill_parent" 
+	    android:layout_weight="1"
+	    style="@style/ListItemText" />
+	
+	<TextView
+	    android:id="@+id/product_list_item_price_min"
+	    android:layout_width="0dip" 
+	    android:layout_height="fill_parent" 
+	    android:layout_weight="1"
+	    style="@style/ListItemText" />
+	
+	<TextView
+	    android:id="@+id/product_list_item_price_max"
+	    android:layout_width="0dip" 
+	    android:layout_height="fill_parent" 
+	    android:layout_weight="1"
+	    style="@style/ListItemText" />
+	
+	<TextView
+	    android:id="@+id/product_list_item_price_average"
+	    android:layout_width="0dip" 
+	    android:layout_height="fill_parent" 
+	    android:layout_weight="1"
+	    style="@style/ListItemText" />
+	<TextView
+	    android:id="@+id/product_list_item_price_home"
+	    android:layout_width="0dip" 
+	    android:layout_height="fill_parent" 
+	    android:layout_weight="1"
+	    style="@style/ListItemText" />
+	
+	<TextView
+	    android:id="@+id/product_list_item_price_unit"
+	    android:layout_width="0dip" 
+	    android:layout_height="fill_parent" 
+	    android:layout_weight="1"
+	    style="@style/ListItemText" />
+
+	<LinearLayout
+	    android:id="@+id/product_list_item_add_custom"
+	    android:layout_width="0dip"
+		android:layout_height="fill_parent"
+		android:orientation="horizontal"
+		android:layout_weight="1"
+		android:layout_gravity="center|center_vertical">
+
+	    <TextView
+	    android:id="@+id/product_list_item_add_custom_tv"
+	    android:layout_width="fill_parent" 
+	    android:layout_height="fill_parent" 
+	    style="@style/ListItemText" />
+
+		<ImageView
+		    android:id="@+id/product_list_item_add_custom_chk"
+		    android:layout_width="fill_parent"
+		    android:layout_height="fill_parent"
+		    android:src="@drawable/checkbox_none"
+		    android:contentDescription="@string/divider"
+		    android:scaleType="center" />
+
+	</LinearLayout>
+
+</LinearLayout>

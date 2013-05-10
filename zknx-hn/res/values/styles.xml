@@ -1,0 +1,163 @@
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <style name="AppTheme" parent="android:Theme.Light" />
+    
+    <!--=========================== 主页界面 ===========================-->
+    <!-- 功能分类按钮 -->
+    <style name="MainFuncBtn">
+	    <item name="android:textSize">56sp</item>
+	    <item name="android:textColor">#FFFFFFFF</item>
+	    <item name="android:layout_width">300dip</item>
+	    <item name="android:layout_height">225dip</item>
+	    <item name="android:gravity">center</item>
+	    <item name="android:layout_centerInParent">true</item>
+	    <item name="android:background">@drawable/home_function_class_btn</item>
+	</style>
+	
+    <!-- 功能按钮 -->
+    <style name="SubFuncBtn">
+	    <item name="android:textSize">26sp</item>
+	    <item name="android:textColor">#FFFFFFFF</item>
+	    <item name="android:layout_width">match_parent</item>
+	    <item name="android:layout_height">80dip</item>
+	    <item name="android:gravity">center</item>
+	    <item name="android:layout_centerInParent">true</item>
+	    <item name="android:background">@drawable/bottom_button</item>
+	</style>
+	
+    <!--=========================== 登录界面 ===========================-->
+    <style name="Popup" parent="android:style/Theme.Dialog">
+		<item name="android:windowIsTranslucent">true</item>
+		<item name="android:windowAnimationStyle">@+android:style/Animation.Translucent</item>
+		<item name="android:windowBackground">@android:color/transparent</item>
+		<item name="android:colorBackgroundCacheHint">@null</item>
+		<item name="android:windowIsFloating">true</item>
+		<item name="android:windowContentOverlay">@null</item>
+		<item name="android:windowFrame">@null</item>
+		<item name="android:windowTitleStyle">@null</item>  
+        <item name="android:windowSoftInputMode">stateUnspecified|adjustPan</item>  
+        <item name="android:backgroundDimEnabled">false</item>  
+        <item name="android:background">#00ffffff</item>  
+        <item name="android:windowNoTitle">true</item>
+	</style>
+	
+    <style name="Popup2" parent="android:style/Theme.Dialog">
+		<item name="android:windowNoTitle">true</item>
+		<item name="android:windowIsTranslucent">true</item>
+		<item name="android:windowAnimationStyle">@+android:style/Animation.Translucent</item>
+	</style>
+    
+    <!--=========================== 功能界面 ===========================-->
+	
+    <!-- 标题文字 -->
+    <style name="TitleText_TODO">
+	    <item name="android:textSize">30sp</item>
+	    <item name="android:textIsSelectable">true</item>
+	    <item name="android:textColor">#FFFFFFFF</item>
+	    <item name="android:layout_width">fill_parent</item>
+	    <item name="android:layout_height">fill_parent</item>
+	    <item name="android:gravity">left|center_vertical</item>
+	</style>
+	
+    <!-- 二级标题文字 -->
+    <style name="TitleText">
+	    <item name="android:textSize">18sp</item>
+	    <item name="android:textColor">#FFFFFFFF</item>
+	    <item name="android:layout_width">fill_parent</item>
+	    <item name="android:layout_height">wrap_content</item>
+	    <item name="android:gravity">center</item>
+	</style>
+	
+    <!-- ListItem 文字 -->
+    <style name="ListItemText">
+	    <item name="android:textSize">18sp</item>
+	    <item name="android:textColor">#FFFFFFFF</item>
+	    <item name="android:layout_width">fill_parent</item>
+	    <item name="android:layout_height">fill_parent</item>
+	    <item name="android:gravity">center</item>
+	    <item name="android:layout_centerVertical">true</item>
+	    <item name="android:textIsSelectable">false</item>
+	</style>
+	
+    <!-- ListItem 勾选 -->
+    <!--style name="ListItemCheckBox">
+	    <item name="android:layout_width">fill_parent</item>
+	    <item name="android:layout_height">wrap_content</item>
+	    <item name="android:gravity">center</item>
+	    <item name="android:layout_centerHorizontal">true</item>
+	    <item name="android:button">@drawable/checkbox</item>
+	</style-->
+	
+    <!-- 分类按钮 -->
+    <style name="ClassBtn">
+	    <item name="android:textSize">16sp</item>
+	    <item name="android:textColor">#FFFFFFFF</item>
+	    <item name="android:gravity">center</item>
+	    <item name="android:layout_centerInParent">true</item>
+	    <item name="android:background">@drawable/button_class</item>
+	</style>
+	
+	<!-- 商友信息 -->
+    <style name="FriendInfo">
+	    <item name="android:layout_width">match_parent</item>
+	    <item name="android:layout_height">48sp</item>
+	    
+	    <item name="android:orientation">horizontal</item>
+	    <item name="android:layout_gravity">center_vertical|left</item>
+	</style>
+	
+    <style name="FriendInfoLabel">
+	    <item name="android:textSize">16sp</item>
+	    <item name="android:textColor">#FFFFFFFF</item>
+	    
+	    <item name="android:layout_width">0sp</item>
+	    <item name="android:layout_height">match_parent</item>
+	    <item name="android:layout_weight">1</item>
+	    
+	    <item name="android:gravity">center</item>
+	</style>
+	
+    <style name="FriendInfoValue">
+	    <item name="android:textSize">16sp</item>
+	    <item name="android:textColor">#FFFFFFFF</item>
+	    
+	    <item name="android:layout_width">0sp</item>
+	    <item name="android:layout_height">match_parent</item>
+	    <item name="android:layout_weight">1</item>
+	    
+	    <item name="android:gravity">center</item>
+	</style>
+	
+    <!-- 发布按钮 -->
+    <style name="PostBtn">
+	    <item name="android:textSize">16sp</item>
+	    <item name="android:textColor">#FFFFFFFF</item>
+	    <item name="android:gravity">center</item>
+	    <item name="android:background">@drawable/button_class</item>
+	</style>
+	
+    <!-- 新建留言标题 -->
+    <style name="NewMessageTitle">
+	    <item name="android:textSize">18sp</item>
+	    <item name="android:textColor">#FFFFFFFF</item>
+	    <item name="android:layout_width">0sp</item>
+	    <item name="android:layout_height">wrap_content</item>
+	    <item name="android:layout_weight">1</item>
+	</style>
+	
+    <!--=========================== 页面跳转动画 ===========================-->
+	
+    <style name="AnimationActivity" parent="@android:style/Animation.Activity">
+		<item name="android:activityOpenEnterAnimation">@anim/act_open_enter</item>
+		<item name="android:activityOpenExitAnimation">@anim/act_open_exit</item>
+		<item name="android:activityCloseEnterAnimation">@anim/act_close_enter</item>
+		<item name="android:activityCloseExitAnimation">@anim/act_close_exit</item>
+	</style>
+	
+    <style name="ThemeActivity">
+		<item name="android:windowAnimationStyle">@style/AnimationActivity</item>
+		<item name="android:windowNoTitle">true</item>
+		<item name="android:windowFullscreen">true</item>
+	</style>
+
+</resources>
