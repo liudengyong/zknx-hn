@@ -123,7 +123,7 @@ public class AisView extends FunctionView {
 		
 		String title = "AIS ”Õº";
 		LinearLayout layout = null;
-		AisParser.AisLayout aisLayout = AisParser.GetAisLayout(ais_id, mContext);
+		AisParser.AisLayout aisLayout = AisParser.GetAisLayout(ais_id, mInflater);
 		
 		if (aisLayout != null) {
 			title = aisLayout.getTitle();

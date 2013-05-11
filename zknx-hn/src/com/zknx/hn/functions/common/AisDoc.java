@@ -72,6 +72,12 @@ public class AisDoc {
 	private AisHeader mHeader;
 	// Item树
 	private List<List<AisItem>> mItemTree;
+	// 音频Item
+	private AisItem mAudioItem;
+	// 视频Item
+	private AisItem mVideoItem;
+	// 图像Items
+	private AisItem[] mImageItems;
 
 	/**
 	 * 通过ais_id构造AisDoc
@@ -210,6 +216,8 @@ public class AisDoc {
 					return false;
 				}
 
+				Debug.Log("item长度：" + length);
+
 				byte[] data = new byte[length];
 				if (length != file.read(data)) {
 					Debug.Log("严重错误：Ais解析，读取数据错误！");
@@ -224,43 +232,35 @@ public class AisDoc {
 					Debug.Log("字体结构：" + data);
 					break;
 				case DataMan.AIS_TOKEN_IMAGE:
-					// 换行
-					if (row != null && row.size() > 0) {
-						mItemTree.add(row);
-						row = new ArrayList<AisItem>();
-					}
+					if (mImageItems == null)
+						mImageItems = new AisItem[3];
 
-					row.add(new AisItem(ItemType.IMAGE, data));
-					mItemTree.add(row);
 					// 换行
-					row = new ArrayList<AisItem>();
+					AisItem imageItem = new AisItem(ItemType.IMAGE, data);
+					
+					if (mImageItems[0] == null)
+						mImageItems[0] = imageItem;
+					else if (mImageItems[1] == null)
+						mImageItems[1] = imageItem;
+					else if (mImageItems[2] == null)
+						mImageItems[2] = imageItem;
+					else
+						Debug.Log("解析Ais警告：多余三个图片Item");
 					
 					break;
 				case DataMan.AIS_TOKEN_VIDEO:
-					// 换行
-					if (row != null && row.size() > 0) {
-						mItemTree.add(row);
-						row = new ArrayList<AisItem>();
-					}
-
-					row.add(new AisItem(ItemType.VIDEO, data));
-					mItemTree.add(row);
-					// 换行
-					row = new ArrayList<AisItem>();
-					
+					// 只有一个视频Item
+					if (mVideoItem == null)
+						mVideoItem = new AisItem(ItemType.VIDEO, data);
+					else
+						Debug.Log("解析Ais警告：多余一个视频Item");
 					break;
 				case DataMan.AIS_TOKEN_AUDIO:
-					// 换行
-					if (row != null && row.size() > 0) {
-						mItemTree.add(row);
-						row = new ArrayList<AisItem>();
-					}
-
-					row.add(new AisItem(ItemType.AUDIO, data));
-					mItemTree.add(row);
-					// 换行
-					row = new ArrayList<AisItem>();
-
+					// 只有一个音频Item
+					if (mAudioItem == null)
+						mAudioItem = new AisItem(ItemType.AUDIO, data);
+					else
+						Debug.Log("解析Ais警告：多余一个音频Item");
 					break;
 				}
 			}
@@ -390,4 +390,28 @@ public class AisDoc {
     	// 错误处理？
     	return "标题";
     }
+
+    /**
+     * 获取音频Item
+     * @return
+     */
+	public AisItem getAudioItem() {
+		return mAudioItem;
+	}
+
+	/**
+     * 获取视频Item
+     * @return
+     */
+	public AisItem getVideoItem() {
+		return mVideoItem;
+	}
+	
+	/**
+     * 获取图像Items
+     * @return
+     */
+	public AisItem[] getImageItems() {
+		return mImageItems;
+	}
 }

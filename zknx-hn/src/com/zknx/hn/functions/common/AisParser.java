@@ -21,16 +21,22 @@ import android.graphics.BitmapFactory;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
 import android.widget.LinearLayout;
-import android.widget.ScrollView;
 import android.widget.TextView;
 
 public class AisParser {
+
+	LayoutInflater mInflater;
+	
+	public AisParser(LayoutInflater inflater) {
+		mInflater = inflater;
+	}
 
 	/**
 	 * 获取ais视图
@@ -38,26 +44,24 @@ public class AisParser {
 	 * @param context
 	 * @return
 	 */
-	public static AisLayout GetAisLayout(int ais_id, Context context) {
-
-		// Ais内容视图
-		LinearLayout contentLayout = new LinearLayout(context);
-		// 内容滚动视图
-		ScrollView scrollView = new ScrollView(context);
-		scrollView.addView(contentLayout, UIConst.GetLayoutParams(L_LAYOUT_TYPE.FULL));
-
-		// Ais视图
-		LinearLayout layout = new LinearLayout(context);
-		layout.addView(scrollView, UIConst.GetLayoutParams(L_LAYOUT_TYPE.FULL));
-
-		String title = new AisParser().parse(ais_id, contentLayout);
+	public static AisLayout GetAisLayout(int ais_id, LayoutInflater inflater) {
 		
+		LinearLayout aisLayout = (LinearLayout) inflater.inflate(R.layout.ais_view, null);
+		
+		// 音视频图标
+		LinearLayout mediaIconLayout = (LinearLayout) aisLayout.findViewById(R.id.ais_view_media_icon);
+		
+		// Ais内容滚动视图
+		LinearLayout contentLayout = (LinearLayout) aisLayout.findViewById(R.id.ais_content_view);
+
+		String title = new AisParser(inflater).parse(ais_id, contentLayout, mediaIconLayout);
+
 		if (title == null) {
 			Debug.Log("严重错误：AIS parse错误");
 			return null;
 		}
 		
-		return new AisLayout(title, layout);
+		return new AisLayout(title, aisLayout);
 	}
 
 	/** 
@@ -100,7 +104,7 @@ public class AisParser {
 	 * @param root
 	 * @return
 	 */
-	private String parse(int ais_id, LinearLayout root) {
+	private String parse(int ais_id, LinearLayout root, LinearLayout mediaIconLayout) {
 		// 获取解析后的ais文档
 		AisDoc aisDoc = new AisDoc(ais_id);
 		String title = aisDoc.getTitle();
@@ -108,10 +112,20 @@ public class AisParser {
 		
 		if (title != null && aisItemTree != null) {
 
-			Context context = root.getContext();
+			AisItem audioItem = aisDoc.getAudioItem();
+			AisItem videoItem = aisDoc.getVideoItem();
 
-			root.setOrientation(LinearLayout.VERTICAL);
-			root.setPadding(8, 8, 8, 8);
+			if (audioItem != null) {
+				mediaIconLayout.setVisibility(View.VISIBLE);
+				mediaIconLayout.findViewById(R.id.ais_view_audio_icon).setVisibility(View.VISIBLE);
+			}
+
+			if (videoItem != null) {
+				mediaIconLayout.setVisibility(View.VISIBLE);
+				mediaIconLayout.findViewById(R.id.ais_view_video_icon).setVisibility(View.VISIBLE);
+			}
+			
+			Context context = root.getContext();
 
 			// 从解析出的ais文档数中生成视图
 			for (List<AisItem> aisLine : aisItemTree) {
@@ -123,6 +137,34 @@ public class AisParser {
 					if (item != null)
 						root.addView(item.view);
 				}
+			}
+
+			AisItem imageItems[] = aisDoc.getImageItems();
+
+			if (imageItems != null && imageItems.length > 0) {
+				
+				LinearLayout imagePreview = (LinearLayout) mInflater.inflate(R.layout.ais_view_images_preview, null);
+
+				AisItem imageItem = imageItems[0];
+				if (imageItem.data != null) {
+					Bitmap bitmap = BitmapFactory.decodeByteArray(imageItem.data, 0, imageItem.data.length);
+					((ImageView)imagePreview.findViewById(R.id.ais_view_image1_preview)).setImageBitmap(bitmap);
+				}
+
+				imageItem = imageItems[1];
+				if (imageItems[1].data != null) {
+					Bitmap bitmap = BitmapFactory.decodeByteArray(imageItem.data, 0, imageItem.data.length);
+					((ImageView)imagePreview.findViewById(R.id.ais_view_image2_preview)).setImageBitmap(bitmap);
+				}
+
+				imageItem = imageItems[2];
+				if (imageItems[0].data != null) {
+					Bitmap bitmap = BitmapFactory.decodeByteArray(imageItem.data, 0, imageItem.data.length);
+					((ImageView)imagePreview.findViewById(R.id.ais_view_image3_preview)).setImageBitmap(bitmap);
+				}
+
+				// 添加图片预览视图
+				root.addView(imagePreview);
 			}
 			
 			return title;
@@ -206,6 +248,7 @@ public class AisParser {
 	
 	/**
 	 * Ais图像/视频/音频视图
+	 * TODO 待调整
 	 */
 	
 	class AisMedia extends AisView {

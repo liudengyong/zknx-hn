@@ -62,5 +62,9 @@
     <!-- 精选课件 -->
     <string name="submit">交卷</string>
     <string name="confirm_submit_course">确认交卷吗？</string>
+    
+    <!-- Ais视图 -->
+    <string name="audio">音频</string>
+    <string name="video">视频</string>
 
 </resources>
