@@ -67,5 +67,7 @@
     <string name="audio">音频</string>
     <string name="video">视频</string>
     <string name="return_ais_view">返回</string>
+    <string name="start_play_audio">开始播放音频</string>
+    <string name="stop_play_audio">停止播放音频</string>
 
 </resources>

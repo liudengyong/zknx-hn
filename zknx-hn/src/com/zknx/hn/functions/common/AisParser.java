@@ -7,12 +7,12 @@ import org.apache.http.util.EncodingUtils;
 
 import com.zknx.hn.R;
 import com.zknx.hn.common.Debug;
+import com.zknx.hn.common.Dialog;
 import com.zknx.hn.common.UIConst;
 import com.zknx.hn.common.UIConst.L_LAYOUT_TYPE;
 import com.zknx.hn.data.DataMan;
 import com.zknx.hn.data.FileUtils;
 import com.zknx.hn.functions.common.AisDoc.AisItem;
-import com.zknx.hn.functions.common.AisDoc.ItemType;
 
 import android.content.Context;
 import android.content.Intent;
@@ -26,7 +26,6 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.CheckBox;
 import android.widget.ImageView;
-import android.widget.ImageView.ScaleType;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -34,6 +33,11 @@ public class AisParser {
 
 	LayoutInflater mInflater;
 	
+	// 用于播放音频
+	AisItem mAudioItem;
+	AisItem mVideoItem;
+	MediaPlayer player;
+
 	public AisParser(LayoutInflater inflater) {
 		mInflater = inflater;
 	}
@@ -112,19 +116,13 @@ public class AisParser {
 		
 		if (title != null && aisItemTree != null) {
 
-			AisItem audioItem = aisDoc.getAudioItem();
-			AisItem videoItem = aisDoc.getVideoItem();
+			// 初始化音视频图标监听
+			mAudioItem = aisDoc.getAudioItem();
+			mVideoItem = aisDoc.getVideoItem();
 
-			if (audioItem != null) {
-				mediaIconLayout.setVisibility(View.VISIBLE);
-				mediaIconLayout.findViewById(R.id.ais_view_audio_icon).setVisibility(View.VISIBLE);
-			}
+			initMediaImage(mediaIconLayout, R.id.ais_view_audio_icon, mAudioItem);
+			initMediaImage(mediaIconLayout, R.id.ais_view_video_icon, mVideoItem);
 
-			if (videoItem != null) {
-				mediaIconLayout.setVisibility(View.VISIBLE);
-				mediaIconLayout.findViewById(R.id.ais_view_video_icon).setVisibility(View.VISIBLE);
-			}
-			
 			Context context = root.getContext();
 
 			// 从解析出的ais文档数中生成视图
@@ -189,8 +187,6 @@ public class AisParser {
 		case IMAGE:
 		case VIDEO:
 		case AUDIO:
-			aisView = new AisMedia(context, aisItem);
-			break;
 		default:
 			Debug.Log("严重错误：getAisItemView，" + aisItem.type);
 			break;
@@ -245,111 +241,94 @@ public class AisParser {
 	}
 	
 	/**
-	 * Ais图像/视频/音频视图
-	 * TODO 待调整
+	 * 初始化音视频监听事件
+	 * @param mediaResId
 	 */
-	
-	class AisMedia extends AisView {
-		
-		private String mediaFile;
-		private MediaPlayer player = null;
-		
-		AisMedia(Context context, AisItem item) {
-			super(context, item);
-			
-			mediaFile = DataMan.DataFile(DataMan.FILE_NAME_TMP);
-			
-			view = genImage();
+	private void initMediaImage(LinearLayout mediaIconLayout, int mediaResId, AisItem mediaAisItem) {
+		if (mediaAisItem != null) {
+			mediaIconLayout.setVisibility(View.VISIBLE);
+			View mediaView = mediaIconLayout.findViewById(mediaResId);
+			mediaView.setVisibility(View.VISIBLE);
+			mediaView.setOnClickListener(mClickMediaIcon);
 		}
+	}
 
-		/**
-		 * 生成图像视图/播放视频音频图标
-		 */
-		private ImageView genImage() {
-
-			ImageView image = new ImageView(context);
-
-			image.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
+	/**
+	 * 播放音视频
+	 */
+	private OnClickListener mClickMediaIcon = new OnClickListener() {
+		@Override
+		public void onClick(View view) {
 			
-			switch (item.type) {
-			case IMAGE:
-			{
-				Bitmap bitmap = BitmapFactory.decodeByteArray(item.data, 0, item.data.length);
-				image.setImageBitmap(bitmap);
-			}
-			break;
-			case VIDEO:
-			case AUDIO:
-			{
-				// TODO 播放音视频图标
-				image.setImageResource((item.type == ItemType.VIDEO) ? R.drawable.ic_video: R.drawable.ic_audio);
-				image.setOnClickListener(clickMediaIcon);
-			}
-			image.setOnClickListener(clickMediaIcon);
-			break;
+			switch (view.getId()) {
+			case R.id.ais_view_audio_icon:
+				playAudio();
+				break;
+			case R.id.ais_view_video_icon:
+                playVideo();
+                break;
 			default:
-				Debug.Log("严重错误：媒体类型错误：" + item.type);
-				return null;
+				Debug.Log("严重错误：mClickMediaIcon监听错误");
+				break;
 			}
-
-			// 重新计算视图大小
-			image.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
-			
-			image.setScaleType(ScaleType.CENTER_INSIDE);
-			image.setLayoutParams(UIConst.GetLayoutParams(L_LAYOUT_TYPE.H_WRAP));
-			image.setPadding(2, 2, 2, 2); // 避免分不清边界
-			
-			return image;
 		}
+	};
+	
+	/**
+	 * 播放音频
+	 */
+	private void playAudio() {
+		if (mAudioItem == null) {
+			Debug.Log("播放音频错误：mAudioItem空");
+			return;
+		}
+
+		if (player == null)
+			player = new MediaPlayer();
 		
-		/**
-		 * 播放音视频
-		 */
-		private OnClickListener clickMediaIcon = new OnClickListener() {
-			@Override
-			public void onClick(View view) {
-				
-				// 调用系统播放器播放视频
-				if (item.type == ItemType.VIDEO) {
-					Intent it = new Intent(Intent.ACTION_VIEW);  
-	                it.setDataAndType(Uri.parse(mediaFile), "video/mp4");  
-	                context.startActivity(it);
-	                return;
-				}
+		// 点击两次停止播放
+		if (player.isPlaying()) {
+			player.stop();
+			Dialog.Toast(mInflater.getContext(), R.string.stop_play_audio);
+			return;
+		}
 
-				if (player == null) {
-					player = new MediaPlayer();
-				}
-				
-				// 点击两次停止播放
-				if (player.isPlaying()) {
-					player.stop();
-					return;
-				}
+		Exception exp = null;
+		try {
+			String tmpFileName = DataMan.DataFile("tmp.mp3");
+			FileUtils.WriteFile(tmpFileName, mAudioItem.data);
+			player.reset();
+			player.setDataSource(tmpFileName);
+			player.prepare();
+			player.start();
+			Dialog.Toast(mInflater.getContext(), R.string.start_play_audio);
+		} catch (IllegalArgumentException e) {
+			exp = e;
+		} catch (SecurityException e) {
+			exp = e;
+		} catch (IllegalStateException e) {
+			exp = e;
+		} catch (IOException e) {
+			exp = e;
+		}
 
-				Exception exp = null;
-				try {
-					FileUtils.WriteFile(mediaFile, item.data);
-					player.reset();
-					player.setDataSource(mediaFile);
-					player.prepare();
-					player.start();
-				} catch (IllegalArgumentException e) {
-					exp = e;
-				} catch (SecurityException e) {
-					exp = e;
-				} catch (IllegalStateException e) {
-					exp = e;
-				} catch (IOException e) {
-					exp = e;
-				}
-
-				if (exp != null)
-					Debug.Log("播放异常：" + exp.getMessage());
-			}
-		};
+		if (exp != null)
+			Debug.Log("播放异常：" + exp.getMessage());
 	}
 	
+	/**
+	 * 播放视频
+	 */
+	private void playVideo() {
+		if (mVideoItem != null) {
+			String tmpFile = DataMan.DataFile("tmp.mp4");
+			FileUtils.WriteFile(tmpFile, mVideoItem.data);
+			Intent it = new Intent(Intent.ACTION_VIEW);  
+	        it.setDataAndType(Uri.parse(tmpFile), "video/mp4");  
+	        mInflater.getContext().startActivity(it);
+		}
+	}
+
 	/**
 	 * Ais勾选框视图
 	 */
