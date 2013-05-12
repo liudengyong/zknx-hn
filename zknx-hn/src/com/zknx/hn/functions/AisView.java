@@ -2,7 +2,9 @@ package com.zknx.hn.functions;
 
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.AdapterView;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 import com.zknx.hn.R;
@@ -23,6 +25,11 @@ public class AisView extends FunctionView {
 	private CommonListAdapter mAdapterSubClass;
 
 	private int mFrameResId;
+	
+	// 点击图片返回时用到
+	private LinearLayout mAisViewRoot;
+	private int mCurAisId = DataMan.INVALID_ID;
+	private String mAisTitle = "Ais视图";
 
 	public AisView(LayoutInflater inflater, LinearLayout frameRoot, int function_id, int frameResId) {
 		super(inflater, frameRoot, frameResId);
@@ -123,14 +130,51 @@ public class AisView extends FunctionView {
 		
 		String title = "AIS视图";
 		LinearLayout layout = null;
-		AisParser.AisLayout aisLayout = AisParser.GetAisLayout(ais_id, mInflater);
+		AisParser.AisLayout aisLayout = AisParser.GetAisLayout(ais_id, mInflater, mClickImage);
 		
 		if (aisLayout != null) {
 			title = aisLayout.getTitle();
 			layout = aisLayout.getLayout();
+			initContent(title, layout, getCutomBottom(), root);
+			mAisViewRoot = root;
+			mCurAisId = ais_id;
+			mAisTitle = title;
 		}
+	}
+	
+	/**
+	 * 监听图片点击，是否在全Ais界面显示图片
+	 */
+	OnClickListener mClickImage = new OnClickListener() {
+		@Override
+		public void onClick(View view) {
+			if (view instanceof ImageView) {
+				setAisImageView((ImageView)view);
+			} else {
+				Debug.Log("严重错误：mClickImage监听类型错误，" + view.getClass());
+			}
+		}
+	};
+	
+	/**
+	 * Ais界面显示图片
+	 */
+	private void setAisImageView(ImageView imageView) {
+		
+		LinearLayout layout = (LinearLayout) mInflater.inflate(R.layout.ais_image_view, null);
+		
+		layout.findViewById(R.id.ais_image_view_back).setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				// 返回Ais视图
+				attachAisView(mCurAisId, mAisViewRoot);
+			}
+		});
 
-		initContent(title, layout, getCutomBottom(), root);
+		ImageView newImageView = (ImageView) layout.findViewById(R.id.ais_image_view_image);
+		newImageView.setImageDrawable(imageView.getDrawable());
+
+		initContent(mAisTitle, layout, mAisViewRoot);
 	}
 
 	String getTitle(int function_id) {

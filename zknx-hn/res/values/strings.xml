@@ -66,5 +66,6 @@
     <!-- Ais视图 -->
     <string name="audio">音频</string>
     <string name="video">视频</string>
+    <string name="return_ais_view">返回</string>
 
 </resources>

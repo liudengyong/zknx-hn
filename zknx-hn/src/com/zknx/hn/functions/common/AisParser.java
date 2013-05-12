@@ -44,7 +44,7 @@ public class AisParser {
 	 * @param context
 	 * @return
 	 */
-	public static AisLayout GetAisLayout(int ais_id, LayoutInflater inflater) {
+	public static AisLayout GetAisLayout(int ais_id, LayoutInflater inflater, OnClickListener clickImage) {
 		
 		LinearLayout aisLayout = (LinearLayout) inflater.inflate(R.layout.ais_view, null);
 		
@@ -54,7 +54,7 @@ public class AisParser {
 		// Ais内容滚动视图
 		LinearLayout contentLayout = (LinearLayout) aisLayout.findViewById(R.id.ais_content_view);
 
-		String title = new AisParser(inflater).parse(ais_id, contentLayout, mediaIconLayout);
+		String title = new AisParser(inflater).parse(ais_id, contentLayout, mediaIconLayout, clickImage);
 
 		if (title == null) {
 			Debug.Log("严重错误：AIS parse错误");
@@ -104,7 +104,7 @@ public class AisParser {
 	 * @param root
 	 * @return
 	 */
-	private String parse(int ais_id, LinearLayout root, LinearLayout mediaIconLayout) {
+	private String parse(int ais_id, LinearLayout root, LinearLayout mediaIconLayout, OnClickListener clickImage) {
 		// 获取解析后的ais文档
 		AisDoc aisDoc = new AisDoc(ais_id);
 		String title = aisDoc.getTitle();
@@ -145,23 +145,9 @@ public class AisParser {
 				
 				LinearLayout imagePreview = (LinearLayout) mInflater.inflate(R.layout.ais_view_images_preview, null);
 
-				AisItem imageItem = imageItems[0];
-				if (imageItem.data != null) {
-					Bitmap bitmap = BitmapFactory.decodeByteArray(imageItem.data, 0, imageItem.data.length);
-					((ImageView)imagePreview.findViewById(R.id.ais_view_image1_preview)).setImageBitmap(bitmap);
-				}
-
-				imageItem = imageItems[1];
-				if (imageItems[1].data != null) {
-					Bitmap bitmap = BitmapFactory.decodeByteArray(imageItem.data, 0, imageItem.data.length);
-					((ImageView)imagePreview.findViewById(R.id.ais_view_image2_preview)).setImageBitmap(bitmap);
-				}
-
-				imageItem = imageItems[2];
-				if (imageItems[0].data != null) {
-					Bitmap bitmap = BitmapFactory.decodeByteArray(imageItem.data, 0, imageItem.data.length);
-					((ImageView)imagePreview.findViewById(R.id.ais_view_image3_preview)).setImageBitmap(bitmap);
-				}
+				setAisImage(imagePreview, R.id.ais_view_image1_preview, imageItems[0], clickImage);
+				setAisImage(imagePreview, R.id.ais_view_image2_preview, imageItems[1], clickImage);
+				setAisImage(imagePreview, R.id.ais_view_image3_preview, imageItems[2], clickImage);
 
 				// 添加图片预览视图
 				root.addView(imagePreview);
@@ -171,6 +157,18 @@ public class AisParser {
 		}
 		
 		return null;
+	}
+
+	/**
+	 * 设置Ais图片
+	 */
+	private void setAisImage(LinearLayout imagePreview, int imageViewId, AisItem imageItem, OnClickListener clickImage) {
+		if (imageItem != null) {
+			ImageView imageView = (ImageView)imagePreview.findViewById(imageViewId);
+			Bitmap bitmap = BitmapFactory.decodeByteArray(imageItem.data, 0, imageItem.data.length);
+			imageView.setImageBitmap(bitmap);
+			imageView.setOnClickListener(clickImage);
+		}
 	}
 	
 	/**
