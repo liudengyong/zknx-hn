@@ -2,14 +2,19 @@
     android:layout_width="match_parent"
     android:layout_height="72sp"
     android:orientation="horizontal"
-    android:baselineAligned="false" >
+    android:baselineAligned="false"
+    android:background="#000000"
+	android:paddingTop="6sp"
+	android:paddingBottom="6sp" >
 
     <ImageView
         android:id="@+id/ais_view_image1_preview"
 	    android:layout_width="match_parent"
 	    android:layout_height="match_parent"
 	    android:layout_weight="1"
-	    android:background="@drawable/image_view_border" >
+	    android:background="#FFFFFFFF"
+	    android:layout_marginLeft="6sp"
+	    android:layout_marginRight="3sp">
 	</ImageView>
 
     <ImageView
@@ -17,7 +22,9 @@
 	    android:layout_width="match_parent"
 	    android:layout_height="match_parent"
 	    android:layout_weight="1"
-	    android:background="@drawable/image_view_border">
+	    android:background="#FFFFFFFF"
+	    android:layout_marginLeft="3sp"
+	    android:layout_marginRight="3sp">
 	</ImageView>
 
     <ImageView
@@ -25,7 +32,9 @@
 	    android:layout_width="match_parent"
 	    android:layout_height="match_parent"
 	    android:layout_weight="1"
-	    android:background="@drawable/image_view_border" >
+	    android:background="#FFFFFFFF"
+	    android:layout_marginLeft="3sp"
+	    android:layout_marginRight="6sp" >
 	</ImageView>
 
 </LinearLayout>
