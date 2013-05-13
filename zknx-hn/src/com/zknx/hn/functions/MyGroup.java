@@ -58,6 +58,8 @@ public class MyGroup extends FunctionView {
 	
 	// 发布信息
 	private Button mNewMessagePost;
+	// 返回列表
+	private Button mNewMessageBack;
 	
 	// 商友列表视图
 	ListView mFriendListView;
@@ -255,7 +257,7 @@ public class MyGroup extends FunctionView {
 				super.onItemClick(parent, view, position, id);
 				
 				// 切换为新建留言界面，传参留言组id
-				initNewMessageView(mAdapterFriendMessage, position);
+				initNewMessageView(mAdapterFriendMessage, position, R.id.my_group_message_friend_message);
 			}
 		});
 		
@@ -276,7 +278,7 @@ public class MyGroup extends FunctionView {
 				super.onItemClick(parent, view, position, id);
 				
 				// 切换为新建留言界面，传参留言组id
-				initNewMessageView(mAdapterMajor, position);
+				initNewMessageView(mAdapterMajor, position, R.id.my_group_message_group);
 			}
 		});
 		
@@ -286,7 +288,7 @@ public class MyGroup extends FunctionView {
 	/**
 	 * 初始化新建留言视图
 	 */
-	private void initNewMessageView(CommonListAdapter adapterMessage, int position) {
+	private void initNewMessageView(CommonListAdapter adapterMessage, int position, final int tabBtnId) {
 		
 		final int friendId = adapterMessage.getItemMapInt(position, DataMan.KEY_MY_GROUP_MESSAGE_ID);
 		String messageOwner = adapterMessage.getItemMapString(position, DataMan.KEY_FRIEND_MESSAGE_POSER);
@@ -301,16 +303,25 @@ public class MyGroup extends FunctionView {
 			mNewMessageContent = (EditText)mNewMessageLayout.findViewById(R.id.new_message_content);
 			
 			mNewMessagePost = (Button)mNewMessageLayout.findViewById(R.id.new_message_post_btn);
+			mNewMessageBack = (Button)mNewMessageLayout.findViewById(R.id.new_message_back);
 		}
 
 		OnClickListener clickPost = new OnClickListener() {
 			@Override
 			public void onClick(View view) {
-				postNewMessage(friendId);
+				switch (view.getId()) {
+				case R.id.new_message_post_btn:
+					postNewMessage(friendId);
+					break;
+				case R.id.new_message_back:
+					initMessageTab(tabBtnId);
+					break;
+				}
 			}
 		};
 		
 		mNewMessagePost.setOnClickListener(clickPost);
+		mNewMessageBack.setOnClickListener(clickPost);
 
 		// TODO 自我介绍
 		mNewMessageSelfIntroduce.setText("张三的自我介绍……");
