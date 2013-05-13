@@ -61,6 +61,8 @@ public class DataMan extends DataInterface {
 
 	// 默认非法id值
 	public static final int INVALID_ID = -1;
+	// 用于查询我的留言的标志
+	public static final int MY_MESSAGE = 0;
 	
 	// 通用分隔符
 	public static final String COMMON_TOKEN = ",";
@@ -634,13 +636,19 @@ public class DataMan extends DataInterface {
 
 	/**
 	 * 获取我的商圈朋友列表
-	 * friend_class_id: INVALID_ID 即返回所有商友列表
+	 * majorIid: INVALID_ID 即返回所有商友列表
 	 * @return
+	 * @param
+	 * myFriend：是否查询我的好友
 	 */
-	public static List<ListItemMap> GetMyGroupFriendList(int friend_class_id) {
+	public static List<ListItemMap> GetMyGroupFriendList(int majorIid, boolean myFriend) {
 		
         ArrayList<ListItemMap> list = new ArrayList<ListItemMap>();  
         List<String> lines = ReadLines(FILE_NAME_MY_FRIEND);
+        
+        // TODO 测试代码待删除
+        if (!myFriend)
+        	list.add(new ListItemMap("非好友"/* 名字 */, KEY_FRIEND_ID, 1/* id */));
         
         for (String line : lines)  
         {
@@ -663,12 +671,16 @@ public class DataMan extends DataInterface {
         				Debug.Log("严重错误：未知专业，" + major_id);
 
         			// 取所有商友或者商友匹配，不然继续
-        			if (friend_class_id != INVALID_ID && friend_class_id != major_id)
+        			if (majorIid != INVALID_ID && majorIid != major_id)
         				continue;
 
 	        		String name = token[2];
 	        		String address = token[4];
 	        		String telephone = token[5];
+	        		
+	        		if (myFriend) {
+	        			// TODO 判断是否我的好友
+	        		}
 	
 	        		ListItemMap map = new ListItemMap(name/* 名字 */, KEY_FRIEND_ID, id/* id */);
 	        		
@@ -690,7 +702,7 @@ public class DataMan extends DataInterface {
 	 */
 	public static ListItemMap GetMyFriendInfo(int friend_id) {
 
-		List<ListItemMap> friendList = GetMyGroupFriendList(INVALID_ID);
+		List<ListItemMap> friendList = GetMyGroupFriendList(INVALID_ID, true);
 		
 		if (friend_id != INVALID_ID) {
 			for (ListItemMap item : friendList) {
@@ -716,6 +728,11 @@ public class DataMan extends DataInterface {
 		ArrayList<ListItemMap> list = new ArrayList<ListItemMap>();  
         List<String> lines = ReadLines(FILE_NAME_MY_GROUP_MESSAGE);
         
+        // TODO 待删除测试代码
+        list.add(new ListItemMap("我的自我介绍……"/* 名字 */, KEY_MY_GROUP_MESSAGE_ID, 1/* id */));
+        list.add(new ListItemMap("你好，我有一百吨大米出售，请联系我：18911939853"/* 名字 */, KEY_MY_GROUP_MESSAGE_ID, 1/* id */));
+        list.add(new ListItemMap("我想买你的苹果，你的电话是多少？"/* 名字 */, KEY_MY_GROUP_MESSAGE_ID, 1/* id */));
+        
         for (String line : lines)  
         {
         	// message_id,owner(发起人id),发起人名字,发起人专业,poster(发言人id),发言人名字,发言人专业,日期,联系地址,联系电话,留言内容
@@ -729,13 +746,18 @@ public class DataMan extends DataInterface {
         			// INVALID_ID 表示获取全部信息
         			if (id != fiend_id && fiend_id != INVALID_ID)
         				continue;
-
+        			
 	        		int owner_id = ParseInt(token[1]);
 	        		String owner = token[2];
 	        		
 	        		int poster_id = ParseInt(token[3]);
 	        		String poster = token[4];
-	        		
+
+	        		// 查询我的留言
+        			if (MY_MESSAGE == fiend_id && !token[1].equals(UserMan.GetCurrentUserId())) {
+        				continue;
+        			}
+
 	        		String date = token[5];
 	        		String address = token[6];
 	        		String telephone = token[7];
@@ -996,5 +1018,14 @@ public class DataMan extends DataInterface {
 	 */
 	public static boolean PostSupplyDemandInfo(int product_id) {
 		return false;
+	}
+	
+	/**
+	 * 从用户名分享专业id
+	 * @param userId
+	 * @return
+	 */
+	public static int GetMajor(int userId) {
+		return DataInterface.GetMajor(userId);
 	}
 }

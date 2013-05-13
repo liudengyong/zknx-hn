@@ -130,4 +130,13 @@ public class DataInterface {
 		// 检查前几位？
 		return true;
 	}
+	
+	/**
+	 * TODO 从用户名分享专业id
+	 * @param userId
+	 * @return
+	 */
+	protected static int GetMajor(int userId) {
+		return -1;
+	}
 }

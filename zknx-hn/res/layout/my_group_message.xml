@@ -9,7 +9,16 @@
     android:layout_height="wrap_content"
     android:orientation="horizontal" >
 		<Button
-		    android:id="@+id/my_group_message_friend"
+		    android:id="@+id/my_group_message_my_message"
+		    android:layout_width="0dip"
+		    android:layout_height="wrap_content"
+		    android:layout_weight="1"
+		    android:text="@string/my_message"
+		    android:background="@drawable/menu_title"
+		    style="@style/ClassBtn" />
+		
+		<Button
+		    android:id="@+id/my_group_message_friend_message"
 		    android:layout_width="0dip"
 		    android:layout_height="wrap_content"
 		    android:layout_weight="1"
@@ -18,20 +27,11 @@
 		    style="@style/ClassBtn" />
 		
 		<Button
-		    android:id="@+id/my_group_message_all"
+		    android:id="@+id/my_group_message_group"
 		    android:layout_width="0dip"
 		    android:layout_height="wrap_content"
 		    android:layout_weight="1"
-		    android:text="@string/all_message"
-		    android:background="@drawable/menu_title"
-		    style="@style/ClassBtn" />
-		
-		<Button
-		    android:id="@+id/my_group_message_new"
-		    android:layout_width="0dip"
-		    android:layout_height="wrap_content"
-		    android:layout_weight="1"
-		    android:text="@string/new_message"
+		    android:text="@string/group"
 		    android:background="@drawable/menu_title"
 		    style="@style/ClassBtn" />
 	</LinearLayout>

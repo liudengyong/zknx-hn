@@ -255,11 +255,12 @@ public class Function extends Activity {
 
 	    	// 功能参数
 	    	intent.replaceExtras(extras);
+	    	intent.setClass(context, Function.class);
 
-	    	if (isNeedLogin(id))
-	    		intent.setClass(context, Login.class);
-	    	else
-	    		intent.setClass(context, Function.class);
+	    	if (isNeedLogin(id)) {
+	    		//intent.setClass(context, Login.class);
+	    		UserMan.SetUserInfo("userId", "userName", "addrId", "address", "phone");
+	    	}
 	    	
 	    	context.startActivity(intent);
 	    	//overridePendingTransition(android.R.anim.fade_in,android.R.anim.fade_out);

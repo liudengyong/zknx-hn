@@ -2,6 +2,8 @@ package com.zknx.hn.data;
 
 import java.util.HashMap;
 
+import com.zknx.hn.common.Debug;
+
 public class ListItemMap extends HashMap<String, Object> {
 
 	/**
@@ -42,8 +44,14 @@ public class ListItemMap extends HashMap<String, Object> {
 	public static String GetMapString(Object objectMap, String key) {
 		if (objectMap == null)
 			return "";
-		
+
 		HashMap<String, Object> map = (HashMap<String, Object>)objectMap;
+		Object value = map.get(key);
+		if (value == null) {
+			Debug.Log("严重错误：GetMapString," + key);
+			return "";
+		}
+
 		return map.get(key).toString();
 	}
 
@@ -57,8 +65,12 @@ public class ListItemMap extends HashMap<String, Object> {
 		if (map == null)
 			return DataMan.INVALID_ID;
 
-		int value = DataMan.ParseInt(map.get(key).toString());
+		Object value = map.get(key);
+		if (value == null) {
+			Debug.Log("严重错误：GetMapInt," + key);
+			return DataMan.INVALID_ID;
+		}
 
-		return value;
+		return DataMan.ParseInt(value.toString());
 	}
 }

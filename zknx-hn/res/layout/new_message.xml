@@ -2,31 +2,33 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content" >
-    
-    <LinearLayout android:id="@+id/new_message_reply"
+
+    <LinearLayout android:id="@+id/new_message_self_introduce_layout"
 	android:layout_width="fill_parent"
 	android:layout_height="wrap_content"
 	android:layout_alignParentTop="true"
 	android:layout_margin="6sp" >
 	    <TextView
-	        android:id="@+id/new_message_reply_tv"
 	        android:gravity="left"
-	        style="@style/NewMessageTitle">
-		</TextView>
+	        android:text="@string/introduce"
+	        style="@style/NewMessageSelfIntroduce" />
+		<TextView
+	        android:id="@+id/new_message_self_introduce"
+	        style="@style/NewMessageSelfIntroduce" />
 	</LinearLayout>
-	
+		
     <LinearLayout android:id="@+id/new_message_title"
 	android:layout_width="fill_parent"
 	android:layout_height="wrap_content"
-	android:layout_below="@+id/new_message_reply"
+	android:layout_below="@+id/new_message_self_introduce_layout"
 	android:layout_margin="6sp" >
 	    <TextView
-	        android:id="@+id/new_message_title_name"
+	        android:id="@+id/new_message_reply"
 	        android:gravity="left"
 	        style="@style/NewMessageTitle">
 		</TextView>
 		<TextView
-	        android:id="@+id/new_message_title_date"
+	        android:id="@+id/new_message_date"
 	        android:gravity="right"
 	        style="@style/NewMessageTitle">
 		</TextView>
@@ -36,19 +38,33 @@
 	   android:layout_width="fill_parent"
 	   android:layout_height="0sp"
 	   android:layout_below="@+id/new_message_title"
-	   android:layout_above="@+id/new_message_post_btn"
+	   android:layout_above="@+id/new_message_bottom"
 	   android:layout_marginTop="10dip"
 	   android:hint="@string/new_message"
 	   android:inputType="textMultiLine"
 	   android:gravity="left|top"
 	   android:minLines="4"/>
 	
-	<Button android:id="@+id/new_message_post_btn"
-	   android:layout_width="fill_parent"
+    <LinearLayout android:id="@+id/new_message_bottom"
+	android:layout_width="fill_parent"
+	android:layout_height="wrap_content"
+	android:layout_above="@+id/new_message_divider_bottom"
+	android:layout_margin="6sp" >
+
+	<Button android:id="@+id/new_message_back"
+	   android:layout_width="0sp"
 	   android:layout_height="wrap_content"
-	   android:layout_above="@+id/new_message_divider_bottom"
+	   android:text="@string/back"
+	   style="@style/PostBtn"
+	   android:layout_weight="1" />
+	
+	<Button android:id="@+id/new_message_post_btn"
+	   android:layout_width="0sp"
+	   android:layout_height="wrap_content"
 	   android:text="@string/post"
-	   style="@style/PostBtn" />
+	   style="@style/PostBtn"
+	   android:layout_weight="1" />
+	</LinearLayout>
 	
 	<View android:id="@+id/new_message_divider_left"
 	   android:layout_width="1dip"

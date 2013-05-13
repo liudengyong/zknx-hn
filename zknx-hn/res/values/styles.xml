@@ -144,6 +144,13 @@
 	    <item name="android:layout_height">wrap_content</item>
 	    <item name="android:layout_weight">1</item>
 	</style>
+	<style name="NewMessageSelfIntroduce">
+	    <item name="android:textSize">18sp</item>
+	    <item name="android:textColor">#FFFFFFFF</item>
+	    <item name="android:layout_width">wrap_content</item>
+	    <item name="android:layout_height">wrap_content</item>
+	    <item name="android:gravity">left</item>
+	</style>
 	
     <!--=========================== 页面跳转动画 ===========================-->
 	

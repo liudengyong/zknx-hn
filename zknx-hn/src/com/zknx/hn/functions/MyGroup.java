@@ -32,28 +32,27 @@ import com.zknx.hn.functions.common.ListItemClickListener;
 public class MyGroup extends FunctionView {
 
 	private CommonListAdapter mAdapterFriend;
-	private CommonListAdapter mAdapterMessage;
+	private CommonListAdapter mAdapterFriendMessage;
+	private CommonListAdapter mAdapterMajor;
 	
-	private int mCurrentFriend = 0;
+	private int mCurrentFriend = 0; //TODO 设置当前商友
 	
 	// 留言视图
 	private LinearLayout mMessageLayout;
 	// 留言列表内容
 	private LinearLayout mMessageContent;
 	
-	private Button mMessageButtonAll;
-	private Button mMessageButtonFriend;
-	private Button mMessageButtonNew;
+	private Button mMyMessageBtn;
+	private Button mFriendMessageBtn;
+	private Button mGroupBtn;
 	
 	// 新建留言视图
 	private RelativeLayout mNewMessageLayout;
 	
 	// 新建留言回复视图
-	private LinearLayout mRelayLayout;
+	private TextView mNewMessageSelfIntroduce;
 	private TextView mNewMessageReply;
-	
-	private TextView mNewMessageTitleName;
-	private TextView mNewMessageTitleDate;
+	private TextView mNewMessageDate;
 	// 新建留言内容
 	private EditText mNewMessageContent;
 	
@@ -97,8 +96,8 @@ public class MyGroup extends FunctionView {
 	 * 初始化商友列表（商友分类：全部，种植大户……）
 	 * @param invalidId
 	 */
-	private void initFriendListView(int friend_class_id) {
-		mAdapterFriend = new CommonListAdapter(mContext, DataMan.GetMyGroupFriendList(friend_class_id));
+	private void initFriendListView(int majorId) {
+		mAdapterFriend = new CommonListAdapter(mContext, DataMan.GetMyGroupFriendList(majorId, true));
 		mFriendListView.setAdapter(mAdapterFriend);
 		
 		// 默认第一个商友信息
@@ -142,20 +141,20 @@ public class MyGroup extends FunctionView {
 		if (mMessageLayout == null) {
 			mMessageLayout = (LinearLayout)mInflater.inflate(R.layout.my_group_message, null);
 			
-			mMessageButtonAll = (Button)mMessageLayout.findViewById(R.id.my_group_message_all);
-			mMessageButtonFriend = (Button)mMessageLayout.findViewById(R.id.my_group_message_friend);
-			mMessageButtonNew = (Button)mMessageLayout.findViewById(R.id.my_group_message_new);
+			mMyMessageBtn = (Button)mMessageLayout.findViewById(R.id.my_group_message_my_message);
+			mFriendMessageBtn = (Button)mMessageLayout.findViewById(R.id.my_group_message_friend_message);
+			mGroupBtn = (Button)mMessageLayout.findViewById(R.id.my_group_message_group);
 			
-			mMessageButtonAll.setOnClickListener(mOnClickMessage);
-			mMessageButtonFriend.setOnClickListener(mOnClickMessage);
-			mMessageButtonNew.setOnClickListener(mOnClickMessage);
+			mMyMessageBtn.setOnClickListener(mOnClickMessage);
+			mFriendMessageBtn.setOnClickListener(mOnClickMessage);
+			mGroupBtn.setOnClickListener(mOnClickMessage);
 			
 			// 留言列表
 			mMessageContent = (LinearLayout)mMessageLayout.findViewById(R.id.my_group_message_content);
 		}
 		
-		// 默认显示所有留言
-		initMessageTab(R.id.my_group_message_all);
+		// 默认显示我的留言
+		initMessageTab(R.id.my_group_message_my_message);
 		
 		// 清除第三区后添加视图
 		mContentFrame[2].removeAllViews();
@@ -209,135 +208,123 @@ public class MyGroup extends FunctionView {
 		mMessageContent.removeAllViews();
 		
 		switch (messageButtonId) {
-		case R.id.my_group_message_new:
-			initNewMessageView(DataMan.INVALID_ID, null);
+		case R.id.my_group_message_my_message:
+			initMyMessageView();
 			break;
-		case R.id.my_group_message_all:
-			initMessageList(DataMan.INVALID_ID);
+		case R.id.my_group_message_friend_message:
+			initFriendMessage(mCurrentFriend);
 			break;
-		case R.id.my_group_message_friend:
-			initMessageList(mCurrentFriend);
+		case R.id.my_group_message_group:
+			initMajorGroup(DataMan.GetMajor(mCurrentFriend));
 			break;
 		}
 		
-		mMessageButtonAll.setBackgroundResource(getMessageButtonRes(messageButtonId == R.id.my_group_message_all));
-		mMessageButtonFriend.setBackgroundResource(getMessageButtonRes(messageButtonId == R.id.my_group_message_friend));
-		mMessageButtonNew.setBackgroundResource(getMessageButtonRes(messageButtonId == R.id.my_group_message_new));
+		mMyMessageBtn.setBackgroundResource(getMessageButtonRes(messageButtonId == R.id.my_group_message_my_message));
+		mFriendMessageBtn.setBackgroundResource(getMessageButtonRes(messageButtonId == R.id.my_group_message_friend_message));
+		mGroupBtn.setBackgroundResource(getMessageButtonRes(messageButtonId == R.id.my_group_message_group));
 	}
-
+	
 	/**
-	 * 初始化新建留言视图
+	 * 初始化我的留言视图
 	 */
-	private void initNewMessageView(int friendId, String messgeOwner) {
-
-		if (mNewMessageLayout == null) {
-			mNewMessageLayout = (RelativeLayout) mInflater.inflate(R.layout.new_message, null);
-			
-			mRelayLayout = (LinearLayout)mNewMessageLayout.findViewById(R.id.new_message_reply);
-			mNewMessageReply = (TextView)mNewMessageLayout.findViewById(R.id.new_message_reply_tv);
-
-			mNewMessageTitleName = (TextView)mNewMessageLayout.findViewById(R.id.new_message_title_name);
-			mNewMessageTitleDate = (TextView)mNewMessageLayout.findViewById(R.id.new_message_title_date);
-			
-			mNewMessageContent = (EditText)mNewMessageLayout.findViewById(R.id.new_message_content);
-			
-			mNewMessagePost = (Button)mNewMessageLayout.findViewById(R.id.new_message_post_btn);
-		}
+	private void initMyMessageView() {
+		RelativeLayout myMessageLayout = (RelativeLayout) mInflater.inflate(R.layout.my_group_my_message, null);
+		LinearLayout listViewLayout = (LinearLayout) myMessageLayout.findViewById(R.id.my_group_my_message_listview);
 		
-		if (friendId == DataMan.INVALID_ID) {
-			mRelayLayout.setVisibility(View.GONE);
-			
-			OnClickListener clickPost = new OnClickListener() {
-				@Override
-				public void onClick(View view) {
-					postNewMessage(DataMan.INVALID_ID);
-				}
-			};
-			
-			mNewMessagePost.setOnClickListener(clickPost);
-
-		} else {
-			mRelayLayout.setVisibility(View.VISIBLE);
-			mNewMessageReply.setText("回复：" + messgeOwner);
-			
-			final int replyFriendId = friendId;
-			
-			OnClickListener clickPost = new OnClickListener() {
-				@Override
-				public void onClick(View view) {
-					postNewMessage(replyFriendId);
-				}
-			};
-			
-			mNewMessagePost.setOnClickListener(clickPost);
-		}
-
-		mNewMessageTitleName.setText("用户：" + UserMan.GetCurrentUserName());
-		mNewMessageTitleDate.setText("日期：" + DataMan.GetCurrentTime(true));
+		CommonListAdapter adapter = new CommonListAdapter(mContext, DataMan.GetMyGroupMessageList(DataMan.MY_MESSAGE));
+		CommonListParams listParams = new CommonListParams(mInflater, listViewLayout, adapter, null);
+		
+		// 初始化我的留言列表
+		CommonList.Init(listParams);
 
 		// 添加新建留言视图
 		mMessageContent.removeAllViews();
-		mMessageContent.addView(mNewMessageLayout, UIConst.GetLayoutParams(L_LAYOUT_TYPE.FULL));;
-	}
-	
-	private int getMessageButtonRes(boolean focus) {
-		return focus ? R.drawable.menu_title_focus : R.drawable.menu_title;
+		mMessageContent.addView(myMessageLayout, UIConst.GetLayoutParams(L_LAYOUT_TYPE.FULL));
 	}
 	
 	/**
-	 * 初始化留言列表
-	 * @param friend_id
+	 * 初始化当前商友留言
 	 */
-	void initMessageList(int friend_id) {
+	private void initFriendMessage(int friendId) {
 		
-		mAdapterMessage = new CommonListAdapter(mContext, DataMan.GetMyGroupMessageList(friend_id));
+		mAdapterFriendMessage = new CommonListAdapter(mContext, DataMan.GetMyGroupMessageList(friendId));
 		
-		CommonListParams listParams = new CommonListParams(mInflater, mMessageContent, mAdapterMessage, mOnMessageClick);
+		CommonListParams listParams = new CommonListParams(mInflater, mMessageContent, mAdapterFriendMessage, new ListItemClickListener() {
+			@Override
+			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+				super.onItemClick(parent, view, position, id);
+				
+				// 切换为新建留言界面，传参留言组id
+				initNewMessageView(mAdapterFriendMessage, position);
+			}
+		});
 		
 		CommonList.Init(listParams);
 	}
 	
 	/**
-	 * 点击留言列表即回复
-	 * TODO (讨论) 后台维护留言？后台删除留言？
+	 * 初始化商圈（专业）用户列表
+	 * @param friend_id
 	 */
-	ListItemClickListener mOnMessageClick = new ListItemClickListener() {
-		@Override
-		public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-			super.onItemClick(parent, view, position, id);
-			
-			int messageOwnerId = getMessageOwnerId(position);
-			String messagOwner = messageOwner(position);
-
-			// 切换为新建留言界面，传参留言组id
-			initNewMessageView(messageOwnerId, messagOwner);
-		}
-
-		/**
-		 * 获取message_id
-		 * @param position
-		 * @return
-		 */
-		private int getMessageOwnerId(int position) {
-			return mAdapterMessage.getItemMapInt(position, DataMan.KEY_MY_GROUP_MESSAGE_ID);
-		}
+	private void initMajorGroup(int majorId) {
 		
-		/**
-		 * 获取message主人名字
-		 * @param position
-		 * @return
-		 */
-		private String messageOwner(int position) {
-			ListItemMap map = mAdapterMessage.getItem(position);
-
-			if (map == null) {
-				Debug.Log("严重错误：messageOwner为空");
-				return null;
+		mAdapterMajor = new CommonListAdapter(mContext, DataMan.GetMyGroupFriendList(majorId, false));
+		
+		CommonListParams listParams = new CommonListParams(mInflater, mMessageContent, mAdapterMajor, new ListItemClickListener() {
+			@Override
+			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+				super.onItemClick(parent, view, position, id);
+				
+				// 切换为新建留言界面，传参留言组id
+				initNewMessageView(mAdapterMajor, position);
 			}
+		});
+		
+		CommonList.Init(listParams);
+	}
 
-			return map.getString(DataMan.KEY_FRIEND_MESSAGE_POSER);
+	/**
+	 * 初始化新建留言视图
+	 */
+	private void initNewMessageView(CommonListAdapter adapterMessage, int position) {
+		
+		final int friendId = adapterMessage.getItemMapInt(position, DataMan.KEY_MY_GROUP_MESSAGE_ID);
+		String messageOwner = adapterMessage.getItemMapString(position, DataMan.KEY_FRIEND_MESSAGE_POSER);
+
+		if (mNewMessageLayout == null) {
+			mNewMessageLayout = (RelativeLayout) mInflater.inflate(R.layout.new_message, null);
+			
+			mNewMessageSelfIntroduce = (TextView)mNewMessageLayout.findViewById(R.id.new_message_self_introduce);
+			mNewMessageReply = (TextView)mNewMessageLayout.findViewById(R.id.new_message_reply);
+			mNewMessageDate = (TextView)mNewMessageLayout.findViewById(R.id.new_message_date);
+			
+			mNewMessageContent = (EditText)mNewMessageLayout.findViewById(R.id.new_message_content);
+			
+			mNewMessagePost = (Button)mNewMessageLayout.findViewById(R.id.new_message_post_btn);
 		}
-	};
+
+		OnClickListener clickPost = new OnClickListener() {
+			@Override
+			public void onClick(View view) {
+				postNewMessage(friendId);
+			}
+		};
+		
+		mNewMessagePost.setOnClickListener(clickPost);
+
+		// TODO 自我介绍
+		mNewMessageSelfIntroduce.setText("张三的自我介绍……");
+		mNewMessageReply.setText("回复：" + messageOwner + "张三");
+		mNewMessageDate.setText("日期：" + DataMan.GetCurrentTime(true));
+
+		// 添加新建留言视图
+		mMessageContent.removeAllViews();
+		mMessageContent.addView(mNewMessageLayout, UIConst.GetLayoutParams(L_LAYOUT_TYPE.FULL));;
+	}
+
+	private int getMessageButtonRes(boolean focus) {
+		return focus ? R.drawable.menu_title_focus : R.drawable.menu_title;
+	}
 
 	/**
 	 * 发布新留言
