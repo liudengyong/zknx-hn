@@ -8,7 +8,7 @@
     <TextView
         android:id="@+id/login_title_tv"
         android:textIsSelectable="true"
-        android:background="@drawable/menu_title"
+        android:background="@drawable/tab_button_bg"
         android:text="@string/please_login"
         android:layout_gravity="top"
         style="@style/TitleText" />

@@ -334,7 +334,7 @@ public class MyGroup extends FunctionView {
 	}
 
 	private int getMessageButtonRes(boolean focus) {
-		return focus ? R.drawable.menu_title_focus : R.drawable.menu_title;
+		return focus ? R.drawable.tab_button_cur : R.drawable.tab_button;
 	}
 
 	/**

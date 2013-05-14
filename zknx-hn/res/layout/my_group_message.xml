@@ -10,30 +10,18 @@
     android:orientation="horizontal" >
 		<Button
 		    android:id="@+id/my_group_message_my_message"
-		    android:layout_width="0dip"
-		    android:layout_height="wrap_content"
-		    android:layout_weight="1"
 		    android:text="@string/my_message"
-		    android:background="@drawable/menu_title"
-		    style="@style/ClassBtn" />
-		
+		    style="@style/TabBtn" />
+
 		<Button
 		    android:id="@+id/my_group_message_friend_message"
-		    android:layout_width="0dip"
-		    android:layout_height="wrap_content"
-		    android:layout_weight="1"
 		    android:text="@string/friend_message"
-		    android:background="@drawable/menu_title"
-		    style="@style/ClassBtn" />
-		
+		    style="@style/TabBtn" />
+
 		<Button
 		    android:id="@+id/my_group_message_group"
-		    android:layout_width="0dip"
-		    android:layout_height="wrap_content"
-		    android:layout_weight="1"
 		    android:text="@string/group"
-		    android:background="@drawable/menu_title"
-		    style="@style/ClassBtn" />
+		    style="@style/TabBtn" />
 	</LinearLayout>
 	
     <LinearLayout

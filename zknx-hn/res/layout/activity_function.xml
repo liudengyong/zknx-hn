@@ -15,12 +15,11 @@
 	
 	     <ImageButton
 	        android:id="@+id/function_btn_return_home"
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
+	        android:layout_width="32sp"
+	        android:layout_height="32sp"
 	        android:contentDescription="@string/divider"
-	        android:src="@drawable/icon_back"
-	        android:background="#00FFFFFF"
-	        android:padding="10dip"/>
+	        android:background="@drawable/back_button"
+	        android:layout_marginRight="10dip"/>
 	    
 	    <TextView
 	        android:id="@+id/function_title_text"

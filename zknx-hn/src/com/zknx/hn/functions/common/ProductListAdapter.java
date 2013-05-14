@@ -82,7 +82,7 @@ public class ProductListAdapter extends CommonListAdapter {
 
 		LinearLayout h = (LinearLayout)inflater.inflate(R.layout.product_list_item, null);
 		
-		h.setBackgroundResource(R.drawable.menu_title);
+		h.setBackgroundResource(R.drawable.tab_button_bg);
 
 		// "名字", "最低价", "最高价", "平均价", "产地价", "单位", "添加"
 		// 初始化列头标签

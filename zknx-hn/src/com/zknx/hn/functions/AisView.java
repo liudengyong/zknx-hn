@@ -29,7 +29,9 @@ public class AisView extends FunctionView {
 	// 点击图片返回时用到
 	private LinearLayout mAisViewRoot;
 	private int mCurAisId = DataMan.INVALID_ID;
-	private String mAisTitle = "Ais视图";
+	
+	private static final String DEFAULT_TITLE = "内容";
+	private String mAisTitle = DEFAULT_TITLE;
 
 	public AisView(LayoutInflater inflater, LinearLayout frameRoot, int function_id, int frameResId) {
 		super(inflater, frameRoot, frameResId);
@@ -76,13 +78,13 @@ public class AisView extends FunctionView {
 	 * @param position
 	 */
 	void initSubClassOrAisView(int position) {
-		
+
 		int class_id = mAdapterClass.getItemMapInt(position, DataMan.KEY_AIS_CLASS_ID);
-		
+
 		if (mFrameResId == R.layout.func_frame_split) {
 			attachAisView(class_id, mContentFrame[1]); // FIXME clss_id != ais_id
 		} else if (mFrameResId == R.layout.func_frame_triple) {
-			initSubClass(position);			
+			initSubClass(position);
 		} else {
 			Debug.Log("严重错误：AISView.cutomClass2View," + class_id);
 		}
@@ -128,18 +130,20 @@ public class AisView extends FunctionView {
 
 	void attachAisView(int ais_id, LinearLayout root) {
 		
-		String title = "AIS视图";
+		String title = DEFAULT_TITLE;
 		LinearLayout layout = null;
 		AisParser.AisLayout aisLayout = AisParser.GetAisLayout(ais_id, mInflater, mClickImage);
 		
 		if (aisLayout != null) {
 			title = aisLayout.getTitle();
 			layout = aisLayout.getLayout();
-			initContent(title, layout, getCutomBottom(), root);
+			// 保存当前信息
 			mAisViewRoot = root;
 			mCurAisId = ais_id;
 			mAisTitle = title;
 		}
+
+		initContent(title, layout, getCutomBottom(), root);
 	}
 	
 	/**
