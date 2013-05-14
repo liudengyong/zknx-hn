@@ -76,7 +76,7 @@ public class MyGroup extends FunctionView {
 	 * 初始化我的商友列表
 	 */
 	private void initFriendList() {
-		LinearLayout layout = (LinearLayout)mInflater.inflate(R.layout.my_group_friend, null);
+		LinearLayout layout = (LinearLayout)mInflater.inflate(R.layout.group_my_friend, null);
 		
 		// XXX 替换为通用frame，并增加添加好友按钮到custom_bottom （是否增加添加好友？）
 		
@@ -112,7 +112,7 @@ public class MyGroup extends FunctionView {
 	void initGroupFriendInfo(int position) {
 		int friend_id = mAdapterFriend.getItemMapInt(position, DataMan.KEY_FRIEND_ID);
 		
-		LinearLayout layout = (LinearLayout)mInflater.inflate(R.layout.my_group_friend_info, null);
+		LinearLayout layout = (LinearLayout)mInflater.inflate(R.layout.group_friend_info, null);
 		
 		ListItemMap info = DataMan.GetMyFriendInfo(friend_id);
 		
@@ -141,7 +141,7 @@ public class MyGroup extends FunctionView {
 		
 		// 留言视图
 		if (mMessageLayout == null) {
-			mMessageLayout = (LinearLayout)mInflater.inflate(R.layout.my_group_message, null);
+			mMessageLayout = (LinearLayout)mInflater.inflate(R.layout.group_message, null);
 			
 			mMyMessageBtn = (Button)mMessageLayout.findViewById(R.id.my_group_message_my_message);
 			mFriendMessageBtn = (Button)mMessageLayout.findViewById(R.id.my_group_message_friend_message);
@@ -230,7 +230,7 @@ public class MyGroup extends FunctionView {
 	 * 初始化我的留言视图
 	 */
 	private void initMyMessageView() {
-		RelativeLayout myMessageLayout = (RelativeLayout) mInflater.inflate(R.layout.my_group_my_message, null);
+		RelativeLayout myMessageLayout = (RelativeLayout) mInflater.inflate(R.layout.group_my_message, null);
 		LinearLayout listViewLayout = (LinearLayout) myMessageLayout.findViewById(R.id.my_group_my_message_listview);
 		
 		CommonListAdapter adapter = new CommonListAdapter(mContext, DataMan.GetMyGroupMessageList(DataMan.MY_MESSAGE));
@@ -294,7 +294,7 @@ public class MyGroup extends FunctionView {
 		String messageOwner = adapterMessage.getItemMapString(position, DataMan.KEY_FRIEND_MESSAGE_POSER);
 
 		if (mNewMessageLayout == null) {
-			mNewMessageLayout = (RelativeLayout) mInflater.inflate(R.layout.new_message, null);
+			mNewMessageLayout = (RelativeLayout) mInflater.inflate(R.layout.group_new_message, null);
 			
 			mNewMessageSelfIntroduce = (TextView)mNewMessageLayout.findViewById(R.id.new_message_self_introduce);
 			mNewMessageReply = (TextView)mNewMessageLayout.findViewById(R.id.new_message_reply);
