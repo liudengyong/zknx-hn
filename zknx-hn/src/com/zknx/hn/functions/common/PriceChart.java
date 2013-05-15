@@ -193,6 +193,8 @@ public class PriceChart extends View {
         	
         	// 下一点
         	drawPoint(canvas, points.points[i + 1].x, points.points[i + 1].y);
+        	
+        	++i;
         }
 	}
 
@@ -307,20 +309,22 @@ public class PriceChart extends View {
 		int height = getRealHeight();
 
 		// 计算日期需要步进的宽度
-		int dateStep  = width / (dateSize - 1);
+		float dateStep  = (float) width / (dateSize - 1);
 		float priceStep = height / (mMaxPrice - mMinPrice);
 
 		// 走势图起点x坐标
-		int x = (int)getRealX();
+		float x = getRealX();
 		// 走势图起点y坐标
-		int y = (int)getRealY();
-
+		int startY = (int) getRealY();
+		
 		 // 价格点的数据
 	    Point points[] = new Point[dateSize];
 
 		for (int i = 0; i < dateSize; ++i) {
+			// 计算出y坐标
+			int y = startY + (int) ((mMaxPrice - mPriceInfo.getPrice(i)) * priceStep);
 			// 当前价格跟最大值之间的差距
-			points[i] = new Point(x, (int) (y + (mMaxPrice - mPriceInfo.getPrice(i)) * priceStep));
+			points[i] = new Point((int)x, y);
 			// 步进固定的宽度
 			x += dateStep;
 		}
@@ -343,12 +347,12 @@ public class PriceChart extends View {
 	}
 	
 	class Points {
-		public Points(Point[] _points, int _dateStep) {
+		public Points(Point[] _points, float _dateStep) {
 			points   = _points;
 			dateStep = _dateStep;
 		}
 
 		Point[] points;
-		int dateStep;
+		float dateStep;
 	}
 }
