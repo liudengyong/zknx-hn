@@ -10,6 +10,7 @@ import java.io.InputStreamReader;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
@@ -389,8 +390,11 @@ public class DataMan extends DataInterface {
         return list;
 	}
 	
+	// 一天的毫秒数： 1天=24*60*60*1000=86400000毫秒
+	private static final long MILLIS_ONE_DAY = 86400000;
+	
 	/**
-	 * 获取价格信息
+	 * 获取最近30天价格信息 HISTORY_PRICE_DAYS
 	 * TODO interface 获取历史价格，周期？
 	 * @param product_id
 	 * @param market_id
@@ -403,30 +407,42 @@ public class DataMan extends DataInterface {
 		if (market_id == INVALID_ID || product_id == INVALID_ID)
 			return null;
 		
-		List<Float> listPrice = new ArrayList<Float>();
-		
+		// TODO 获取价格单位
 		// 价格单位（万元，元，角等）
 		String priceUnit = "元";
 		// 日期单位（年，月，周等）
-		String dateUnit = "月";
+		String dateUnit = "月.日";
 		
-		listPrice.add(1.0f);
-		listPrice.add(3.0f);
-		listPrice.add(2.0f);
-		listPrice.add(8.0f);
-		listPrice.add(3.0f);
-		listPrice.add(2.0f);
-		listPrice.add(1.0f);
-		listPrice.add(3.0f);
-		listPrice.add(2.0f);
-		listPrice.add(1.0f);
-		listPrice.add(3.0f);
-		listPrice.add(2.0f);
+		ProductPriceInfo info = new ProductPriceInfo(priceUnit, dateUnit);
 		
-		ProductPriceInfo info = new ProductPriceInfo(listPrice, priceUnit, dateUnit);
+		// 日期格式（月.日）
+		SimpleDateFormat simpleDate = new SimpleDateFormat("MM.dd"); //如果写成年月日的形式的话，要写小d，如："yyyy/MM/dd"
+		
+		// 向前减去30天
+		long today = System.currentTimeMillis();
+		for (int i = 0; i < HISTORY_PRICE_DAYS; ++i) {
+
+			// 获取当天价格
+			Float price = GetPrice(today, product_id, market_id);
+			// 添加当天的价格
+			if (price != 0F)
+				info.add(simpleDate.format(new Date(today)), price);
+
+			today -= MILLIS_ONE_DAY;
+		}
+		
 		return info;
 	}
 	
+	/**
+	 * TODO 获取某天的价格
+	 * @param today
+	 * @return
+	 */
+	private static Float GetPrice(long today, int product_id, int market_id) {
+		return 1.0F;
+	}
+
 	/**
 	 * 获取产品分类
 	 * @return

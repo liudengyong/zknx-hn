@@ -33,6 +33,9 @@ public class DataInterface {
 	// XXX 数据文件的MD5校验值（假设这个文件传输没有问题）
 	protected static final String MD5_FILE_NAME = "md5.txt";
 	
+	// 获取历史价格信息的天数
+	public static final int HISTORY_PRICE_DAYS = 30;
+	
 	// 商友专业id
 	// 种植大户
 	public static final int MAJOR_ID_RICH_PLANTER = 0;

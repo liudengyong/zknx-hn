@@ -1,7 +1,5 @@
 package com.zknx.hn.functions.common;
 
-import java.util.Collections;
-
 import com.zknx.hn.R;
 import com.zknx.hn.common.Debug;
 
@@ -100,8 +98,8 @@ public class PriceChart extends View {
 		mPointOffsetX = mBitmapPoint.getWidth() / 2;
 		mPointOffsetY = mBitmapPoint.getHeight() / 2;
 		
-		mMaxPrice = Collections.max(priceInfo.price);
-		mMinPrice = Collections.min(priceInfo.price);
+		mMaxPrice = priceInfo.getMaxPrice();
+		mMinPrice = priceInfo.getMinPrice();
 	}
 	
 	/**
@@ -230,7 +228,7 @@ public class PriceChart extends View {
         for (int i = 0; i < points.points.length; ++i) {
         	float nextY = yStart + height;
 
-            canvas.drawText(i + mPriceInfo.dateUnit, xStart + OFFSET_DATE_UNIT_X, nextY + OFFSET_DATE_UNIT_Y, mPaintAxisUnit);
+            canvas.drawText(i + mPriceInfo.getDateUnit(), xStart + OFFSET_DATE_UNIT_X, nextY + OFFSET_DATE_UNIT_Y, mPaintAxisUnit);
 
             xStart += points.dateStep;
         }
@@ -245,7 +243,7 @@ public class PriceChart extends View {
         	// 画价格单位以及网格价格值
         	float price = mMaxPrice - (priceValueStep * i);
 
-        	canvas.drawText(price + mPriceInfo.priceUnit, getX() + OFFSET_PRICE_UNIT_X, yStart + OFFSET_PRICE_UNIT_Y, mPaintAxisUnit);
+        	canvas.drawText(price + mPriceInfo.getPriceUnit(), getX() + OFFSET_PRICE_UNIT_X, yStart + OFFSET_PRICE_UNIT_Y, mPaintAxisUnit);
 
             yStart += pricePositionStep;
         }
@@ -296,7 +294,7 @@ public class PriceChart extends View {
 	private Points computerPoints() {
 
         // 初始化价格点
-		int dateSize = mPriceInfo.price.size();
+		int dateSize = mPriceInfo.size();
 
 		if (dateSize <= 0) {
 			Debug.Log("严重错误：initPoints,dateSize=" + dateSize);
@@ -322,7 +320,7 @@ public class PriceChart extends View {
 
 		for (int i = 0; i < dateSize; ++i) {
 			// 当前价格跟最大值之间的差距
-			points[i] = new Point(x, (int) (y + (mMaxPrice - mPriceInfo.price.get(i)) * priceStep));
+			points[i] = new Point(x, (int) (y + (mMaxPrice - mPriceInfo.getPrice(i)) * priceStep));
 			// 步进固定的宽度
 			x += dateStep;
 		}
