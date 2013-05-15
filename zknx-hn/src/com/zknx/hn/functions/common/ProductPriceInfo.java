@@ -41,7 +41,7 @@ public class ProductPriceInfo {
 	 */
 	public String getDate(int location) {
 		if (location < mPriceList.size()) {
-			return mPriceList.get(location).mDate;
+			return get(location).mDate;
 		}
 		
 		return null;
@@ -54,10 +54,19 @@ public class ProductPriceInfo {
 	 */
 	public Float getPrice(int location) {
 		if (location < mPriceList.size()) {
-			return mPriceList.get(location).mPrice;
+			return get(location).mPrice;
 		}
 		
 		return 0F;
+	}
+	
+	/**
+	 * 反着取，从旧日期往新日期取（add时是先添加新日期）
+	 * @param location
+	 * @return
+	 */
+	private PricePair get(int location) {
+		return mPriceList.get(mPriceList.size() - location - 1);
 	}
 	
 	/**

@@ -10,6 +10,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Paint.FontMetrics;
 import android.graphics.Path;
 import android.graphics.Paint.Cap;
 import android.graphics.Point;
@@ -52,22 +53,12 @@ public class PriceChart extends View {
 
     // 配置常量
     // 走势图跟父视图之间的间隔
- 	static final int CHART_PADDING = 10;
+ 	static final int CHART_PADDING = 24;
 
- 	// XXX 固定价格分辨率？ 水平网格固定数目 
+ 	// XXX 固定价格分辨率？ 水平网格固定数目 （8个格）
 	private static final int PRICE_GRID_COUNT = 8;
 	
 	// XXX 调整日期单位（字体大小和为位置）
-	
-	// 日期单位水平方向无偏移
-	private static final float OFFSET_DATE_UNIT_X = 0;
-	// 日期单位向y轴线上侧偏移14个像素
-	private static final float OFFSET_DATE_UNIT_Y = -14;
-	
-	// 价格单位向x轴线右侧偏移2个像素
-	private static final float OFFSET_PRICE_UNIT_X = 2;
-	// 价格单位竖直方向无偏移
-	private static final float OFFSET_PRICE_UNIT_Y = 0;
     
     // 价格的最大值最小值
  	private ProductPriceInfo mPriceInfo;
@@ -186,13 +177,14 @@ public class PriceChart extends View {
 	 * @param points
 	 */
 	private void drawPricePoint(Canvas canvas, Points points) {
-		for (int i = 0; i < points.points.length - 1; ++i) {
+		for (int i = 0; i < points.points.length; ++i) {
         	
         	// 当前点
         	drawPoint(canvas, points.points[i].x, points.points[i].y);
         	
         	// 下一点
-        	drawPoint(canvas, points.points[i + 1].x, points.points[i + 1].y);
+        	if (points.points.length > (i + 1))
+        		drawPoint(canvas, points.points[i + 1].x, points.points[i + 1].y);
         	
         	++i;
         }
@@ -224,28 +216,49 @@ public class PriceChart extends View {
 	private void drawGridUnit(Canvas canvas, Points points) {
 		float xStart = getRealX();
         float yStart = getRealY();
-        int height = getHeight();
+        int height = getRealHeight();
         
-        // 竖直网格，画时间单位（月份？）
-        for (int i = 0; i < points.points.length; ++i) {
-        	float nextY = yStart + height;
+        // 获取日期文字高度，放到x轴线下面
+        FontMetrics fm = mPaintAxisUnit.getFontMetrics();  
+        float fontHeight = (float) Math.ceil(fm.descent - fm.ascent);
 
-            canvas.drawText(i + mPriceInfo.getDateUnit(), xStart + OFFSET_DATE_UNIT_X, nextY + OFFSET_DATE_UNIT_Y, mPaintAxisUnit);
+        // 水平网格，画时间单位（月份？）
+        float fixedDateY = yStart + height + fontHeight;
+        for (int i = 0; i < points.points.length; ++i) {
+        	// 画日期
+        	if (i == 0)
+        		canvas.drawText(mPriceInfo.getDateUnit(), xStart, fixedDateY, mPaintAxisUnit);
+        	else
+        		canvas.drawText(mPriceInfo.getDate(i), xStart, fixedDateY, mPaintAxisUnit);
 
             xStart += points.dateStep;
         }
         
-        float pricePositionStep = height / PRICE_GRID_COUNT;
-        float priceValueStep = (mMaxPrice - mMinPrice) / PRICE_GRID_COUNT;
+        // 计算价格差
+        float pricePositionStep = (float)height / PRICE_GRID_COUNT;
+        
+        float gap = mMaxPrice - mMinPrice;
+        
+        // 最高价和最低价一样时（特殊情况），从0到最高价格
+        if (gap == 0)
+        	gap = mMaxPrice;
+        
+        float priceValueStep = gap / PRICE_GRID_COUNT;
         xStart = getRealX();
         
-        // 水平网格固定数目？
-        for (int i = 0; i < PRICE_GRID_COUNT; ++i) {
+        // 竖直网格（价格）固定数目？
+        // 需要多画一个，需要画9个价格（包括最高和最低）
+        float fixedPriceX = getX(); // 右移padding
+        for (int i = 0; i <= PRICE_GRID_COUNT; ++i) {
         	
         	// 画价格单位以及网格价格值
         	float price = mMaxPrice - (priceValueStep * i);
-
-        	canvas.drawText(price + mPriceInfo.getPriceUnit(), getX() + OFFSET_PRICE_UNIT_X, yStart + OFFSET_PRICE_UNIT_Y, mPaintAxisUnit);
+        	
+        	// 第一个画单位
+        	if (i == 0)
+        		canvas.drawText(mPriceInfo.getPriceUnit(), fixedPriceX, yStart, mPaintAxisUnit);
+        	else
+        		canvas.drawText(price + "", fixedPriceX, yStart, mPaintAxisUnit);
 
             yStart += pricePositionStep;
         }
@@ -260,7 +273,7 @@ public class PriceChart extends View {
 	private void drawGrid(Canvas canvas, Points points) {
 		float xStart = getRealX();
         float yStart = getRealY();
-        int height = getHeight();
+        int height = getRealHeight();
         
         // 竖直网格
         for (int i = 0; i < points.points.length; ++i) {
@@ -271,16 +284,19 @@ public class PriceChart extends View {
             xStart += points.dateStep;
         }
         
-        int width = getWidth();
-        int pricePositionStep = height / PRICE_GRID_COUNT;
+        int width = getRealWidth();
+        
+        // 计算价格差对应的高度
+        float pricePositionStep = (float)height / PRICE_GRID_COUNT;
         xStart = getRealX();
         
-        // 水平网格固定数目？
-        for (int i = 0; i < PRICE_GRID_COUNT; ++i) {
+        // 水平网格固定数目
+        // 需要多画一个（包括最高和最低价格）
+        for (int i = 0; i <= PRICE_GRID_COUNT; ++i) {
         	// 水平网格
-        	float nextX = xStart + width;
+        	float nextX = xStart + width + CHART_PADDING;
         	
-        	mPathGrid.moveTo(xStart - CHART_PADDING, yStart); // 补全padding，水平填满
+        	mPathGrid.moveTo(xStart, yStart); // 补全padding，水平填满
         	mPathGrid.lineTo(nextX, yStart);
         	
             yStart += pricePositionStep;

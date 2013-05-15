@@ -34,7 +34,7 @@ public class DataInterface {
 	protected static final String MD5_FILE_NAME = "md5.txt";
 	
 	// 获取历史价格信息的天数
-	public static final int HISTORY_PRICE_DAYS = 30;
+	public static final int HISTORY_PRICE_DAYS = 15;
 	
 	// 商友专业id
 	// 种植大户

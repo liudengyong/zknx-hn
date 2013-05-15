@@ -414,10 +414,10 @@ public class DataMan extends DataInterface {
 		String dateUnit = "月.日";
 		
 		ProductPriceInfo info = new ProductPriceInfo(priceUnit, dateUnit);
-		
+
 		// 日期格式（月.日）
-		SimpleDateFormat simpleDate = new SimpleDateFormat("MM.dd"); //如果写成年月日的形式的话，要写小d，如："yyyy/MM/dd"
-		
+		SimpleDateFormat simpleDate = new SimpleDateFormat("M.d", Locale.CHINA); //如果写成年月日的形式的话，要写小d，如："yyyy/MM/dd"
+
 		// 向前减去30天
 		long today = System.currentTimeMillis();
 		for (int i = 0; i < HISTORY_PRICE_DAYS; ++i) {
@@ -440,7 +440,8 @@ public class DataMan extends DataInterface {
 	 * @return
 	 */
 	private static Float GetPrice(long today, int product_id, int market_id) {
-		return 1.0F;
+		long time = System.currentTimeMillis();
+		return 4.0F + (time % 4);
 	}
 
 	/**
