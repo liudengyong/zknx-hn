@@ -70,14 +70,15 @@ public class Params {
 		// 三区显示
 		case UIConst.FUNCTION_ID_POLICY:
 		case UIConst.FUNCTION_ID_ARGRI_TECH:
-		case UIConst.FUNCTION_ID_EXPERT_GUIDE:
 		case UIConst.FUNCTION_ID_CUR_POLITICS:
 		case UIConst.FUNCTION_ID_CLASS_EXPERIENCE:
 		case UIConst.FUNCTION_ID_HAPPAY:
 		case UIConst.FUNCTION_ID_LAW:
 			return new AisView(inflater, frameRoot, function_id, R.layout.func_frame_triple);
-		case UIConst.FUNCTION_ID_BEST_COUSE:
+		case UIConst.FUNCTION_ID_BEST_COUSE: // 精选课件
 			return new BestCourse(inflater, frameRoot);
+		case UIConst.FUNCTION_ID_EXPERT_GUIDE: // 专家指导
+			return new Expert(inflater, frameRoot);
 		case UIConst.FUNCTION_ID_SETTING:
 			return new Setting(inflater, frameRoot, R.layout.func_frame_split);
 		default:

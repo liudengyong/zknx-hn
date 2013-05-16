@@ -21,8 +21,9 @@ import com.zknx.hn.functions.common.ListItemClickListener;
 
 public class AisView extends FunctionView {
 
-	private CommonListAdapter mAdapterClass;
-	private CommonListAdapter mAdapterSubClass;
+	// 子类可以访问
+	CommonListAdapter mAdapterClass;
+	CommonListAdapter mAdapterSubClass;
 
 	private int mFrameResId;
 	
@@ -94,7 +95,15 @@ public class AisView extends FunctionView {
 	 * 初始化Ais子分类
 	 * @param position
 	 */
-	private void initSubClass(int position) {
+	void initSubClass(int position) {
+		initSubClass(position, null);
+	}
+	
+	/**
+	 * 初始化Ais子分类
+	 * @param position
+	 */
+	protected void initSubClass(int position, View custom) {
 		
 		ListItemMap mapItem = mAdapterClass.getItem(position);
 		String title = "AIS分类";
@@ -117,7 +126,8 @@ public class AisView extends FunctionView {
 			}
 		});
 		
-		CommonList.Init(listParams, title);
+		// 定制视图为空则是普通列表
+		CommonList.Init(listParams, title, custom);
 		
 		// 默认第一个AIS视图
 		initSubClassAisView(0);
