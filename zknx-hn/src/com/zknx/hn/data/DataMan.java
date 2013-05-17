@@ -1045,4 +1045,22 @@ public class DataMan extends DataInterface {
 	public static int GetMajor(int userId) {
 		return DataInterface.GetMajor(userId);
 	}
+	
+	/**
+	 * TODO interface 向专家提问
+	 * @return
+	 */
+	public static boolean AskExpert(String userId, String expertId, String subject, String question) {
+		// TODO interface 提问参数需调整? encoding?
+		String params = "user=" + userId + ",expert=" + expertId + ",subject=" + subject + ",question=" + question;
+
+		String ret = Downloader.PostUrl(URL_ASK_EXPERT, params);
+
+		if (ret.equals("true"))
+			return true;
+		
+		Debug.Log("提问专家错误：返回：" + ret);
+
+		return false;
+	}
 }

@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content" >
+
+    <LinearLayout android:id="@+id/expert_ask_subject_layout"
+	android:layout_width="fill_parent"
+	android:layout_height="wrap_content"
+	android:layout_alignParentTop="true"
+	android:layout_margin="6sp" >
+	    <TextView
+	        android:gravity="left"
+	        android:text="@string/subject"
+	        style="@style/NewMessageSelfIntroduce"
+	        android:padding="4sp" />
+		<EditText
+        android:id="@+id/expert_ask_subject"
+        android:layout_width="fill_parent"
+	    android:layout_height="wrap_content"
+	    android:hint="@string/input_subject"
+	    android:inputType="textMultiLine" />
+	</LinearLayout>
+	
+    <EditText
+        android:id="@+id/expert_ask_question"
+        android:layout_width="fill_parent"
+        android:layout_height="0sp"
+        android:layout_above="@+id/expert_ask_bottom"
+        android:layout_below="@+id/expert_ask_subject_layout"
+        android:layout_marginTop="10dip"
+        android:gravity="left|top"
+        android:hint="@string/input_question"
+        android:inputType="textMultiLine"
+        android:minLines="4" />
+	
+    <LinearLayout android:id="@+id/expert_ask_bottom"
+	android:layout_width="fill_parent"
+	android:layout_height="wrap_content"
+	android:layout_above="@+id/expert_ask_divider_bottom"
+	android:layout_margin="6sp" >
+
+	<Button
+	    android:id="@+id/expert_ask_back"
+	    style="@style/PostBtn"
+	    android:layout_width="0sp"
+	    android:layout_height="wrap_content"
+	    android:layout_weight="1"
+	    android:text="@string/back" />
+	
+	<Button android:id="@+id/expert_ask_ask"
+	   android:layout_width="0sp"
+	   android:layout_height="wrap_content"
+	   android:text="@string/ask"
+	   style="@style/PostBtn"
+	   android:layout_weight="1" />
+	</LinearLayout>
+	
+	<View android:id="@+id/expert_ask_divider_left"
+	   android:layout_width="1dip"
+	   android:layout_height="fill_parent"
+	   android:background="@drawable/list_divider_vertical"
+	   android:layout_alignParentLeft="true"
+	   android:layout_above="@+id/expert_ask_divider_bottom" />
+	
+	<View android:id="@+id/expert_ask_divider_right"
+	   android:layout_width="1dip"
+	   android:layout_height="fill_parent"
+	   android:background="@drawable/list_divider_vertical"
+	   android:layout_alignParentRight="true"
+	   android:layout_above="@+id/expert_ask_divider_bottom" />
+	    
+	<View android:id="@+id/expert_ask_divider_bottom"
+	   android:layout_width="fill_parent"
+	   android:layout_height="1dip"
+	   android:background="@drawable/list_divider"
+	   android:layout_alignParentBottom="true" />
+
+</RelativeLayout>

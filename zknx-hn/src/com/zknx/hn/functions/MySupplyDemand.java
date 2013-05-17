@@ -19,8 +19,6 @@ import android.widget.Toast;
 import com.zknx.hn.R;
 import com.zknx.hn.common.Dialog;
 import com.zknx.hn.common.Dialog.ConfirmListener;
-import com.zknx.hn.common.UIConst;
-import com.zknx.hn.common.UIConst.L_LAYOUT_TYPE;
 import com.zknx.hn.data.DataMan;
 import com.zknx.hn.functions.common.CommonList;
 import com.zknx.hn.functions.common.CommonListAdapter;
@@ -49,11 +47,8 @@ public class MySupplyDemand extends FunctionView {
 	 * 初始化供求信息分类
 	 */
 	void initClassList() {
-		Button createInfoBtn = new Button(mContext);
-		createInfoBtn.setText("发布新信息");
-		createInfoBtn.setBackgroundResource(R.drawable.button_class);
-		createInfoBtn.setLayoutParams(UIConst.GetLayoutParams(L_LAYOUT_TYPE.FULL));
-		createInfoBtn.setOnClickListener(mOnClickCreateInfo);
+		
+		LinearLayout createInfoBtn = getLinearLayoutBtn("发布新信息", mOnClickCreateInfo);
 		
 		mAdapterClass = new CommonListAdapter(mContext, DataMan.GetProductClassList());
 		

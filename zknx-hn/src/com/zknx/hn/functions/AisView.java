@@ -96,14 +96,14 @@ public class AisView extends FunctionView {
 	 * @param position
 	 */
 	void initSubClass(int position) {
-		initSubClass(position, null);
+		initSubClass(position, null, null);
 	}
 	
 	/**
 	 * 初始化Ais子分类
 	 * @param position
 	 */
-	protected void initSubClass(int position, View custom) {
+	protected void initSubClass(int position, LinearLayout header, LinearLayout footer) {
 		
 		ListItemMap mapItem = mAdapterClass.getItem(position);
 		String title = "AIS分类";
@@ -127,7 +127,7 @@ public class AisView extends FunctionView {
 		});
 		
 		// 定制视图为空则是普通列表
-		CommonList.Init(listParams, title, custom);
+		CommonList.Init(listParams, title, header, footer);
 		
 		// 默认第一个AIS视图
 		initSubClassAisView(0);

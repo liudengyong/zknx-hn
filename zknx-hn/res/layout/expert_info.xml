@@ -16,7 +16,7 @@
         android:layout_height="match_parent"
         android:layout_width="0sp"
         android:layout_weight="3" />
-    
+
         <LinearLayout
         android:layout_height="match_parent"
 	    android:layout_width="0sp"
@@ -30,16 +30,14 @@
 	        android:layout_height="0sp"
 	        android:layout_weight="1" 
 	        android:layout_gravity="center|left"
-	        android:gravity="center|bottom"
-	        android:text="专业" />
+	        android:gravity="center|bottom" />
 
 	    	<TextView android:id="@+id/expert_info_name"
 	        android:layout_width="match_parent"
 	        android:layout_height="0sp"
 	        android:layout_weight="1" 
 	        android:layout_gravity="center|left"
-	        android:gravity="center|top"
-	        android:text="名字" />
+	        android:gravity="center|top" />
 
 		</LinearLayout>
 
@@ -49,19 +47,12 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:layout_gravity="center"
-    android:text="专家介绍……"
     android:layout_margin="10sp" />
 	
     <TextView
         android:textIsSelectable="true"
         android:background="@drawable/tab_button_bg"
-        android:text="专家解答"
+        android:text="@string/expert_anwser"
         style="@style/TitleText" />
-
-    <Button android:id="@+id/expert_info_ask"
-		android:layout_height="wrap_content" 
-		android:layout_width="fill_parent"
-		android:text="向专家提问"
-		style="@style/ClassBtn"/>
 
 </LinearLayout>

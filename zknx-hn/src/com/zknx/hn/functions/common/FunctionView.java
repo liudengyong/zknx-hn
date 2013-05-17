@@ -8,6 +8,8 @@ import com.zknx.hn.common.UIConst.L_LAYOUT_TYPE;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -95,5 +97,21 @@ public class FunctionView {
 	 */
 	protected void initContent(String title, View content, LinearLayout root) {
 		initContent(title, content, null, root);
+	}
+	
+	/**
+	 * 获取按钮视图
+	 * @return
+	 */
+	protected LinearLayout getLinearLayoutBtn(String text, OnClickListener listener) {
+
+		LinearLayout layout = (LinearLayout)mInflater.inflate(R.layout.common_btn, null);
+		Button btn = (Button) layout.findViewById(R.id.common_btn);
+		btn.setText(text);
+		//createInfoBtn.setBackgroundResource(R.drawable.button_class);
+		//createInfoBtn.setLayoutParams(UIConst.GetLayoutParams(L_LAYOUT_TYPE.FULL));
+		btn.setOnClickListener(listener);
+
+		return layout;
 	}
 }

@@ -33,19 +33,22 @@ public class CommonList {
 	/**
 	 * 普通列表的初始化
 	 *  */
-	public static ListView Init(CommonListParams params, String title, View custom) {
+	public static ListView Init(CommonListParams params, String title, LinearLayout header, View bottom) {
 
 		RelativeLayout commonFrame = (RelativeLayout)params.inflater.inflate(R.layout.common_frame, null);
 
 		// 视图
 		TextView titleTextView = (TextView)commonFrame.findViewById(R.id.common_frame_title);
-		LinearLayout customLayout  = (LinearLayout)commonFrame.findViewById(R.id.common_frame_custom);
+		LinearLayout headerLayout  = (LinearLayout)commonFrame.findViewById(R.id.common_frame_custom);
 		LinearLayout contentLayout = (LinearLayout)commonFrame.findViewById(R.id.common_frame_content);
-		LinearLayout customBottom  = (LinearLayout)commonFrame.findViewById(R.id.common_frame_custom_bottom);
-		
+		LinearLayout bottomLayout  = (LinearLayout)commonFrame.findViewById(R.id.common_frame_custom_bottom);
+
 		// 隐藏底部定制
-		customBottom.setVisibility(View.GONE);
-		
+		if (bottom == null)
+			bottomLayout.setVisibility(View.GONE);
+		else
+			bottomLayout.addView(bottom, UIConst.GetLayoutParams(L_LAYOUT_TYPE.H_WRAP));
+
 		// 标题
 		if (title != null)
 			titleTextView.setText(title);
@@ -63,10 +66,10 @@ public class CommonList {
 		}
 
 		// 定制视图（比如分类按钮）
-		if (custom != null)
-			customLayout.addView(custom, UIConst.GetLayoutParams(L_LAYOUT_TYPE.H_WRAP));
+		if (header != null)
+			headerLayout.addView(header, UIConst.GetLayoutParams(L_LAYOUT_TYPE.H_WRAP));
 		else
-			customLayout.setVisibility(View.GONE);
+			headerLayout.setVisibility(View.GONE);
 
 		// 列表
 		ListView listView = new ListView(params.inflater.getContext());
@@ -93,23 +96,30 @@ public class CommonList {
 	}
 	
 	/**
+	 * 有标题，有定制头的初始化，没有定制脚
+	 * */
+	public static ListView Init(CommonListParams params, String title, LinearLayout header) {
+		return Init(params, title, header, null);
+	}
+	
+	/**
 	 * 没有标题，有定制视图的初始化（用于添加自定义title，市场和产品价格列表）
 	 * */
-	public static ListView Init(CommonListParams params, LinearLayout custom) {
-		return Init(params, null, custom);
+	public static ListView Init(CommonListParams params, LinearLayout header) {
+		return Init(params, null, header, null);
 	}
 	
 	/**
 	 * 没有定制视图，有标题的初始化
 	 *  */
 	public static ListView Init(CommonListParams params, String title) {
-		return Init(params, title, null);
+		return Init(params, title, null, null);
 	}
 	
 	/**
 	 * 没有定制视图，没有标题的初始化
 	 *  */
 	public static ListView Init(CommonListParams params) {
-		return Init(params, null, null);
+		return Init(params, null, null, null);
 	}
 }

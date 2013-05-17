@@ -76,5 +76,15 @@
     <string name="back">返回</string>
     <string name="start_play_audio">开始播放音频</string>
     <string name="stop_play_audio">停止播放音频</string>
+    
+    <!-- 专家指导 -->
+    <string name="expert_anwser">专家解答</string>
+    <string name="ask_expert">向专家提问</string>
+    <string name="ask">提问</string>
+    <string name="subject">主题</string>
+    <string name="input_subject">请输入主题</string>
+    <string name="input_question">请输入问题</string>
+    <string name="confirm_ask_question">确认提问吗？</string>
+    <string name="input_too_short">输入太短，不能少于5个汉字</string>
 
 </resources>

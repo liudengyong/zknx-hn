@@ -53,6 +53,8 @@ public class DataInterface {
 	
 	// post留言的url
 	protected static final String URL_POST_MESSAGE = "post_message.asp";
+	// TODO interface post专家提问的url
+	protected static final String URL_ASK_EXPERT = "ask_expert.asp";
 	
 	// Ais解析
 	public static final char AIS_TOKEN = '\\';
