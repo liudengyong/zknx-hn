@@ -159,7 +159,7 @@ public class DataMan extends DataInterface {
 
 	        		String name = token[1];
 	
-	        		list.add(new ListItemMap(name/* 名字 */, key, id/* id */));
+	        		list.add(new ListItemMap(name/* 名字 */, key, token[0]/* id */));
         		}
         	}
         }
@@ -194,7 +194,7 @@ public class DataMan extends DataInterface {
         		if (!AddressMatch(address_id, address_id_parsed))
         			continue;
 
-        		list.add(new ListItemMap(token[3]/* 市场名字 */, KEY_MARKET_ID, ParseInt(token[2])/* 市场id */));
+        		list.add(new ListItemMap(token[3]/* 市场名字 */, KEY_MARKET_ID, token[2]/* 市场id */));
         	}
         }
 
@@ -238,7 +238,7 @@ public class DataMan extends DataInterface {
         		boolean isMyProduct = IsMyProduct(product_id); /* 添加自选按钮状态 */
         		
         		//list.add(new ProductListItemMap("名字", "最低价", "最高价", "平均价", "产地价", "单位", "添加"));
-        		list.add(new ProductListItemMap(DataMan.KEY_PRODUCT_ID, product_id, product_name, minPrice, maxPrice, averagePrice, hostPrice, unit, isMyProduct));
+        		list.add(new ProductListItemMap(DataMan.KEY_PRODUCT_ID, token[2], product_name, minPrice, maxPrice, averagePrice, hostPrice, unit, isMyProduct));
         	}
         }
 
@@ -290,7 +290,7 @@ public class DataMan extends DataInterface {
 				return true; // 已经存在，不用重复添加
 		}
 		
-		ListItemMap myNewProduct = new ListItemMap(product_name /* 产品名字 */, KEY_PRODUCT_ID, product_id);
+		ListItemMap myNewProduct = new ListItemMap(product_name /* 产品名字 */, KEY_PRODUCT_ID, product_id + "");
 		list.add(myNewProduct);
 
 		return SaveMyProducts(list);
@@ -384,7 +384,7 @@ public class DataMan extends DataInterface {
     		String unit = token[8];
     		boolean addToMyProduct = false; /* 隐藏自选按钮 */
         	
-        	list.add(new ProductListItemMap(DataMan.KEY_MARKET_ID, market_id, market_name, minPrice, maxPrice, averagePrice, hostPrice, unit, addToMyProduct));
+        	list.add(new ProductListItemMap(DataMan.KEY_MARKET_ID, token[0], market_name, minPrice, maxPrice, averagePrice, hostPrice, unit, addToMyProduct));
         }
 
         return list;
@@ -568,7 +568,7 @@ public class DataMan extends DataInterface {
 		String title = token[3];
 		int supply_demand_id = ParseInt(token[2]);
 		
-		ListItemMap map = new ListItemMap(title, KEY_SUPPLY_DEMAND_INFO_ID, supply_demand_id);
+		ListItemMap map = new ListItemMap(title, KEY_SUPPLY_DEMAND_INFO_ID, supply_demand_id + "");
 		
 		if (supply_demand_id != INVALID_ID) {
 			int product_id = ParseInt(token[0]);
@@ -665,7 +665,7 @@ public class DataMan extends DataInterface {
         
         // TODO 测试代码待删除
         if (!myFriend)
-        	list.add(new ListItemMap("非好友"/* 名字 */, KEY_FRIEND_ID, 1/* id */));
+        	list.add(new ListItemMap("非好友"/* 名字 */, KEY_FRIEND_ID, "friend_id_todo"/* id */));
         
         for (String line : lines)  
         {
@@ -699,7 +699,7 @@ public class DataMan extends DataInterface {
 	        			// TODO 判断是否我的好友
 	        		}
 	
-	        		ListItemMap map = new ListItemMap(name/* 名字 */, KEY_FRIEND_ID, id/* id */);
+	        		ListItemMap map = new ListItemMap(name/* 名字 */, KEY_FRIEND_ID, "id"/* id */);
 	        		
 	        		map.put(KEY_FRIEND_MAJOR, major);
 	        		map.put(KEY_FRIEND_ADDRESS, address);
@@ -717,15 +717,13 @@ public class DataMan extends DataInterface {
 	 * 查询我的朋友信息
 	 * @return
 	 */
-	public static ListItemMap GetMyFriendInfo(int friend_id) {
+	public static ListItemMap GetMyFriendInfo(String friend_id) {
 
 		List<ListItemMap> friendList = GetMyGroupFriendList(INVALID_ID, true);
 		
-		if (friend_id != INVALID_ID) {
+		if (friend_id != null) {
 			for (ListItemMap item : friendList) {
-				int id = item.getInt(KEY_FRIEND_ID);
-				
-				if (id == friend_id)
+				if (item.getString(KEY_FRIEND_ID).equals(friend_id))
 					return item;
 			}
 		}
@@ -746,9 +744,9 @@ public class DataMan extends DataInterface {
         List<String> lines = ReadLines(FILE_NAME_MY_GROUP_MESSAGE);
         
         // TODO 待删除测试代码
-        list.add(new ListItemMap("我的自我介绍……"/* 名字 */, KEY_MY_GROUP_MESSAGE_ID, 1/* id */));
-        list.add(new ListItemMap("你好，我有一百吨大米出售，请联系我：18911939853"/* 名字 */, KEY_MY_GROUP_MESSAGE_ID, 1/* id */));
-        list.add(new ListItemMap("我想买你的苹果，你的电话是多少？"/* 名字 */, KEY_MY_GROUP_MESSAGE_ID, 1/* id */));
+        list.add(new ListItemMap("我的自我介绍……"/* 名字 */, KEY_MY_GROUP_MESSAGE_ID, "friend"/* id */));
+        list.add(new ListItemMap("你好，我有一百吨大米出售，请联系我：18911939853"/* 名字 */, KEY_MY_GROUP_MESSAGE_ID, "id"/* id */));
+        list.add(new ListItemMap("我想买你的苹果，你的电话是多少？"/* 名字 */, KEY_MY_GROUP_MESSAGE_ID, "id"/* id */));
         
         for (String line : lines)  
         {
@@ -780,7 +778,7 @@ public class DataMan extends DataInterface {
 	        		String telephone = token[7];
 	        		String message = token[8];
 	
-	        		ListItemMap map = new ListItemMap(poster/* 名字 */, KEY_MY_GROUP_MESSAGE_ID, id/* id */);
+	        		ListItemMap map = new ListItemMap(poster/* 名字 */, KEY_MY_GROUP_MESSAGE_ID, "id"/* id */);
 	        		
 	        		map.put(KEY_FRIEND_MAJOR, owner_id);
 	        		map.put(KEY_FRIEND_MESSAGE_POSER, owner);
@@ -805,7 +803,7 @@ public class DataMan extends DataInterface {
 	 * @param message
 	 * @return
 	 */
-	public static boolean PostNewMessage(String userId, int friendId, String message) {
+	public static boolean PostNewMessage(String userId, String friendId, String message) {
 		// TODO interface 留言参数需调整? encoding?
 		String params = "user=" + userId + ",friend=" + friendId + ",message=" + message;
 

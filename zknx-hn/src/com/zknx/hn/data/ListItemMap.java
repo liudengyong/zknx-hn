@@ -11,7 +11,7 @@ public class ListItemMap extends HashMap<String, Object> {
 	 */
 	private static final long serialVersionUID = 1L;
 	
-	public ListItemMap(String itemName, String keyId, int id) {
+	public ListItemMap(String itemName, String keyId, String id) {
 		this.put(DataMan.KEY_NAME, itemName);
 		this.put(keyId, id);
 	}

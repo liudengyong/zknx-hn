@@ -9,7 +9,7 @@ public class ProductListItemMap extends ListItemMap {
 	 */
 	private static final long serialVersionUID = 1L;
 	
-	public ProductListItemMap(String key_product_market, int product_id, String productName, String priceMin, String priceMax, String priceAverage, String priceHome, String priceUnit, boolean addOrRemove) {
+	public ProductListItemMap(String key_product_market, String product_id, String productName, String priceMin, String priceMax, String priceAverage, String priceHome, String priceUnit, boolean addOrRemove) {
 		super(ProductListAdapter.KEY_PRODUCT_NAME, key_product_market, product_id);
 		this.put(ProductListAdapter.KEY_PRODUCT_NAME, productName);
 		this.put(ProductListAdapter.KEY_PRICE_MIN, priceMin);

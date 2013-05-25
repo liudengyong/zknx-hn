@@ -110,11 +110,11 @@ public class MyGroup extends FunctionView {
 	 * 初始化商友信息
 	 */
 	void initGroupFriendInfo(int position) {
-		int friend_id = mAdapterFriend.getItemMapInt(position, DataMan.KEY_FRIEND_ID);
+		String friendId = mAdapterFriend.getItemMapString(position, DataMan.KEY_FRIEND_ID);
 		
 		LinearLayout layout = (LinearLayout)mInflater.inflate(R.layout.group_friend_info, null);
 		
-		ListItemMap info = DataMan.GetMyFriendInfo(friend_id);
+		ListItemMap info = DataMan.GetMyFriendInfo(friendId);
 		
 		if (info != null) {
 			TextView tv = (TextView)layout.findViewById(R.id.my_friend_info_name);
@@ -290,7 +290,7 @@ public class MyGroup extends FunctionView {
 	 */
 	private void initNewMessageView(CommonListAdapter adapterMessage, int position, final int tabBtnId) {
 		
-		final int friendId = adapterMessage.getItemMapInt(position, DataMan.KEY_MY_GROUP_MESSAGE_ID);
+		final String friendId = adapterMessage.getItemMapString(position, DataMan.KEY_MY_GROUP_MESSAGE_ID);
 		String messageOwner = adapterMessage.getItemMapString(position, DataMan.KEY_FRIEND_MESSAGE_POSER);
 
 		if (mNewMessageLayout == null) {
@@ -339,9 +339,9 @@ public class MyGroup extends FunctionView {
 
 	/**
 	 * 发布新留言
-	 * thread_id为空则新建用户自己的留言
+	 * friendId 为空则新建用户自己的留言（自我介绍）
 	 */
-	private void postNewMessage(final int message_id) {
+	private void postNewMessage(final String friendId) {
 		
 		final String userId = UserMan.GetCurrentUserId();
 
@@ -360,7 +360,7 @@ public class MyGroup extends FunctionView {
 		Dialog.Confirm(mContext, R.string.confirm_post_message, new ConfirmListener() {
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
-				if (!DataMan.PostNewMessage(userId, message_id, newMessage)) {
+				if (!DataMan.PostNewMessage(userId, friendId, newMessage)) {
 					Toast.makeText(mContext, "发布留言失败", Toast.LENGTH_LONG).show();
 					return;
 				}
