@@ -218,7 +218,14 @@ public class AisDoc {
 
 				Debug.Log("item长度：" + length);
 
-				byte[] data = new byte[length];
+				byte[] data;
+				try {
+					data = new byte[length];
+				} catch (Throwable e) {
+					Debug.Log("严重错误：内存不足，" + e.getMessage());
+					return false;
+				}
+
 				if (length != file.read(data)) {
 					Debug.Log("严重错误：Ais解析，读取数据错误！");
 					return false;
