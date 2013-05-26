@@ -222,7 +222,7 @@ public class AisDoc {
 				try {
 					data = new byte[length];
 				} catch (Throwable e) {
-					Debug.Log("严重错误：内存不足，" + e.getMessage());
+					Debug.Log("严重错误：内存不足，parseAisDoc");
 					return false;
 				}
 

@@ -1,6 +1,8 @@
 package com.zknx.hn.functions.common;
 
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.List;
 
 import org.apache.http.util.EncodingUtils;
@@ -13,6 +15,7 @@ import com.zknx.hn.common.UIConst.L_LAYOUT_TYPE;
 import com.zknx.hn.data.DataMan;
 import com.zknx.hn.data.FileUtils;
 import com.zknx.hn.functions.common.AisDoc.AisItem;
+import com.zknx.hn.functions.common.AisDoc.ItemType;
 
 import android.content.Context;
 import android.content.Intent;
@@ -24,6 +27,7 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.webkit.WebView;
 import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -33,13 +37,18 @@ public class AisParser {
 
 	LayoutInflater mInflater;
 	
+	private final int IMAGE_WIDTH = 240;
+	private final int IMAGE_HEIGHT = 360;
+
 	// 用于播放音频
 	AisItem mAudioItem;
 	AisItem mVideoItem;
-	MediaPlayer player;
+	MediaPlayer mPlayer;
 
 	public AisParser(LayoutInflater inflater) {
 		mInflater = inflater;
+		
+		mPlayer = new MediaPlayer();
 	}
 
 	/**
@@ -57,8 +66,11 @@ public class AisParser {
 		
 		// Ais内容滚动视图
 		LinearLayout contentLayout = (LinearLayout) aisLayout.findViewById(R.id.ais_content_view);
+		
+		// Ais内容滚动视图
+		WebView webView = (WebView) aisLayout.findViewById(R.id.ais_webview);
 
-		String title = new AisParser(inflater).parse(ais_id, contentLayout, mediaIconLayout, clickImage);
+		String title = new AisParser(inflater).parseAis(ais_id, contentLayout, webView, mediaIconLayout, clickImage);
 
 		if (title == null) {
 			Debug.Log("严重错误：AIS parse错误");
@@ -108,7 +120,7 @@ public class AisParser {
 	 * @param root
 	 * @return
 	 */
-	private String parse(int ais_id, LinearLayout root, LinearLayout mediaIconLayout, OnClickListener clickImage) {
+	private String parseAis(int ais_id, LinearLayout root, WebView webView, LinearLayout mediaIconLayout, OnClickListener clickImage) {
 		// 获取解析后的ais文档
 		AisDoc aisDoc = new AisDoc(ais_id);
 		String title = aisDoc.getTitle();
@@ -122,39 +134,127 @@ public class AisParser {
 
 			initMediaImage(mediaIconLayout, R.id.ais_view_audio_icon, mAudioItem);
 			initMediaImage(mediaIconLayout, R.id.ais_view_video_icon, mVideoItem);
+			
+			// TODO 解析课件
+			if (ais_id == DataMan.INVALID_ID) {
 
-			Context context = root.getContext();
+				// 隐藏webview
+				webView.setVisibility(View.GONE);
 
-			// 从解析出的ais文档数中生成视图
-			for (List<AisItem> aisLine : aisItemTree) {
-				for (AisItem aisItem : aisLine) {
-
-					AisView item = getAisItemView(aisItem, context);
-
-					// TODO AIS 排版优化？一行？
-					if (item != null)
-						root.addView(item.view);
+				Context context = root.getContext();
+				// 从解析出的ais文档数中生成视图
+				for (List<AisItem> aisLine : aisItemTree) {
+					for (AisItem aisItem : aisLine) {
+	
+						AisView item = getAisItemView(aisItem, context);
+	
+						// TODO AIS 排版优化？一行？
+						if (item != null)
+							root.addView(item.view);
+					}
 				}
-			}
-
-			AisItem imageItems[] = aisDoc.getImageItems();
-
-			if (imageItems != null && imageItems.length > 0) {
+	
+				AisItem imageItems[] = aisDoc.getImageItems();
+	
+				if (imageItems != null && imageItems.length > 0) {
+					
+					LinearLayout imagePreview = (LinearLayout) mInflater.inflate(R.layout.ais_view_images_preview, null);
+	
+					setAisImage(imagePreview, R.id.ais_view_image1_preview, imageItems[0], clickImage);
+					setAisImage(imagePreview, R.id.ais_view_image2_preview, imageItems[1], clickImage);
+					setAisImage(imagePreview, R.id.ais_view_image3_preview, imageItems[2], clickImage);
+	
+					// 添加图片预览视图
+					root.addView(imagePreview);
+				}
+			} else { // 解析普通视图为webview
+				AisItem imageItems[] = aisDoc.getImageItems();
 				
-				LinearLayout imagePreview = (LinearLayout) mInflater.inflate(R.layout.ais_view_images_preview, null);
-
-				setAisImage(imagePreview, R.id.ais_view_image1_preview, imageItems[0], clickImage);
-				setAisImage(imagePreview, R.id.ais_view_image2_preview, imageItems[1], clickImage);
-				setAisImage(imagePreview, R.id.ais_view_image3_preview, imageItems[2], clickImage);
-
-				// 添加图片预览视图
-				root.addView(imagePreview);
+				// 添加图片
+				String imageTags = "";
+				int imageIndex = 0;
+				if (imageItems != null) {
+					for (AisItem item : imageItems) {
+						if (item != null)
+							imageTags += genImgTag(item, imageIndex++);
+					}
+				}
+	
+				// 添加文字
+				String text = "";
+				for (List<AisItem> aisLine : aisItemTree) {
+					for (AisItem aisItem : aisLine) {
+						if (aisItem != null && aisItem.type == ItemType.TEXT)
+							try {
+								text += new String(aisItem.data, "GBK");
+							} catch (UnsupportedEncodingException e) {
+								Debug.Log("编码错误：" + e.getMessage());
+							}
+					}
+				}
+				
+				// html文本
+				String htmlString = genHtmlString(imageTags, text);
+	
+				// 加载webview
+				webView.loadData(htmlString, "text/html", "GBK");
+				webView.loadDataWithBaseURL(null, htmlString, "text/html", "UTF-8", null);
+				webView.setBackgroundColor(0); // 设置透明
 			}
+			
+			// 解析成功播放音频
+			playAudio();
 			
 			return title;
 		}
 		
 		return null;
+	}
+	
+	/**
+	 * 获取html文本
+	 * @return
+	 */
+	private String genHtmlString(String imageTags, String text) {
+		// 文本换行（添加<div>）
+		return "<div class=\"profile-datablock\"><div class=\"profile-content\" style=\"font-size:20px;color:white;\">" + imageTags + text.replaceAll("\r", "<div>") + "</div></div>";
+	}
+
+	/**
+	 * 获取图片标签
+	 * @param item
+	 * @return
+	 */
+	private String genImgTag(AisItem item, int imageIndex) {
+		
+		String imageFilePathName = DataMan.DataFile("image" + imageIndex + ".bmp");
+		String imageAlt = "图片找不到：" + imageFilePathName;
+		
+		// 保存图片
+		saveImageToFile(item.data, imageFilePathName);
+
+		return "<img src=\"file://" + imageFilePathName + "\"" + 
+				" alt=\"" + imageAlt + "\"" +
+				" width=\"" + IMAGE_WIDTH + "\"" + 
+				" height=\"" + IMAGE_HEIGHT + "\"" +
+				" style=\"float:left;margin-right:8px;margin-top:8px;\"/>";
+	}
+	
+	/**
+	 * 保存图片
+	 */
+	private void saveImageToFile(byte[] data, String fileName) {
+		if (data != null) {
+			try {
+				Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
+				FileOutputStream out = new FileOutputStream(fileName);
+				bitmap.compress(Bitmap.CompressFormat.PNG, 90, out);
+			} catch (Exception e) {
+				Debug.Log("严重错误：不能压缩图片，" + e.getMessage());
+			} catch (Throwable e) {
+				Debug.Log("严重错误：内存不足，setAisImage");
+			}
+		}
 	}
 
 	/**
@@ -163,9 +263,13 @@ public class AisParser {
 	private void setAisImage(LinearLayout imagePreview, int imageViewId, AisItem imageItem, OnClickListener clickImage) {
 		if (imageItem != null) {
 			ImageView imageView = (ImageView)imagePreview.findViewById(imageViewId);
-			Bitmap bitmap = BitmapFactory.decodeByteArray(imageItem.data, 0, imageItem.data.length);
-			imageView.setImageBitmap(bitmap);
-			imageView.setOnClickListener(clickImage);
+			try {
+				Bitmap bitmap = BitmapFactory.decodeByteArray(imageItem.data, 0, imageItem.data.length);
+				imageView.setImageBitmap(bitmap);
+				imageView.setOnClickListener(clickImage);
+			} catch (Throwable e) {
+				Debug.Log("严重错误：内存不足，setAisImage");
+			}
 		}
 	}
 	
@@ -282,13 +386,10 @@ public class AisParser {
 			Debug.Log("播放音频错误：mAudioItem空");
 			return;
 		}
-
-		if (player == null)
-			player = new MediaPlayer();
 		
 		// 点击两次停止播放
-		if (player.isPlaying()) {
-			player.stop();
+		if (mPlayer.isPlaying()) {
+			mPlayer.stop();
 			Dialog.Toast(mInflater.getContext(), R.string.stop_play_audio);
 			return;
 		}
@@ -297,10 +398,10 @@ public class AisParser {
 		try {
 			String tmpFileName = DataMan.DataFile("tmp.mp3");
 			FileUtils.WriteFile(tmpFileName, mAudioItem.data);
-			player.reset();
-			player.setDataSource(tmpFileName);
-			player.prepare();
-			player.start();
+			mPlayer.reset();
+			mPlayer.setDataSource(tmpFileName);
+			mPlayer.prepare();
+			mPlayer.start();
 			Dialog.Toast(mInflater.getContext(), R.string.start_play_audio);
 		} catch (IllegalArgumentException e) {
 			exp = e;

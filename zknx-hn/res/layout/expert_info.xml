@@ -15,7 +15,8 @@
         android:id="@+id/expert_info_photo"
         android:layout_height="match_parent"
         android:layout_width="0sp"
-        android:layout_weight="3" />
+        android:layout_weight="3"
+        android:padding="10sp" />
 
         <LinearLayout
         android:layout_height="match_parent"

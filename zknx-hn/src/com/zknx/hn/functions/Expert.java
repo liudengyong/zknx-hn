@@ -3,6 +3,7 @@ package com.zknx.hn.functions;
 import com.zknx.hn.R;
 import com.zknx.hn.common.Dialog;
 import com.zknx.hn.common.Dialog.ConfirmListener;
+import com.zknx.hn.common.Debug;
 import com.zknx.hn.common.UIConst;
 import com.zknx.hn.common.WaitDialog;
 import com.zknx.hn.common.WaitDialog.WaitListener;
@@ -42,7 +43,7 @@ public class Expert extends AisView {
 	 */
 	@Override
 	void initSubClass(int position) {
-		LinearLayout inforLayout  = getExpertInfor(position);
+		LinearLayout inforLayout  = getExpertInfo(position);
 		LinearLayout askBtnLayout = getExpertAskButton(position);
 
 		super.initSubClass(position, inforLayout, askBtnLayout);
@@ -53,12 +54,24 @@ public class Expert extends AisView {
 	 * @param position
 	 * @return
 	 */
-	private LinearLayout getExpertInfor(int position) {
+	private LinearLayout getExpertInfo(int position) {
 		LinearLayout inforLayout = (LinearLayout) mInflater.inflate(R.layout.expert_info, null);
 		
 		// TODO 专家照片
 		ImageView newImageView = (ImageView) inforLayout.findViewById(R.id.expert_info_photo);
-		newImageView.setImageDrawable(mContext.getResources().getDrawable(R.drawable.ic_video));
+
+		long time = System.currentTimeMillis();
+		int res = R.drawable.expert;
+		if (time % 3 == 1)
+			res = R.drawable.expert2;
+		else if (time % 3 == 2)
+			res = R.drawable.expert3;
+		
+		try {
+			newImageView.setImageDrawable(mContext.getResources().getDrawable(res));
+		} catch (Throwable e) {
+			Debug.Log("严重错误：内存不足，getExpertInfo");
+		}
 		
 		// TODO 专家名字，专业，介绍
 		String name = "李天明";
