@@ -699,7 +699,7 @@ public class DataMan extends DataInterface {
 	        			// TODO 判断是否我的好友
 	        		}
 	
-	        		ListItemMap map = new ListItemMap(name/* 名字 */, KEY_FRIEND_ID, "id"/* id */);
+	        		ListItemMap map = new ListItemMap(name/* 名字 */, KEY_FRIEND_ID, token[0]/* id */);
 	        		
 	        		map.put(KEY_FRIEND_MAJOR, major);
 	        		map.put(KEY_FRIEND_ADDRESS, address);
@@ -738,10 +738,12 @@ public class DataMan extends DataInterface {
 	 * fiend_id:INVALID_ID 即返回所有留言信息
 	 * @return
 	 */
-	public static List<ListItemMap> GetMyGroupMessageList(int fiend_id) {
+	public static List<ListItemMap> GetMyGroupMessageList(String friendId) {
 		
 		ArrayList<ListItemMap> list = new ArrayList<ListItemMap>();  
         List<String> lines = ReadLines(FILE_NAME_MY_GROUP_MESSAGE);
+        
+        int fiend_id = ParseInt(friendId);
         
         // TODO 待删除测试代码
         list.add(new ListItemMap("我的自我介绍……"/* 名字 */, KEY_MY_GROUP_MESSAGE_ID, "friend"/* id */));
@@ -1040,7 +1042,7 @@ public class DataMan extends DataInterface {
 	 * @param userId
 	 * @return
 	 */
-	public static int GetMajor(int userId) {
+	public static int GetMajor(String userId) {
 		return DataInterface.GetMajor(userId);
 	}
 	

@@ -114,4 +114,22 @@ public class FunctionView {
 
 		return layout;
 	}
+	
+	/**
+	 * 获取双按钮视图
+	 * @return
+	 */
+	protected LinearLayout getLinearLayoutBtnPair(int text1, int text2, OnClickListener listener) {
+
+		LinearLayout layout = (LinearLayout)mInflater.inflate(R.layout.common_btn_pair, null);
+		Button btn = (Button) layout.findViewById(R.id.common_btn_pair1);
+		btn.setText(text1);
+		btn.setOnClickListener(listener);
+		
+		btn = (Button) layout.findViewById(R.id.common_btn_pair2);
+		btn.setText(text2);
+		btn.setOnClickListener(listener);
+
+		return layout;
+	}
 }

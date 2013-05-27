@@ -143,7 +143,7 @@ public class DataInterface {
 	 * @param userId
 	 * @return
 	 */
-	protected static int GetMajor(int userId) {
+	protected static int GetMajor(String userId) {
 		return -1;
 	}
 }

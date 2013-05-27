@@ -1,8 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+    
+<LinearLayout android:id="@+id/group_friend_info"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical" >
+    android:orientation="vertical"
+    android:layout_above="@+id/group_friend_info_contact" >
     
     <LinearLayout style="@style/FriendInfo" >
 		<TextView
@@ -45,3 +50,11 @@
 	</LinearLayout>
 
 </LinearLayout>
+
+<LinearLayout android:id="@+id/group_friend_info_contact"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical" 
+    android:layout_alignParentBottom="true"/>
+
+</RelativeLayout>

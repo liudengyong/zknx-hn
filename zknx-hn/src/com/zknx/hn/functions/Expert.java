@@ -24,7 +24,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 public class Expert extends AisView {
-	
+
 	// 提问等待进度条
 	private WaitDialog mWaitDialog;
 	// 提问的主题和问题
@@ -33,7 +33,7 @@ public class Expert extends AisView {
 
 	public Expert(LayoutInflater inflater, LinearLayout frameRoot) {
 		super(inflater, frameRoot, UIConst.FUNCTION_ID_EXPERT_GUIDE, R.layout.func_frame_triple);
-		
+
 		Instance = this;
 	}
 
@@ -48,7 +48,7 @@ public class Expert extends AisView {
 
 		super.initSubClass(position, inforLayout, askBtnLayout);
 	}
-	
+
 	/**
 	 * 获取专家资料视图
 	 * @param position
@@ -85,23 +85,26 @@ public class Expert extends AisView {
 		
 		return inforLayout;
 	}
-	
+
 	/**
 	 * 获取专家提问按钮视图
 	 * @param position
 	 * @return
 	 */
 	private LinearLayout getExpertAskButton(int position) {
-		
+
 		final String expertId = "";
 		final String expertName = "刘专家";
 
-		LinearLayout askLayout = getLinearLayoutBtn(mContext.getString(R.string.ask_expert), new OnClickListener() {
+		LinearLayout askLayout = getLinearLayoutBtnPair(R.string.ask_expert, R.string.ask_expert_interphone, new OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				initAskView(expertId, expertName);
 			}
 		});
+		
+		// TODO 实现语音对讲
+		askLayout.findViewById(R.id.common_btn_pair2).setEnabled(false);
 		
 		return askLayout;
 	}
@@ -117,7 +120,7 @@ public class Expert extends AisView {
 	    	Instance.processWaitMessage(msg);
 	    }
 	};
-	
+
 	/**
 	 * 初始化提问视图
 	 * @param expertId

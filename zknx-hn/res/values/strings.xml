@@ -59,6 +59,8 @@
     
     <string name="new_message">新建留言</string>
     <string name="introduce">介绍：</string>
+    
+    <string name="friend_interphone">语音对讲</string>
 
     <string name="self_introduce">自我介绍：</string>
     <string name="please_set_self_introduce">请编辑自我介绍</string>
@@ -80,6 +82,7 @@
     <!-- 专家指导 -->
     <string name="expert_anwser">专家解答</string>
     <string name="ask_expert">向专家提问</string>
+    <string name="ask_expert_interphone">语音对讲</string>
     <string name="ask">提问</string>
     <string name="subject">主题</string>
     <string name="input_subject">请输入主题</string>
