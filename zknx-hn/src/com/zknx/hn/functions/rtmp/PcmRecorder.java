@@ -1,6 +1,8 @@
-package com.zknx.hn.functions.speex;
+package com.zknx.hn.functions.rtmp;
 
 import com.zknx.hn.common.Debug;
+import com.zknx.hn.functions.rtmp.speex.Speex.Consumer;
+import com.zknx.hn.functions.rtmp.speex.SpeexEncoder;
 
 import android.media.AudioFormat;
 import android.media.AudioRecord;
@@ -20,7 +22,7 @@ public class PcmRecorder implements Runnable {
 
 	public void run() {
 
-		Encoder encoder = new Encoder(this.consumer);
+		SpeexEncoder encoder = new SpeexEncoder(this.consumer);
 		Thread encodeThread = new Thread(encoder);
 		encoder.setRunning(true);
 		encodeThread.start();
@@ -44,14 +46,11 @@ public class PcmRecorder implements Runnable {
 			//bufferRead = recordInstance.read(tempBuffer, 0, bufferSize);
 			bufferRead = recordInstance.read(tempBuffer, 0, 640);
 			if (bufferRead == AudioRecord.ERROR_INVALID_OPERATION) {
-				throw new IllegalStateException(
-						"read() returned AudioRecord.ERROR_INVALID_OPERATION");
+				throw new IllegalStateException("read() returned AudioRecord.ERROR_INVALID_OPERATION");
 			} else if (bufferRead == AudioRecord.ERROR_BAD_VALUE) {
-				throw new IllegalStateException(
-						"read() returned AudioRecord.ERROR_BAD_VALUE");
+				throw new IllegalStateException("read() returned AudioRecord.ERROR_BAD_VALUE");
 			} else if (bufferRead == AudioRecord.ERROR_INVALID_OPERATION) {
-				throw new IllegalStateException(
-						"read() returned AudioRecord.ERROR_INVALID_OPERATION");
+				throw new IllegalStateException("read() returned AudioRecord.ERROR_INVALID_OPERATION");
 			}
 
 			if (encoder.isIdle()) {

@@ -1,4 +1,4 @@
-package com.zknx.hn.functions.speex;
+package com.zknx.hn.functions.rtmp;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -29,11 +29,19 @@ import org.red5.server.service.IPendingServiceCallback;
 import org.red5.server.stream.IStreamData;
 import org.red5.server.stream.message.RTMPMessage;
 
+import com.zknx.hn.functions.rtmp.speex.Speex;
+import com.zknx.hn.functions.rtmp.speex.Speex.Consumer;
+import com.zknx.hn.functions.rtmp.speex.SpeexDecoder;
+
 /**
  * A publish client to publish stream to server.
  */
 public class RtmpClient implements IEventDispatcher, INetStreamEventHandler,
 		IPendingServiceCallback {
+	
+	public interface PlayStatusListener {
+	     public void OnPlayStatus(int status);
+	}
 
 	private List<IMessage> frameBuffer = new ArrayList<IMessage>();
 
@@ -66,9 +74,9 @@ public class RtmpClient implements IEventDispatcher, INetStreamEventHandler,
 	private int sampleRate = 0;
 	private int channle;
 	private int mode;
-	private Decoder decoder = null;
+	private Speex.Decoder decoder = null;
 	private Consumer consumer;
-	// TODO private PlayStatusListener listener;
+	private PlayStatusListener listener;
 	
 	public synchronized void publish(String publishName, String publishMode,
 			Object[] params) {
@@ -103,11 +111,9 @@ public class RtmpClient implements IEventDispatcher, INetStreamEventHandler,
 		}
 		state = STOPPED;
 		
-		/* TODO
 		if(listener != null){
 			listener.OnPlayStatus(STOPPED);
 		}
-		*/
 	}
 
 	public synchronized void onStreamEvent(Notify notify) {
@@ -335,9 +341,7 @@ public class RtmpClient implements IEventDispatcher, INetStreamEventHandler,
 		this.consumer = consumer;
 	}
 	
-	/*
 	public void setListener(PlayStatusListener listener) {
 		this.listener = listener;
 	}
-	*/
 }
