@@ -21,6 +21,15 @@ public class Debug {
 	}
 	
 	/**
+	 * 输出调试信息
+	 * @param log
+	 */
+	public static void Log(String log, String subTag) {
+		if (App.mDebug)
+			android.util.Log.d("农信:" + subTag, log);
+	}
+	
+	/**
 	 * 拷贝并解压测试数据文件到sd卡
 	 * @param context
 

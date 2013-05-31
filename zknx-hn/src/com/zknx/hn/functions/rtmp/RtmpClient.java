@@ -1,347 +1,160 @@
 package com.zknx.hn.functions.rtmp;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.io.InputStream;
 import java.util.Map;
 
-import org.apache.mina.core.buffer.IoBuffer;
-import org.red5.io.IoConstants;
-import org.red5.io.flv.Tag;
-import org.red5.io.utils.ObjectMap;
-import org.red5.server.event.IEvent;
-import org.red5.server.event.IEventDispatcher;
-import org.red5.server.messaging.IMessage;
-import org.red5.server.net.rtmp.INetStreamEventHandler;
-import org.red5.server.net.rtmp.RTMPClient;
-import org.red5.server.net.rtmp.event.AudioData;
-import org.red5.server.net.rtmp.event.FlexStreamSend;
-import org.red5.server.net.rtmp.event.IRTMPEvent;
-import org.red5.server.net.rtmp.event.Invoke;
-import org.red5.server.net.rtmp.event.Notify;
-import org.red5.server.net.rtmp.event.Ping;
-import org.red5.server.net.rtmp.event.Unknown;
-import org.red5.server.net.rtmp.event.VideoData;
-import org.red5.server.net.rtmp.message.Constants;
-import org.red5.server.net.rtmp.status.StatusCodes;
-import org.red5.server.service.IPendingServiceCall;
-import org.red5.server.service.IPendingServiceCallback;
-import org.red5.server.stream.IStreamData;
-import org.red5.server.stream.message.RTMPMessage;
+import com.smaxe.uv.client.INetConnection;
+import com.smaxe.uv.client.INetStream;
+import com.smaxe.uv.client.License;
+import com.smaxe.uv.client.NetConnection;
+import com.smaxe.uv.client.NetStream;
+import com.smaxe.uv.stream.MediaData;
+import com.zknx.hn.common.Debug;
+import com.zknx.hn.functions.rtmp.RtmpMediaData.OnMediaDataListener;
 
-import com.zknx.hn.functions.rtmp.speex.Speex;
-import com.zknx.hn.functions.rtmp.speex.Speex.Consumer;
-import com.zknx.hn.functions.rtmp.speex.SpeexDecoder;
+public class RtmpClient {
 
-/**
- * A publish client to publish stream to server.
- */
-public class RtmpClient implements IEventDispatcher, INetStreamEventHandler,
-		IPendingServiceCallback {
-	
-	public interface PlayStatusListener {
-	     public void OnPlayStatus(int status);
-	}
+	private final static String subTAG = "RtmpClient";
 
-	private List<IMessage> frameBuffer = new ArrayList<IMessage>();
+	private String SERVER_URL;
+	private String STREAM = "";
+	private NetConnection connection = null;
+	private NetStream netStream = null;
+	private RtmpMediaData rtmpMediaData;
+	private AudioCenter audioCenter;
+	private OnConnListener mConnListener;
 
-	public static final int STOPPED = 0;
-	public static final int CONNECTING = 1;
-	public static final int STREAM_CREATING = 2;
-	public static final int PUBLISHING = 3;
-	private static final int PLAYING = 3;
-	public static final int PUBLISHED = 4;
+	public RtmpClient() {
 
-	public static final int PUBLISH = 1;
-	public static final int PLAY = 2;
-
-	private String host;
-	private int port;
-	private String app;
-	private int state;
-	private int duration = 10 * 1000;
-	private int start = 0;
-	private int playLen = 10;
-	private String publishName;
-	private String playFileName;
-	private int streamId;
-	private String publishMode;
-	private RTMPClient rtmpClient;
-	private int prevSize = 0;
-	private Tag tag;
-	private int currentTime = 0;
-	private long timeBase = 0;
-	private int sampleRate = 0;
-	private int channle;
-	private int mode;
-	private Speex.Decoder decoder = null;
-	private Consumer consumer;
-	private PlayStatusListener listener;
-	
-	public synchronized void publish(String publishName, String publishMode,
-			Object[] params) {
-		state = CONNECTING;
-		this.publishName = publishName;
-		this.publishMode = publishMode;
-		this.mode = PUBLISH;
-		startClientConnect(params);
-	}
-
-	public synchronized void play(String playName, int start, int duration,
-			Object[] params) {
-		state = CONNECTING;
-		this.playFileName = playName;
-		this.start = start;
-		this.duration = duration;
-		this.mode = PLAY;
-		startClientConnect(params);
-	}
-
-	private void startClientConnect(Object[] params) {
-		rtmpClient = new RTMPClient();
-		rtmpClient.setStreamEventDispatcher(this);
-		Map<String, Object> defParams = rtmpClient.makeDefaultConnectionParams(
-				host, port, app);
-		rtmpClient.connect(host, port, defParams, this, params);
-	}
-
-	public synchronized void stop() {
-		if (state >= STREAM_CREATING) {
-			rtmpClient.disconnect();
-		}
-		state = STOPPED;
+		License.setKey("5719B-F1E0E-023C7-7E600-48689");
 		
-		if(listener != null){
-			listener.OnPlayStatus(STOPPED);
-		}
-	}
+		audioCenter = new AudioCenter();
 
-	public synchronized void onStreamEvent(Notify notify) {
-		ObjectMap<?, ?> map = (ObjectMap<?, ?>) notify.getCall().getArguments()[0];
-		String code = (String) map.get("code");
-		if (StatusCodes.NS_PUBLISH_START.equals(code)) {
-			state = PUBLISHED;
-			while (frameBuffer.size() > 0) {
-				rtmpClient.publishStreamData(streamId, frameBuffer.remove(0));
-			}
-		}
-	}
-
-	public synchronized void resultReceived(IPendingServiceCall call) {
-		if ("connect".equals(call.getServiceMethodName())) {
-			state = STREAM_CREATING;
-			rtmpClient.createStream(this);
-		} else if ("createStream".equals(call.getServiceMethodName())) {
-			Object result = call.getResult();
-			if (result instanceof Integer) {
-				Integer streamIdInt = (Integer) result;
-				streamId = streamIdInt.intValue();
-
-				if (this.mode == PUBLISH) {
-					rtmpClient.publish(streamIdInt.intValue(), publishName,
-							publishMode, this);
-					state = PUBLISHING;
-				} else if (this.mode == PLAY) {
-					rtmpClient.play(streamIdInt, playFileName, start, duration);
-
-					Ping ping = new Ping();
-					ping.setEventType(Ping.CLIENT_BUFFER);
-					ping.setValue2(streamId);
-					ping.setValue3(2000);
-					rtmpClient.getConnection().ping(ping);
-					rtmpClient.setServiceProvider(this);
-					state = PLAYING;
-				}
-
-			} else {
-				rtmpClient.disconnect();
-				state = STOPPED;
-			}
-		}
-	}
-
-	public void dispatchEvent(IEvent event) {
-		IRTMPEvent rtmpEvent = (IRTMPEvent) event;
-
-		if (!(rtmpEvent instanceof IStreamData)) {
-			return;
-		}
-		if (rtmpEvent.getHeader().getSize() == 0) {
-			return;
-		}
-
-		if (rtmpEvent instanceof VideoData) {
-			//play video here
-		} else if (rtmpEvent instanceof AudioData) {
-			IoBuffer buf = ((AudioData) rtmpEvent).getData();
-			byte tagType = buf.get();
-			if (decoder == null) {
-				byte codec = (byte) (tagType & 0xF0);
-				if (codec == (byte) (IoConstants.FLAG_FORMAT_SPEEX << 4)) {
-					decoder = new SpeexDecoder(this.consumer);
-					Thread decodeThread = new Thread((Runnable) decoder);
-					decoder.setRunning(true);
-					decodeThread.start();
-				} else if (codec == (byte) (IoConstants.FLAG_FORMAT_NELLYMOSER << 4)) {
-
-					// start nellymoser decoder here
-
-				} else {
-					return;
+		rtmpMediaData = new RtmpMediaData(new OnMediaDataListener() {
+			@Override
+			public void onAudioData(MediaData mediaData) {
+				try {
+					InputStream is = mediaData.read();
+					byte[] audioData = new byte[is.available()];
+					int re = is.read(audioData);
+					if (re != 0) {
+						byte[] realAudioData = new byte[re - 1];
+						System.arraycopy(audioData, 1, realAudioData, 0, re - 1);
+						audioCenter.putData(realAudioData);
+					}
+				} catch (IOException e) {
+					Debug.Log("onAudioData异常：" + e.getMessage());
 				}
 			}
-			int size = buf.remaining();
-			byte[] data = new byte[size];
-			buf.get(data, 0, size);
-			if (decoder.isIdle()) {
-				decoder.putData(rtmpEvent.getTimestamp(), data, size);
-			} else {
+		});
+	}
+
+	/**
+	 * 连接开始会话
+	 * @param SERVER_URL
+	 * @param STREAM
+	 */
+	public void connect(String SERVER_URL, String STREAM) {
+		this.SERVER_URL = SERVER_URL;
+		this.STREAM = STREAM;
+		connection = new NetConnection();
+		connection.addEventListener(new NetConnectionListener());
+		connection.connect(this.SERVER_URL);
+	}
+
+	private class NetConnectionListener extends NetConnection.ListenerAdapter {
+		@Override
+		public void onAsyncError(INetConnection arg0, String arg1, Exception arg2) {
+			super.onAsyncError(arg0, arg1, arg2);
+		}
+
+		@Override
+		public void onIOError(INetConnection arg0, String arg1) {
+			super.onIOError(arg0, arg1);
+		}
+
+		@Override
+		public void onNetStatus(INetConnection source, Map<String, Object> info) {
+			Debug.Log("NetConnection#onNetStatus: " + info, subTAG);
+			String result = info.get("code").toString();
+			if (NetConnection.CONNECT_SUCCESS.equals(result)) {
+				Debug.Log( "NetConnection#onNetStatus: connection success.",subTAG);
+				netStream = new NetStream(source);
+				netStream.addEventListener(new NetStreamListener());
+				if (mConnListener != null) {
+					mConnListener.onConnectSuccess();
+				}
+			} else if (NetConnection.CONNECT_FAILED.equals(result)) {
+				Debug.Log( "NetConnection#onNetStatus: connection fail.",subTAG);
+			} 
+		}
+
+		private class NetStreamListener extends NetStream.ListenerAdapter {
+			@Override
+			public void onNetStatus(INetStream netStream, Map<String, Object> info) {
+				String code = info.get("code").toString();
+				if (NetStream.PUBLISH_START.equals(code)) {
+					Debug.Log( "NetStream#onNetStatus: PUBLISH_START",subTAG);
+				} else if (NetStream.RECORD_START.equals(code)) {
+					Debug.Log( "NetStream#onNetStatus: RECORD_START",subTAG);
+				} else if (NetStream.RECORD_STOP.equals(code)) {
+					Debug.Log( "NetStream#onNetStatus: RECORD_STOP",subTAG);
+				} else if (NetStream.PLAY_START.equals(code)) {
+					Debug.Log( "NetStream#onNetStatus: PLAY_START",subTAG);
+				} else if (NetStream.PLAY_COMPLETE.equals(code)) {
+					Debug.Log( "NetStream#onNetStatus: PLAY_COMPLETE",subTAG);
+				} else if (NetStream.PLAY_PUBLISH_NOTIFY.equals(code)) {
+					Debug.Log( "NetStream#onNetStatus: PLAY_PUBLISH_NOTIFY",subTAG);
+				} else if (NetStream.PLAY_UNPUBLISH_NOTIFY.equals(code)) {
+					Debug.Log( "NetStream#onNetStatus: PLAY_UNPUBLISH_NOTIFY",subTAG);
+				} else if (NetStream.PLAY_STOP.equals(code)) {
+					Debug.Log( "NetStream#onNetStatus: PLAY_STOP",subTAG);
+				}
 			}
 		}
-		if (rtmpEvent.getTimestamp() / 1000 > playLen) {
-			////log.debug("play progress: {} seconds", playLen);
-			playLen += 10;
+	}
+
+	/**
+	 * 播放对方声音
+	 */
+	public void play() {
+		if (connection.connected()) {
+			audioCenter.playSpeexAudio();
+			netStream.play(rtmpMediaData, STREAM);
 		}
 	}
 
-	@SuppressWarnings("rawtypes")
-	public void onStatus(Object obj) {
-		ObjectMap map = (ObjectMap) obj;
-		String code = (String) map.get("code");
-		//String description = (String) map.get("description");
-		//String details = (String) map.get("details");
-
-		if (StatusCodes.NS_PLAY_RESET.equals(code)) {
-			//log.debug("{}: {}", new Object[] { code, description });
-		} else if (StatusCodes.NS_PLAY_START.equals(code)) {
-			//log.info("playing name: " + playFileName);
-			//log.error("{}: {}", new Object[] { code, description });
-		} else if (StatusCodes.NS_PLAY_STOP.equals(code)) {
-			state = STOPPED;
-			//log.error("{}: {}", new Object[] { code, description });
-			//log.info("Recording Complete");
-			rtmpClient.disconnect();
-			stop();
-		} else if (StatusCodes.NS_PLAY_STREAMNOTFOUND.equals(code)) {
-			state = STOPPED;
-			//log.info("File {} Not found", new Object[] { details });
-			//log.debug("{} for {}", new Object[] { code, details });
-			rtmpClient.disconnect();
-			stop();
+	/**
+	 * 录音并推送给对方
+	 */
+	public void publish() {
+		if (connection.connected()) {
+			netStream.attachAudio(audioCenter);
+			audioCenter.publishSpeexAudio();
+			netStream.publish(STREAM, NetStream.LIVE);
 		}
 	}
 
-	public void writeTag(byte[] buf, int size, long ts) {
-		if (timeBase == 0) {
-			timeBase = ts;
-		}
-		currentTime = (int) (ts - timeBase);
-		tag = new Tag(IoConstants.TYPE_AUDIO, currentTime, size + 1, null,
-				prevSize);
-		prevSize = size + 1;
-
-		byte tagType = (byte) ((IoConstants.FLAG_FORMAT_SPEEX << 4))
-				| (IoConstants.FLAG_SIZE_16_BIT << 1);
-		switch (sampleRate) {
-		case 44100:
-			tagType |= IoConstants.FLAG_RATE_44_KHZ << 2;
-			break;
-		case 22050:
-			tagType |= IoConstants.FLAG_RATE_22_KHZ << 2;
-			break;
-		case 11025:
-			tagType |= IoConstants.FLAG_RATE_11_KHZ << 2;
-			break;
-		default:
-			tagType |= IoConstants.FLAG_RATE_5_5_KHZ << 2;
-		}
-
-		tagType |= (channle == 2 ? IoConstants.FLAG_TYPE_STEREO
-				: IoConstants.FLAG_TYPE_MONO);
-
-		IoBuffer body = IoBuffer.allocate(tag.getBodySize());
-		body.setAutoExpand(true);
-		body.put(tagType);
-		body.put(buf);
-		body.flip();
-		body.limit(tag.getBodySize());
-		tag.setBody(body);
-
-		IMessage msg = makeMessageFromTag(tag);
-		try {
-			pushMessage(msg);
-		} catch (IOException e) {
-			e.printStackTrace();
+	/**
+	 * 连接断开
+	 */
+	public void disConnect() {
+		if (connection.connected()) {
+			connection.close();
+			audioCenter.closeAll();
 		}
 	}
 
-	public IMessage makeMessageFromTag(Tag tag) {
-		IRTMPEvent msg = null;
-		switch (tag.getDataType()) {
-		case Constants.TYPE_AUDIO_DATA:
-			msg = new AudioData(tag.getBody());
-			break;
-		case Constants.TYPE_VIDEO_DATA:
-			msg = new VideoData(tag.getBody());
-			break;
-		case Constants.TYPE_INVOKE:
-			msg = new Invoke(tag.getBody());
-			break;
-		case Constants.TYPE_NOTIFY:
-			msg = new Notify(tag.getBody());
-			break;
-		case Constants.TYPE_FLEX_STREAM_SEND:
-			msg = new FlexStreamSend(tag.getBody());
-			break;
-		default:
-			//log.warn("Unexpected type? {}", tag.getDataType());
-			msg = new Unknown(tag.getDataType(), tag.getBody());
-		}
-		msg.setTimestamp(tag.getTimestamp());
-		RTMPMessage rtmpMsg = new RTMPMessage();
-		rtmpMsg.setBody(msg);
-		rtmpMsg.getBody();
-		return rtmpMsg;
+	/**
+	 * 监听连接成功
+	 * @param onConnListener
+	 */
+	public void setOnConnListener(OnConnListener onConnListener) {
+		this.mConnListener = onConnListener;
 	}
 
-	synchronized public void pushMessage(IMessage message) throws IOException {
-		if (state >= PUBLISHED && message instanceof RTMPMessage) {
-			RTMPMessage rtmpMsg = (RTMPMessage) message;
-			rtmpClient.publishStreamData(streamId, rtmpMsg);
-		} else {
-			frameBuffer.add(message);
-		}
-	}
-
-	public int getState() {
-		return state;
-	}
-
-	public void setHost(String host) {
-		this.host = host;
-	}
-
-	public void setPort(int port) {
-		this.port = port;
-	}
-
-	public void setApp(String app) {
-		this.app = app;
-	}
-
-	public void setSampleRate(int sampleRate) {
-		this.sampleRate = sampleRate;
-	}
-
-	public void setChannle(int channle) {
-		this.channle = channle;
-	}
-
-	public void setConsumer(Consumer consumer) {
-		this.consumer = consumer;
-	}
-	
-	public void setListener(PlayStatusListener listener) {
-		this.listener = listener;
+	public interface OnConnListener{
+		public void onConnectSuccess();
 	}
 }
