@@ -7,17 +7,13 @@ import java.util.Map;
 
 import org.apache.mina.core.buffer.IoBuffer;
 import org.red5.io.IoConstants;
-import org.red5.io.flv.impl.Tag;
+import org.red5.io.flv.Tag;
 import org.red5.io.utils.ObjectMap;
-import org.red5.server.api.event.IEvent;
-import org.red5.server.api.event.IEventDispatcher;
-import org.red5.server.api.event.IEventHandler;
-import org.red5.server.api.service.IPendingServiceCall;
-import org.red5.server.api.service.IPendingServiceCallback;
+import org.red5.server.event.IEvent;
+import org.red5.server.event.IEventDispatcher;
 import org.red5.server.messaging.IMessage;
-import org.red5.server.net.remoting.RemotingClient;
-import org.red5.server.net.rtmp.RTMPConnManager;
-import org.red5.server.net.rtmp.RTMPConnection;
+import org.red5.server.net.rtmp.INetStreamEventHandler;
+import org.red5.server.net.rtmp.RTMPClient;
 import org.red5.server.net.rtmp.event.AudioData;
 import org.red5.server.net.rtmp.event.FlexStreamSend;
 import org.red5.server.net.rtmp.event.IRTMPEvent;
@@ -28,15 +24,16 @@ import org.red5.server.net.rtmp.event.Unknown;
 import org.red5.server.net.rtmp.event.VideoData;
 import org.red5.server.net.rtmp.message.Constants;
 import org.red5.server.net.rtmp.status.StatusCodes;
+import org.red5.server.service.IPendingServiceCall;
+import org.red5.server.service.IPendingServiceCallback;
 import org.red5.server.stream.IStreamData;
 import org.red5.server.stream.message.RTMPMessage;
 
 /**
  * A publish client to publish stream to server.
  */
-public class NetClient implements IEventDispatcher, IEventHandler, IPendingServiceCallback {
-	
-	private static final int FLAG_FORMAT_SPEEX = 11;
+public class RtmpClient implements IEventDispatcher, INetStreamEventHandler,
+		IPendingServiceCallback {
 
 	private List<IMessage> frameBuffer = new ArrayList<IMessage>();
 
@@ -61,8 +58,7 @@ public class NetClient implements IEventDispatcher, IEventHandler, IPendingServi
 	private String playFileName;
 	private int streamId;
 	private String publishMode;
-	private RTMPConnection rtmpClient;
-	private RTMPConnManager rtmpMan = new RTMPConnManager();
+	private RTMPClient rtmpClient;
 	private int prevSize = 0;
 	private Tag tag;
 	private int currentTime = 0;
@@ -72,7 +68,7 @@ public class NetClient implements IEventDispatcher, IEventHandler, IPendingServi
 	private int mode;
 	private Decoder decoder = null;
 	private Consumer consumer;
-	//private PlayStatusListener listener;
+	// TODO private PlayStatusListener listener;
 	
 	public synchronized void publish(String publishName, String publishMode,
 			Object[] params) {
@@ -94,25 +90,20 @@ public class NetClient implements IEventDispatcher, IEventHandler, IPendingServi
 	}
 
 	private void startClientConnect(Object[] params) {
-		
-		// TODO getConnection?
-		/*
-		rtmpClient = rtmpMan.getConnection(0);
-
+		rtmpClient = new RTMPClient();
 		rtmpClient.setStreamEventDispatcher(this);
-
 		Map<String, Object> defParams = rtmpClient.makeDefaultConnectionParams(
 				host, port, app);
 		rtmpClient.connect(host, port, defParams, this, params);
-		*/
 	}
 
 	public synchronized void stop() {
-		/* TODO
 		if (state >= STREAM_CREATING) {
 			rtmpClient.disconnect();
 		}
 		state = STOPPED;
+		
+		/* TODO
 		if(listener != null){
 			listener.OnPlayStatus(STOPPED);
 		}
@@ -124,16 +115,13 @@ public class NetClient implements IEventDispatcher, IEventHandler, IPendingServi
 		String code = (String) map.get("code");
 		if (StatusCodes.NS_PUBLISH_START.equals(code)) {
 			state = PUBLISHED;
-			/* TODO
 			while (frameBuffer.size() > 0) {
 				rtmpClient.publishStreamData(streamId, frameBuffer.remove(0));
 			}
-			*/
 		}
 	}
 
 	public synchronized void resultReceived(IPendingServiceCall call) {
-		/*TODO
 		if ("connect".equals(call.getServiceMethodName())) {
 			state = STREAM_CREATING;
 			rtmpClient.createStream(this);
@@ -164,7 +152,6 @@ public class NetClient implements IEventDispatcher, IEventHandler, IPendingServi
 				state = STOPPED;
 			}
 		}
-		*/
 	}
 
 	public void dispatchEvent(IEvent event) {
@@ -184,7 +171,7 @@ public class NetClient implements IEventDispatcher, IEventHandler, IPendingServi
 			byte tagType = buf.get();
 			if (decoder == null) {
 				byte codec = (byte) (tagType & 0xF0);
-				if (codec == (byte) (FLAG_FORMAT_SPEEX << 4)) {
+				if (codec == (byte) (IoConstants.FLAG_FORMAT_SPEEX << 4)) {
 					decoder = new SpeexDecoder(this.consumer);
 					Thread decodeThread = new Thread((Runnable) decoder);
 					decoder.setRunning(true);
@@ -206,30 +193,36 @@ public class NetClient implements IEventDispatcher, IEventHandler, IPendingServi
 			}
 		}
 		if (rtmpEvent.getTimestamp() / 1000 > playLen) {
+			////log.debug("play progress: {} seconds", playLen);
 			playLen += 10;
 		}
 	}
 
 	@SuppressWarnings("rawtypes")
 	public void onStatus(Object obj) {
-		/*
 		ObjectMap map = (ObjectMap) obj;
 		String code = (String) map.get("code");
-		String description = (String) map.get("description");
-		String details = (String) map.get("details");
+		//String description = (String) map.get("description");
+		//String details = (String) map.get("details");
 
 		if (StatusCodes.NS_PLAY_RESET.equals(code)) {
+			//log.debug("{}: {}", new Object[] { code, description });
 		} else if (StatusCodes.NS_PLAY_START.equals(code)) {
+			//log.info("playing name: " + playFileName);
+			//log.error("{}: {}", new Object[] { code, description });
 		} else if (StatusCodes.NS_PLAY_STOP.equals(code)) {
 			state = STOPPED;
+			//log.error("{}: {}", new Object[] { code, description });
+			//log.info("Recording Complete");
 			rtmpClient.disconnect();
 			stop();
 		} else if (StatusCodes.NS_PLAY_STREAMNOTFOUND.equals(code)) {
 			state = STOPPED;
+			//log.info("File {} Not found", new Object[] { details });
+			//log.debug("{} for {}", new Object[] { code, details });
 			rtmpClient.disconnect();
 			stop();
 		}
-		*/
 	}
 
 	public void writeTag(byte[] buf, int size, long ts) {
@@ -241,7 +234,8 @@ public class NetClient implements IEventDispatcher, IEventHandler, IPendingServi
 				prevSize);
 		prevSize = size + 1;
 
-		byte tagType = (byte) ((FLAG_FORMAT_SPEEX << 4)) | (IoConstants.FLAG_SIZE_16_BIT << 1);
+		byte tagType = (byte) ((IoConstants.FLAG_FORMAT_SPEEX << 4))
+				| (IoConstants.FLAG_SIZE_16_BIT << 1);
 		switch (sampleRate) {
 		case 44100:
 			tagType |= IoConstants.FLAG_RATE_44_KHZ << 2;
@@ -294,28 +288,23 @@ public class NetClient implements IEventDispatcher, IEventHandler, IPendingServi
 			msg = new FlexStreamSend(tag.getBody());
 			break;
 		default:
+			//log.warn("Unexpected type? {}", tag.getDataType());
 			msg = new Unknown(tag.getDataType(), tag.getBody());
 		}
 		msg.setTimestamp(tag.getTimestamp());
-		
-		/*
 		RTMPMessage rtmpMsg = new RTMPMessage();
 		rtmpMsg.setBody(msg);
 		rtmpMsg.getBody();
 		return rtmpMsg;
-		*/
-		return null;
 	}
 
 	synchronized public void pushMessage(IMessage message) throws IOException {
-		/*
 		if (state >= PUBLISHED && message instanceof RTMPMessage) {
 			RTMPMessage rtmpMsg = (RTMPMessage) message;
 			rtmpClient.publishStreamData(streamId, rtmpMsg);
 		} else {
 			frameBuffer.add(message);
 		}
-		*/
 	}
 
 	public int getState() {
@@ -345,16 +334,10 @@ public class NetClient implements IEventDispatcher, IEventHandler, IPendingServi
 	public void setConsumer(Consumer consumer) {
 		this.consumer = consumer;
 	}
-
-	@Override
-	public boolean handleEvent(IEvent arg0) {
-		// TODO Auto-generated method stub
-		return false;
-	}
 	
-	/* TODO
+	/*
 	public void setListener(PlayStatusListener listener) {
 		this.listener = listener;
 	}
-    */
+	*/
 }
