@@ -6,9 +6,6 @@ import java.util.Map;
 
 import com.smaxe.uv.client.INetConnection;
 import com.smaxe.uv.client.INetStream;
-import com.smaxe.uv.client.License;
-import com.smaxe.uv.client.NetConnection;
-import com.smaxe.uv.client.NetStream;
 import com.smaxe.uv.stream.MediaData;
 import com.zknx.hn.common.Debug;
 import com.zknx.hn.functions.rtmp.RtmpMediaData.OnMediaDataListener;
@@ -18,14 +15,16 @@ public class RtmpClient {
 	private final static String subTAG = "RtmpClient";
 	
 	// TODO ÆÆ½â
+	/*
 	static {
 		License.setKey("5719B-F1E0E-023C7-7E600-48689");
 	}
+	*/
 
 	private String SERVER_URL;
 	private String STREAM = "";
-	private NetConnection connection = null;
-	private NetStream netStream = null;
+	private UltraNetConnection connection = null;
+	private UltraNetStream netStream = null;
 	private AudioCenter audioCenter = new AudioCenter();
 	private OnConnListener mConnListener;
 	
@@ -59,12 +58,12 @@ public class RtmpClient {
 	public void connect(String SERVER_URL, String STREAM) {
 		this.SERVER_URL = SERVER_URL;
 		this.STREAM = STREAM;
-		connection = new NetConnection();
+		connection = new UltraNetConnection();
 		connection.addEventListener(new NetConnectionListener());
 		connection.connect(this.SERVER_URL);
 	}
 
-	private class NetConnectionListener extends NetConnection.ListenerAdapter {
+	private class NetConnectionListener extends UltraNetConnection.ListenerAdapter {
 		@Override
 		public void onAsyncError(INetConnection arg0, String arg1, Exception arg2) {
 			super.onAsyncError(arg0, arg1, arg2);
@@ -77,40 +76,40 @@ public class RtmpClient {
 
 		@Override
 		public void onNetStatus(INetConnection source, Map<String, Object> info) {
-			Debug.Log("NetConnection#onNetStatus: " + info, subTAG);
+			Debug.Log("UltraNetConnection#onNetStatus: " + info, subTAG);
 			String result = info.get("code").toString();
-			if (NetConnection.CONNECT_SUCCESS.equals(result)) {
-				Debug.Log( "NetConnection#onNetStatus: connection success.",subTAG);
-				netStream = new NetStream(source);
+			if (UltraNetConnection.CONNECT_SUCCESS.equals(result)) {
+				Debug.Log( "UltraNetConnection#onNetStatus: connection success.",subTAG);
+				netStream = new UltraNetStream(source);
 				netStream.addEventListener(new NetStreamListener());
 				if (mConnListener != null) {
 					mConnListener.onConnectSuccess();
 				}
-			} else if (NetConnection.CONNECT_FAILED.equals(result)) {
-				Debug.Log( "NetConnection#onNetStatus: connection fail.",subTAG);
+			} else if (UltraNetConnection.CONNECT_FAILED.equals(result)) {
+				Debug.Log( "UltraNetConnection#onNetStatus: connection fail.",subTAG);
 			} 
 		}
 
-		private class NetStreamListener extends NetStream.ListenerAdapter {
+		private class NetStreamListener extends UltraNetStream.ListenerAdapter {
 			@Override
 			public void onNetStatus(INetStream netStream, Map<String, Object> info) {
 				String code = info.get("code").toString();
-				if (NetStream.PUBLISH_START.equals(code)) {
-					Debug.Log( "NetStream#onNetStatus: PUBLISH_START",subTAG);
-				} else if (NetStream.RECORD_START.equals(code)) {
-					Debug.Log( "NetStream#onNetStatus: RECORD_START",subTAG);
-				} else if (NetStream.RECORD_STOP.equals(code)) {
-					Debug.Log( "NetStream#onNetStatus: RECORD_STOP",subTAG);
-				} else if (NetStream.PLAY_START.equals(code)) {
-					Debug.Log( "NetStream#onNetStatus: PLAY_START",subTAG);
-				} else if (NetStream.PLAY_COMPLETE.equals(code)) {
-					Debug.Log( "NetStream#onNetStatus: PLAY_COMPLETE",subTAG);
-				} else if (NetStream.PLAY_PUBLISH_NOTIFY.equals(code)) {
-					Debug.Log( "NetStream#onNetStatus: PLAY_PUBLISH_NOTIFY",subTAG);
-				} else if (NetStream.PLAY_UNPUBLISH_NOTIFY.equals(code)) {
-					Debug.Log( "NetStream#onNetStatus: PLAY_UNPUBLISH_NOTIFY",subTAG);
-				} else if (NetStream.PLAY_STOP.equals(code)) {
-					Debug.Log( "NetStream#onNetStatus: PLAY_STOP",subTAG);
+				if (UltraNetStream.PUBLISH_START.equals(code)) {
+					Debug.Log( "UltraNetStream#onNetStatus: PUBLISH_START",subTAG);
+				} else if (UltraNetStream.RECORD_START.equals(code)) {
+					Debug.Log( "UltraNetStream#onNetStatus: RECORD_START",subTAG);
+				} else if (UltraNetStream.RECORD_STOP.equals(code)) {
+					Debug.Log( "UltraNetStream#onNetStatus: RECORD_STOP",subTAG);
+				} else if (UltraNetStream.PLAY_START.equals(code)) {
+					Debug.Log( "UltraNetStream#onNetStatus: PLAY_START",subTAG);
+				} else if (UltraNetStream.PLAY_COMPLETE.equals(code)) {
+					Debug.Log( "UltraNetStream#onNetStatus: PLAY_COMPLETE",subTAG);
+				} else if (UltraNetStream.PLAY_PUBLISH_NOTIFY.equals(code)) {
+					Debug.Log( "UltraNetStream#onNetStatus: PLAY_PUBLISH_NOTIFY",subTAG);
+				} else if (UltraNetStream.PLAY_UNPUBLISH_NOTIFY.equals(code)) {
+					Debug.Log( "UltraNetStream#onNetStatus: PLAY_UNPUBLISH_NOTIFY",subTAG);
+				} else if (UltraNetStream.PLAY_STOP.equals(code)) {
+					Debug.Log( "UltraNetStream#onNetStatus: PLAY_STOP",subTAG);
 				}
 			}
 		}
@@ -133,7 +132,7 @@ public class RtmpClient {
 		if (connection.connected()) {
 			netStream.attachAudio(audioCenter);
 			audioCenter.publishSpeexAudio();
-			netStream.publish(STREAM, NetStream.LIVE);
+			netStream.publish(STREAM, UltraNetStream.LIVE);
 		}
 	}
 
