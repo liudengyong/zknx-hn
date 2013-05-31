@@ -17,21 +17,31 @@ public class AudioCenter extends AbstractMicrophone {
 	
 	private final static String subTAG = "AudioCenter";
 	
+	// TODO 同步？volatile？
 	private boolean isPublish, isPlaying;
 	private Vector<byte[]> buffer2 = new Vector<byte[]>();
+
+	/**
+	 * 放置数据到缓冲区
+	 * @param data
+	 */
 	public void putData(byte[] data) {
 		buffer2.add(data);
 	}
 
+	/**
+	 * 在一个线程中录音并推送
+	 */
 	public void publishSpeexAudio() {
 		new Thread(new Runnable() {
-			byte[] SpeexRtmpHead = new byte[] { (byte) 0xB2 };
+			
+			private final byte[] SpeexRtmpHead = new byte[] { (byte) 0xB2 };
 			private Speex publishSpeex = new Speex();
-			private int frameSize;
 			private byte[] processedData;
+			
 			@Override
 			public void run() {
-				frameSize = publishSpeex.getFrameSize();
+				int frameSize = publishSpeex.getFrameSize();
 				processedData = new byte[frameSize];
 				int bufferSize = AudioRecord.getMinBufferSize(8000, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT);
 				short[] mAudioRecordBuffer = new short[bufferSize];
@@ -55,43 +65,53 @@ public class AudioCenter extends AbstractMicrophone {
 						}
 					}
 				}
+
 				mAudioRecord.stop();
 				mAudioRecord.release();
 				mAudioRecord = null;
 				publishSpeex.close();
+
 				Debug.Log("Publish SpeexAudio Thread Release", subTAG);
 			}
 		}, "Publish SpeexAudio Thread").start();
 	}
 
+	/**
+	 * 在一个线程中从buffer2获取数据，解码并播放
+	 */
 	public void playSpeexAudio() {
 		new Thread(new Runnable() {
+			
+			private short[] decData = new short[256];
 			private Speex playSpeex = new Speex();
+			
 			@Override
 			public void run() {
-				short[] decData = new short[256];
-				AudioTrack audioTrack;
+				
 				int bufferSizeInBytes = AudioTrack.getMinBufferSize(8000, AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT);
-				audioTrack = new AudioTrack(AudioManager.STREAM_VOICE_CALL, 8000, AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT, 2 * bufferSizeInBytes, AudioTrack.MODE_STREAM);
+				AudioTrack audioTrack = new AudioTrack(AudioManager.STREAM_VOICE_CALL, 8000, AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT, 2 * bufferSizeInBytes, AudioTrack.MODE_STREAM);
 				audioTrack.play();
 				isPlaying = true;
+				
 				while (isPlaying) {
 					while (!buffer2.isEmpty()) {
 						byte[] data = buffer2.elementAt(0);
 						buffer2.remove(0);
 						if (data != null) {
+							// 解码
 							int dec = playSpeex.decode(data, decData, data.length);
+							// 播放
 							if (dec > 0) {
 								audioTrack.write(decData, 0, dec);
 							}
 						}
 					}
+					// 延时以缓解系统压力 时间需调试
 					try {
 						Thread.sleep(10);
 					} catch (InterruptedException e) {
 						e.printStackTrace();
 					}
-
 				}
 
 				audioTrack.stop();
@@ -99,20 +119,29 @@ public class AudioCenter extends AbstractMicrophone {
 				audioTrack = null;
 				playSpeex.close();
 				buffer2.clear();
-				Debug.Log("Play SpeexAudio Thread Release", subTAG);
 
+				Debug.Log("Play SpeexAudio Thread Release", subTAG);
 			}
 		}, "Play SpeexAudio Thread").start();
 	}
 
+	/**
+	 * 停止播放
+	 */
 	public void stopPlay() {
 		isPlaying = false;
 	}
 
+	/**
+	 * 停止录音
+	 */
 	public void stopPublish() {
 		isPublish = false;
 	}
 
+	/**
+	 * 停止录音盒播放
+	 */
 	public void closeAll() {
 		isPlaying = false;
 		isPublish = false;

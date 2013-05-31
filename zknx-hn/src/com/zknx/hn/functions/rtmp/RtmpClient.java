@@ -16,38 +16,39 @@ import com.zknx.hn.functions.rtmp.RtmpMediaData.OnMediaDataListener;
 public class RtmpClient {
 
 	private final static String subTAG = "RtmpClient";
+	
+	// TODO 破解
+	static {
+		License.setKey("5719B-F1E0E-023C7-7E600-48689");
+	}
 
 	private String SERVER_URL;
 	private String STREAM = "";
 	private NetConnection connection = null;
 	private NetStream netStream = null;
-	private RtmpMediaData rtmpMediaData;
-	private AudioCenter audioCenter;
+	private AudioCenter audioCenter = new AudioCenter();
 	private OnConnListener mConnListener;
+	
+	// Rtmp数据处理
+	private RtmpMediaData rtmpMediaData = new RtmpMediaData(new OnMediaDataListener() {
+		@Override
+		public void onAudioData(MediaData mediaData) {
+			try {
+				InputStream is = mediaData.read();
+				byte[] audioData = new byte[is.available()];
+				int re = is.read(audioData);
+				if (re != 0) {
+					byte[] realAudioData = new byte[re - 1];
+					System.arraycopy(audioData, 1, realAudioData, 0, re - 1);
+					audioCenter.putData(realAudioData);
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+	});
 
 	public RtmpClient() {
-
-		License.setKey("5719B-F1E0E-023C7-7E600-48689");
-		
-		audioCenter = new AudioCenter();
-
-		rtmpMediaData = new RtmpMediaData(new OnMediaDataListener() {
-			@Override
-			public void onAudioData(MediaData mediaData) {
-				try {
-					InputStream is = mediaData.read();
-					byte[] audioData = new byte[is.available()];
-					int re = is.read(audioData);
-					if (re != 0) {
-						byte[] realAudioData = new byte[re - 1];
-						System.arraycopy(audioData, 1, realAudioData, 0, re - 1);
-						audioCenter.putData(realAudioData);
-					}
-				} catch (IOException e) {
-					Debug.Log("onAudioData异常：" + e.getMessage());
-				}
-			}
-		});
 	}
 
 	/**
