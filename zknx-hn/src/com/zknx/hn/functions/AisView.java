@@ -1,5 +1,11 @@
 package com.zknx.hn.functions;
 
+import java.io.IOException;
+
+import android.app.Activity;
+import android.content.Intent;
+import android.media.MediaPlayer;
+import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -9,8 +15,10 @@ import android.widget.LinearLayout;
 
 import com.zknx.hn.R;
 import com.zknx.hn.common.Debug;
+import com.zknx.hn.common.Dialog;
 import com.zknx.hn.common.UIConst;
 import com.zknx.hn.data.DataMan;
+import com.zknx.hn.data.FileUtils;
 import com.zknx.hn.data.ListItemMap;
 import com.zknx.hn.functions.common.AisParser;
 import com.zknx.hn.functions.common.CommonList;
@@ -33,9 +41,17 @@ public class AisView extends FunctionView {
 	
 	private static final String DEFAULT_TITLE = "内容";
 	private String mAisTitle = DEFAULT_TITLE;
+	
+	// 播放器
+	private MediaPlayer mPlayer;
+	// 解析器
+	AisParser mAisParser;
 
 	public AisView(LayoutInflater inflater, LinearLayout frameRoot, int function_id, int frameResId) {
 		super(inflater, frameRoot, frameResId);
+		
+		mPlayer = new MediaPlayer();
+		mAisParser = new AisParser(inflater);
 		
 		mFrameResId = frameResId;
 		
@@ -142,7 +158,7 @@ public class AisView extends FunctionView {
 		
 		String title = DEFAULT_TITLE;
 		LinearLayout layout = null;
-		AisParser.AisLayout aisLayout = AisParser.GetAisLayout(ais_id, mInflater, mClickImage);
+		AisParser.AisLayout aisLayout = mAisParser.GetAisLayout(ais_id, mInflater, mJsInterface);
 		
 		if (aisLayout != null) {
 			title = aisLayout.getTitle();
@@ -151,29 +167,18 @@ public class AisView extends FunctionView {
 			mAisViewRoot = root;
 			mCurAisId = ais_id;
 			mAisTitle = title;
+			
+			// 如果有音频则播放音频
+			playAisAudio();
 		}
 
 		initContent(title, layout, getCutomBottom(), root);
 	}
 	
 	/**
-	 * 监听图片点击，是否在全Ais界面显示图片
-	 */
-	OnClickListener mClickImage = new OnClickListener() {
-		@Override
-		public void onClick(View view) {
-			if (view instanceof ImageView) {
-				setAisImageView((ImageView)view);
-			} else {
-				Debug.Log("严重错误：mClickImage监听类型错误，" + view.getClass());
-			}
-		}
-	};
-	
-	/**
 	 * Ais界面显示图片
 	 */
-	private void setAisImageView(ImageView imageView) {
+	private void setAisImageView(String filePathName) {
 		
 		LinearLayout layout = (LinearLayout) mInflater.inflate(R.layout.ais_image_view, null);
 		
@@ -186,7 +191,7 @@ public class AisView extends FunctionView {
 		});
 
 		ImageView newImageView = (ImageView) layout.findViewById(R.id.ais_image_view_image);
-		newImageView.setImageDrawable(imageView.getDrawable());
+		newImageView.setImageURI(Uri.parse(filePathName));
 
 		initContent(mAisTitle, layout, mAisViewRoot);
 	}
@@ -213,5 +218,104 @@ public class AisView extends FunctionView {
 		Debug.Log("严重错误：AISView.getTitle " + function_id);
 
 		return "";
+	}
+	
+	// JS接口
+	private JsInterface mJsInterface = new JsInterface();
+	
+	class JsInterface {
+		
+		JsInterface() {
+		}
+		
+		public void playAudio() {
+			runAction(new Runnable() {
+	            @Override
+	            public void run() {
+	            	playAisAudio();	
+	            }
+	    	});
+		}
+		
+		public void playVideo() {
+			runAction(new Runnable() {
+	            @Override
+	            public void run() {
+	            	playAisVideo();	
+	            }
+	    	});
+		}
+		
+		public void showImage(final String filePathName) {
+			runAction(new Runnable() {
+	            @Override
+	            public void run() {
+	            	setAisImageView(filePathName);
+	            }
+	    	});
+		}
+		
+		private void runAction(Runnable action) {
+			((Activity)mContext).runOnUiThread(action);
+		}
+	}
+
+	/**
+	 * 播放音频
+	 */
+	private void playAisAudio() {
+		byte data[] = mAisParser.getAudioData();
+		
+		if (data == null) {
+			Debug.Log("播放音频错误：getAudioData空");
+			return;
+		}
+
+		// 点击两次停止播放
+		if (mPlayer.isPlaying()) {
+			mPlayer.stop();
+			Dialog.Toast(mInflater.getContext(), R.string.stop_play_audio);
+			return;
+		}
+
+		Exception exp = null;
+		try {
+			String tmpFileName = DataMan.DataFile("tmp.mp3");
+			FileUtils.WriteFile(tmpFileName, data);
+			mPlayer.reset();
+			mPlayer.setDataSource(tmpFileName);
+			mPlayer.prepare();
+			mPlayer.start();
+			Dialog.Toast(mInflater.getContext(), R.string.start_play_audio);
+		} catch (IllegalArgumentException e) {
+			exp = e;
+		} catch (SecurityException e) {
+			exp = e;
+		} catch (IllegalStateException e) {
+			exp = e;
+		} catch (IOException e) {
+			exp = e;
+		}
+
+		if (exp != null)
+			Debug.Log("播放异常：" + exp.getMessage());
+	}
+
+	/**
+	 * 播放视频
+	 */
+	private void playAisVideo() {
+		byte data[] = mAisParser.getVideoData();
+		
+		if (data == null) {
+			Debug.Log("播放视频错误：getVideoData空");
+			return;
+		}
+		
+		String tmpFile = DataMan.DataFile("tmp.mp4");
+		FileUtils.WriteFile(tmpFile, data);
+		Intent it = new Intent(Intent.ACTION_VIEW);  
+        it.setDataAndType(Uri.parse(tmpFile), "video/mp4");  
+        mInflater.getContext().startActivity(it);
 	}
 }

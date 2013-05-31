@@ -1,37 +1,21 @@
 package com.zknx.hn.functions.common;
 
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.List;
 
-import org.apache.http.util.EncodingUtils;
-
 import com.zknx.hn.R;
 import com.zknx.hn.common.Debug;
-import com.zknx.hn.common.Dialog;
-import com.zknx.hn.common.UIConst;
-import com.zknx.hn.common.UIConst.L_LAYOUT_TYPE;
 import com.zknx.hn.data.DataMan;
-import com.zknx.hn.data.FileUtils;
 import com.zknx.hn.functions.common.AisDoc.AisItem;
 import com.zknx.hn.functions.common.AisDoc.ItemType;
 
-import android.content.Context;
-import android.content.Intent;
+import android.annotation.SuppressLint;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.media.MediaPlayer;
-import android.net.Uri;
-import android.view.Gravity;
 import android.view.LayoutInflater;
-import android.view.View;
-import android.view.View.OnClickListener;
 import android.webkit.WebView;
-import android.widget.CheckBox;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 
 public class AisParser {
 
@@ -39,17 +23,37 @@ public class AisParser {
 	
 	private final int IMAGE_WIDTH = 240;
 	private final int IMAGE_HEIGHT = 360;
-
+	
 	// 用于播放音频
-	AisItem mAudioItem;
-	AisItem mVideoItem;
-	MediaPlayer mPlayer;
+	private AisItem mAudioItem;
+	private AisItem mVideoItem;
 
 	public AisParser(LayoutInflater inflater) {
 		mInflater = inflater;
-		
-		mPlayer = new MediaPlayer();
 	}
+	
+	/**
+	 * 获取音视频数据
+	 * @return
+	 */
+	public byte[] getAudioData() {
+		if (mAudioItem == null)
+		    Debug.Log("mAudioItem is null getAudioData");
+		else if (mAudioItem.data == null)
+			Debug.Log("mAudioItem is null data null");
+		else
+			Debug.Log("mAudioItem is null data");
+		return (mAudioItem != null) ? mAudioItem.data : null;
+	}
+	
+	/**
+	 * 获取音视频数据
+	 * @return
+	 */
+	public byte[] getVideoData() {
+		return (mVideoItem != null) ? mVideoItem.data : null;
+	}
+
 
 	/**
 	 * 获取ais视图
@@ -57,20 +61,22 @@ public class AisParser {
 	 * @param context
 	 * @return
 	 */
-	public static AisLayout GetAisLayout(int ais_id, LayoutInflater inflater, OnClickListener clickImage) {
+	@SuppressLint("SetJavaScriptEnabled")
+	public AisLayout GetAisLayout(int ais_id, LayoutInflater inflater, Object jsInterface) {
 		
 		LinearLayout aisLayout = (LinearLayout) inflater.inflate(R.layout.ais_view, null);
-		
-		// 音视频图标
-		LinearLayout mediaIconLayout = (LinearLayout) aisLayout.findViewById(R.id.ais_view_media_icon);
-		
+
 		// Ais内容滚动视图
 		LinearLayout contentLayout = (LinearLayout) aisLayout.findViewById(R.id.ais_content_view);
 		
 		// Ais内容滚动视图
 		WebView webView = (WebView) aisLayout.findViewById(R.id.ais_webview);
+		
+		// 添加JS接口
+		webView.getSettings().setJavaScriptEnabled(true); // 启用JS脚本
+        webView.addJavascriptInterface(jsInterface, "ais");
 
-		String title = new AisParser(inflater).parseAis(ais_id, contentLayout, webView, mediaIconLayout, clickImage);
+		String title = parseAis(ais_id, contentLayout, webView);
 
 		if (title == null) {
 			Debug.Log("严重错误：AIS parse错误");
@@ -120,7 +126,7 @@ public class AisParser {
 	 * @param root
 	 * @return
 	 */
-	private String parseAis(int ais_id, LinearLayout root, WebView webView, LinearLayout mediaIconLayout, OnClickListener clickImage) {
+	private String parseAis(int ais_id, LinearLayout root, WebView webView) {
 		// 获取解析后的ais文档
 		AisDoc aisDoc = new AisDoc(ais_id);
 		String title = aisDoc.getTitle();
@@ -131,82 +137,53 @@ public class AisParser {
 			// 初始化音视频图标监听
 			mAudioItem = aisDoc.getAudioItem();
 			mVideoItem = aisDoc.getVideoItem();
-
-			initMediaImage(mediaIconLayout, R.id.ais_view_audio_icon, mAudioItem);
-			initMediaImage(mediaIconLayout, R.id.ais_view_video_icon, mVideoItem);
 			
-			// TODO 解析课件
-			if (ais_id == DataMan.INVALID_ID) {
+			if (mAudioItem == null)
+			    Debug.Log("mAudioItem is null");
+			else
+				Debug.Log("mAudioItem is not null");
+			if (mVideoItem == null)
+				Debug.Log("mVideoItem is null");
+			
+			// 解析普通视图为webview
+			AisItem imageItems[] = aisDoc.getImageItems();
+			
+			// 添加图片
+			String imageTags = "";
+			int imageIndex = 0;
+			if (imageItems != null) {
+				for (AisItem item : imageItems) {
+					if (item != null)
+						imageTags += genImgTag(item, imageIndex++);
+				}
+			}
 
-				// 隐藏webview
-				webView.setVisibility(View.GONE);
-
-				Context context = root.getContext();
-				// 从解析出的ais文档数中生成视图
-				for (List<AisItem> aisLine : aisItemTree) {
-					for (AisItem aisItem : aisLine) {
-	
-						AisView item = getAisItemView(aisItem, context);
-	
-						// TODO AIS 排版优化？一行？
-						if (item != null)
-							root.addView(item.view);
-					}
+			// 添加文字
+			String text = "";
+			for (List<AisItem> aisLine : aisItemTree) {
+				for (AisItem aisItem : aisLine) {
+					if (aisItem != null && aisItem.type == ItemType.TEXT)
+						try {
+							text += new String(aisItem.data, "GBK");
+						} catch (UnsupportedEncodingException e) {
+							Debug.Log("编码错误：" + e.getMessage());
+						}
 				}
-	
-				AisItem imageItems[] = aisDoc.getImageItems();
-	
-				if (imageItems != null && imageItems.length > 0) {
-					
-					LinearLayout imagePreview = (LinearLayout) mInflater.inflate(R.layout.ais_view_images_preview, null);
-	
-					setAisImage(imagePreview, R.id.ais_view_image1_preview, imageItems[0], clickImage);
-					setAisImage(imagePreview, R.id.ais_view_image2_preview, imageItems[1], clickImage);
-					setAisImage(imagePreview, R.id.ais_view_image3_preview, imageItems[2], clickImage);
-	
-					// 添加图片预览视图
-					root.addView(imagePreview);
-				}
-			} else { // 解析普通视图为webview
-				AisItem imageItems[] = aisDoc.getImageItems();
-				
-				// 添加图片
-				String imageTags = "";
-				int imageIndex = 0;
-				if (imageItems != null) {
-					for (AisItem item : imageItems) {
-						if (item != null)
-							imageTags += genImgTag(item, imageIndex++);
-					}
-				}
-	
-				// 添加文字
-				String text = "";
-				for (List<AisItem> aisLine : aisItemTree) {
-					for (AisItem aisItem : aisLine) {
-						if (aisItem != null && aisItem.type == ItemType.TEXT)
-							try {
-								text += new String(aisItem.data, "GBK");
-							} catch (UnsupportedEncodingException e) {
-								Debug.Log("编码错误：" + e.getMessage());
-							}
-					}
-				}
-				
-				// html文本
-				String htmlString = genHtmlString(imageTags, text);
-	
-				// 加载webview
-				webView.loadData(htmlString, "text/html", "GBK");
-				webView.loadDataWithBaseURL(null, htmlString, "text/html", "UTF-8", null);
-				webView.setBackgroundColor(0); // 设置透明
 			}
 			
-			// 解析成功播放音频
-			playAudio();
+			// html文本
+			String htmlString = genHtmlString(genMediaIconTags(), imageTags, text);
+
+			// 加载webview
+			webView.loadData(htmlString, "text/html", "GBK");
+			webView.loadDataWithBaseURL(null, htmlString, "text/html", "UTF-8", null);
+			webView.setBackgroundColor(0); // 设置透明
 			
 			return title;
 		}
+		
+		mAudioItem = null;
+		mVideoItem = null;
 		
 		return null;
 	}
@@ -215,11 +192,34 @@ public class AisParser {
 	 * 获取html文本
 	 * @return
 	 */
-	private String genHtmlString(String imageTags, String text) {
+	private String genHtmlString(String mediaIconTags, String imageTags, String text) {
 		// 文本换行（添加<div>）
-		return "<div class=\"profile-datablock\"><div class=\"profile-content\" style=\"font-size:20px;color:white;\">" + imageTags + text.replaceAll("\r", "<div>") + "</div></div>";
+		return mediaIconTags + "<div class=\"profile-datablock\"><div class=\"profile-content\" style=\"margin-top:8px;font-size:20px;color:white;\">" + imageTags + text.replaceAll("\r", "<div>") + "</div></div>";
 	}
 
+	/**
+	 * 获取图片标签
+	 * @param item
+	 * @return
+	 */
+	private String genMediaIconTags() {
+		
+		// 隐藏
+		if (mAudioItem == null && mVideoItem == null)
+			return "";
+		
+		String audioIconTag = "";
+		String videoIconTag = "";
+		
+		if (mAudioItem != null)
+			audioIconTag = "<img src=\"file:///android_asset/ic_audio.png\" onclick=\"ais.playAudio()\" alt=audio/>音频";
+		
+		if (mVideoItem != null)
+			videoIconTag = "<img src=\"file:///android_asset/ic_video.png\" onclick=\"ais.playVideo()\" alt=video/>视频";
+		
+		return "<div align=\"right\" style=\"margin:4px;font-size:16px;color:white;\">" + audioIconTag + videoIconTag + "</>";
+	}
+	
 	/**
 	 * 获取图片标签
 	 * @param item
@@ -234,6 +234,7 @@ public class AisParser {
 		saveImageToFile(item.data, imageFilePathName);
 
 		return "<img src=\"file://" + imageFilePathName + "\"" + 
+		        " onclick=\"ais.showImage('" + imageFilePathName + "')\"" +
 				" alt=\"" + imageAlt + "\"" +
 				" width=\"" + IMAGE_WIDTH + "\"" + 
 				" height=\"" + IMAGE_HEIGHT + "\"" +
@@ -254,207 +255,6 @@ public class AisParser {
 			} catch (Throwable e) {
 				Debug.Log("严重错误：内存不足，setAisImage");
 			}
-		}
-	}
-
-	/**
-	 * 设置Ais图片
-	 */
-	private void setAisImage(LinearLayout imagePreview, int imageViewId, AisItem imageItem, OnClickListener clickImage) {
-		if (imageItem != null) {
-			ImageView imageView = (ImageView)imagePreview.findViewById(imageViewId);
-			try {
-				Bitmap bitmap = BitmapFactory.decodeByteArray(imageItem.data, 0, imageItem.data.length);
-				imageView.setImageBitmap(bitmap);
-				imageView.setOnClickListener(clickImage);
-			} catch (Throwable e) {
-				Debug.Log("严重错误：内存不足，setAisImage");
-			}
-		}
-	}
-	
-	/**
-	 * 通过AisItem获取item视图
-	 * @param aisItem
-	 * @return
-	 */
-	private AisView getAisItemView(AisItem aisItem, Context context) {
-		AisView aisView = null;
-		
-		switch (aisItem.type) {
-		case CHEKCBOX:
-			aisView = new AisCheckBox(context, aisItem);
-			break;
-		case TEXT:
-			aisView = new AisText(context, aisItem);
-			break;
-		case IMAGE:
-		case VIDEO:
-		case AUDIO:
-		default:
-			Debug.Log("严重错误：getAisItemView，" + aisItem.type);
-			break;
-		}
-		
-		return aisView;
-	}
-	
-	/**
-	 * Ais视图
-	 */
-	class AisView {
-
-		AisView(Context _context, AisItem _item) {
-			context = _context;
-			item = _item;
-		}
-
-		Context context;
-		AisItem item;
-		View view;
-	}
-	
-	/**
-	 * Ais文本视图
-	 */
-	
-	class AisText extends AisView {
-		
-		AisText(Context context, AisItem item) {
-			super(context, item);
-			
-			view = genText();
-		}
-		
-		/**
-		 * 生成文本视图
-		 */
-		private TextView genText() {
-
-			TextView tv = new TextView(context);
-
-			String text = EncodingUtils.getString(item.data, "GB2312");
-			// 处理Windows换行
-			tv.setText(text.replaceAll("\r", "\n"));
-			tv.setGravity(Gravity.LEFT);
-
-			tv.setLayoutParams(UIConst.GetLayoutParams(L_LAYOUT_TYPE.WRAP));
-
-			return tv;
-		}
-	}
-	
-	/**
-	 * 初始化音视频监听事件
-	 * @param mediaResId
-	 */
-	private void initMediaImage(LinearLayout mediaIconLayout, int mediaResId, AisItem mediaAisItem) {
-		if (mediaAisItem != null) {
-			mediaIconLayout.setVisibility(View.VISIBLE);
-			View mediaView = mediaIconLayout.findViewById(mediaResId);
-			mediaView.setVisibility(View.VISIBLE);
-			mediaView.setOnClickListener(mClickMediaIcon);
-		}
-	}
-
-	/**
-	 * 播放音视频
-	 */
-	private OnClickListener mClickMediaIcon = new OnClickListener() {
-		@Override
-		public void onClick(View view) {
-			
-			switch (view.getId()) {
-			case R.id.ais_view_audio_icon:
-				playAudio();
-				break;
-			case R.id.ais_view_video_icon:
-                playVideo();
-                break;
-			default:
-				Debug.Log("严重错误：mClickMediaIcon监听错误");
-				break;
-			}
-		}
-	};
-	
-	/**
-	 * 播放音频
-	 */
-	private void playAudio() {
-		if (mAudioItem == null) {
-			Debug.Log("播放音频错误：mAudioItem空");
-			return;
-		}
-		
-		// 点击两次停止播放
-		if (mPlayer.isPlaying()) {
-			mPlayer.stop();
-			Dialog.Toast(mInflater.getContext(), R.string.stop_play_audio);
-			return;
-		}
-
-		Exception exp = null;
-		try {
-			String tmpFileName = DataMan.DataFile("tmp.mp3");
-			FileUtils.WriteFile(tmpFileName, mAudioItem.data);
-			mPlayer.reset();
-			mPlayer.setDataSource(tmpFileName);
-			mPlayer.prepare();
-			mPlayer.start();
-			Dialog.Toast(mInflater.getContext(), R.string.start_play_audio);
-		} catch (IllegalArgumentException e) {
-			exp = e;
-		} catch (SecurityException e) {
-			exp = e;
-		} catch (IllegalStateException e) {
-			exp = e;
-		} catch (IOException e) {
-			exp = e;
-		}
-
-		if (exp != null)
-			Debug.Log("播放异常：" + exp.getMessage());
-	}
-	
-	/**
-	 * 播放视频
-	 */
-	private void playVideo() {
-		if (mVideoItem != null) {
-			String tmpFile = DataMan.DataFile("tmp.mp4");
-			FileUtils.WriteFile(tmpFile, mVideoItem.data);
-			Intent it = new Intent(Intent.ACTION_VIEW);  
-	        it.setDataAndType(Uri.parse(tmpFile), "video/mp4");  
-	        mInflater.getContext().startActivity(it);
-		}
-	}
-
-	/**
-	 * Ais勾选框视图
-	 */
-	
-	class AisCheckBox extends AisView {
-		
-		AisCheckBox(Context context, AisItem item) {
-			super(context, item);
-			
-			view = genCheckbox();
-		}
-		
-		/**
-		 * 生成文本视图
-		 * TODO AIS 生成AIS项视图  勾选
-		 */
-		private CheckBox genCheckbox() {
-
-			CheckBox tv = new CheckBox(context);
-			tv.setText("TODO:Test AIS View");
-			tv.setGravity(Gravity.CENTER);
-			
-			tv.setLayoutParams(UIConst.GetLayoutParams(L_LAYOUT_TYPE.WRAP));
-			
-			return tv;
 		}
 	}
 }
