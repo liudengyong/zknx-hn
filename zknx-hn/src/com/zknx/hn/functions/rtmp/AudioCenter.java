@@ -18,15 +18,15 @@ public class AudioCenter extends AbstractMicrophone {
 	private final static String subTAG = "AudioCenter";
 	
 	// TODO 同步？volatile？
-	private boolean isPublish, isPlaying;
-	private Vector<byte[]> buffer2 = new Vector<byte[]>();
+	private volatile boolean isPublish, isPlaying;
+	private Vector<byte[]> bufferData = new Vector<byte[]>();
 
 	/**
 	 * 放置数据到缓冲区
 	 * @param data
 	 */
 	public void putData(byte[] data) {
-		buffer2.add(data);
+		bufferData.add(data);
 	}
 
 	/**
@@ -94,9 +94,9 @@ public class AudioCenter extends AbstractMicrophone {
 				isPlaying = true;
 				
 				while (isPlaying) {
-					while (!buffer2.isEmpty()) {
-						byte[] data = buffer2.elementAt(0);
-						buffer2.remove(0);
+					while (!bufferData.isEmpty()) {
+						byte[] data = bufferData.elementAt(0);
+						bufferData.remove(0);
 						if (data != null) {
 							// 解码
 							int dec = playSpeex.decode(data, decData, data.length);
@@ -118,7 +118,7 @@ public class AudioCenter extends AbstractMicrophone {
 				audioTrack.release();
 				audioTrack = null;
 				playSpeex.close();
-				buffer2.clear();
+				bufferData.clear();
 
 				Debug.Log("Play SpeexAudio Thread Release", subTAG);
 			}

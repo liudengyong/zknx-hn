@@ -27,6 +27,7 @@ import com.zknx.hn.functions.common.CommonListAdapter;
 import com.zknx.hn.functions.common.FunctionView;
 import com.zknx.hn.functions.common.CommonList.CommonListParams;
 import com.zknx.hn.functions.common.ListItemClickListener;
+import com.zknx.hn.functions.rtmp.Test;
 
 public class MyGroup extends FunctionView {
 
@@ -110,6 +111,7 @@ public class MyGroup extends FunctionView {
 	/**
 	 * 初始化商友信息
 	 */
+	Test test = new Test();
 	void initGroupFriendInfo(int position) {
 		mCurFriendId = mAdapterFriend.getItemMapString(position, DataMan.KEY_FRIEND_ID);
 		
@@ -136,7 +138,15 @@ public class MyGroup extends FunctionView {
 		layoutContent.addView(getLinearLayoutBtnPair(R.string.new_message, R.string.friend_interphone, listener ), UIConst.GetLayoutParams(L_LAYOUT_TYPE.H_WRAP));
 		
 		// TODO 实现语音对讲
-		layoutContent.findViewById(R.id.common_btn_pair2).setEnabled(false);
+		//layoutContent.findViewById(R.id.common_btn_pair2).setEnabled(false);
+		layoutContent.findViewById(R.id.common_btn_pair2).setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View view) {
+				test.start("rtmp://192.168.0.101/yong", "yong", "jun");
+				
+				//view.setEnabled(false)
+			}
+		});
 		
 		ListItemMap info = DataMan.GetMyFriendInfo(mCurFriendId);
 		
