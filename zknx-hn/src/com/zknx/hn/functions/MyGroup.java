@@ -142,8 +142,9 @@ public class MyGroup extends FunctionView {
 		layoutContent.findViewById(R.id.common_btn_pair2).setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View view) {
-				test.start("rtmp://192.168.0.101/yong", "yong", "jun");
-				
+				String friendId = "jun";
+				String userId = "yong";
+				test.start(DataMan.RTMP_SERVER, userId, friendId);
 				//view.setEnabled(false)
 			}
 		});

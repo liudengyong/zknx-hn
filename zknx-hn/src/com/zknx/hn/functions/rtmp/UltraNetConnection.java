@@ -137,12 +137,13 @@ public final class UltraNetConnection extends i
     this.b.a(paramInt);
   }
 
-  public void onBWDone()
-  {
+  public void onBWDone(Object args) {
   }
-
-  public void onBWDone(Object[] paramArrayOfObject)
-  {
+/*
+  public void onBWDone(Object[] paramArrayOfObject) {
+  }
+*/
+  public void onBWCheck(Object args) {
   }
 
   private void b(Map<String, Object> paramMap)
@@ -170,8 +171,8 @@ public final class UltraNetConnection extends i
     return this.b;
   }
 
-  private static void b(byte abyte0[])
-  throws IllegalArgumentException
+  @SuppressWarnings("unused")
+private static void b(byte abyte0[]) throws IllegalArgumentException
 {
   int l = 0;
   for(int i1 = 1; i1 < abyte0.length - 1; i1++)

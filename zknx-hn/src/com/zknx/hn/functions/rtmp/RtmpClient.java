@@ -58,9 +58,18 @@ public class RtmpClient {
 	public void connect(String SERVER_URL, String STREAM) {
 		this.SERVER_URL = SERVER_URL;
 		this.STREAM = STREAM;
-		connection = new UltraNetConnection();
-		connection.addEventListener(new NetConnectionListener());
-		connection.connect(this.SERVER_URL);
+		
+		Debug.Log("connection enter : " + STREAM);
+
+		try {
+			connection = new UltraNetConnection();
+			connection.addEventListener(new NetConnectionListener());
+			connection.connect(this.SERVER_URL);
+		} catch (Exception e) {
+			Debug.Log("connect_server failed : " + e.getMessage());
+		}
+
+		Debug.Log("connection exit : " + STREAM);
 	}
 
 	private class NetConnectionListener extends UltraNetConnection.ListenerAdapter {
@@ -119,6 +128,10 @@ public class RtmpClient {
 	 * 播放对方声音
 	 */
 	public void play() {
+		if (connection == null) {
+			Debug.Log("错误：play connection is null");
+			return;
+		}
 		if (connection.connected()) {
 			audioCenter.playSpeexAudio();
 			netStream.play(rtmpMediaData, STREAM);
@@ -129,6 +142,11 @@ public class RtmpClient {
 	 * 录音并推送给对方
 	 */
 	public void publish() {
+		if (connection == null) {
+			Debug.Log("错误：publish connection is null");
+			return;
+		}
+		
 		if (connection.connected()) {
 			netStream.attachAudio(audioCenter);
 			audioCenter.publishSpeexAudio();
