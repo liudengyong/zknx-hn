@@ -10,7 +10,8 @@
         android:layout_width="0dip"
         android:layout_height="fill_parent"
         android:layout_margin="4dip"
-        android:layout_weight="0.62">
+        android:layout_weight="0.62"
+        android:orientation="horizontal">
 
          <!-- TO BE ADD IN CODE -->
 

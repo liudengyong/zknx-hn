@@ -34,16 +34,14 @@
 	    android:layout_height="match_parent"
 	    android:layout_below="@+id/function_title"
 	    android:layout_above="@+id/function_frame_btns"
-	    android:layout_margin="10dip" >
-
-	</LinearLayout>
+	    android:layout_margin="10dip"
+	    android:orientation="horizontal" />
 	
 	<LinearLayout
 	    android:id="@+id/function_frame_btns"
 	    android:layout_width="fill_parent"
 	    android:layout_height="wrap_content"
-	    android:layout_alignParentBottom="true" >
-
-	</LinearLayout>
+	    android:layout_alignParentBottom="true"
+	    android:orientation="horizontal" />
 
 </RelativeLayout>

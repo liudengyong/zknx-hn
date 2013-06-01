@@ -10,22 +10,18 @@
         android:layout_width="0dip"
         android:layout_height="fill_parent"
         android:layout_margin="4dip"
-        android:layout_weight="0.62">
-        
-         <!-- TO BE ADD IN CODE -->
-
-    </LinearLayout>
+        android:layout_weight="0.62"
+        android:orientation="horizontal" />
+        <!-- CHILDREN TO BE ADD IN CODE -->
     
      <LinearLayout
         android:id="@+id/triple_content_2"
         android:layout_width="0dip"
         android:layout_height="fill_parent"
         android:layout_margin="4dip"
-        android:layout_weight="0.62">
-
-         <!-- TO BE ADD IN CODE -->
-
-    </LinearLayout>
+        android:layout_weight="0.62"
+        android:orientation="horizontal" />
+        <!-- CHILDREN TO BE ADD IN CODE -->
     
      <LinearLayout
         android:id="@+id/triple_content_3"
@@ -33,9 +29,7 @@
         android:layout_height="fill_parent"
         android:layout_margin="4dip"
         android:layout_weight="1.0"
-        android:orientation="vertical">
+        android:orientation="vertical" />
+        <!-- CHILDREN TO BE ADD IN CODE -->
 
-         <!-- TO BE ADD IN CODE -->
-
-    </LinearLayout>
 </LinearLayout>

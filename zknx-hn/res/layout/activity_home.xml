@@ -9,10 +9,9 @@
         android:id="@+id/group_main_functions"
         android:layout_width="fill_parent"
         android:layout_height="0dip"
-        android:layout_weight="1.0">
-
-         <!-- TO BE ADD IN CODE -->
-    </LinearLayout>
+        android:layout_weight="1.0"
+        android:orientation="horizontal" />
+        <!-- CHILDREN TO BE ADD IN CODE -->
     
 	<!--android.support.v4.view.ViewPager
         android:id="@+id/sub_functions_pager"

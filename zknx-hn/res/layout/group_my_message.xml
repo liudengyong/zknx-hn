@@ -7,7 +7,8 @@
 		android:layout_width="fill_parent"
 		android:layout_height="0sp"
 		android:layout_alignParentTop="true"
-		android:layout_above="@+id/my_group_my_message_introduce" />
+		android:layout_above="@+id/my_group_my_message_introduce"
+		android:orientation="horizontal" />
 
     <RelativeLayout android:id="@+id/my_group_my_message_introduce"
     android:layout_width="match_parent"
