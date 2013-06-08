@@ -18,7 +18,7 @@ import com.smaxe.uv.client.a.h;
 import com.smaxe.uv.client.a.i;
 import com.smaxe.uv.client.a.k;
 
-@SuppressWarnings({"unchecked", "rawtypes"})
+@SuppressWarnings({"unchecked", "rawtypes", "unused"})
 public final class UltraNetConnection extends i
   implements INetConnection
 {
@@ -171,45 +171,44 @@ public final class UltraNetConnection extends i
     return this.b;
   }
 
-  @SuppressWarnings("unused")
-private static void b(byte abyte0[]) throws IllegalArgumentException
-{
-  int l = 0;
-  for(int i1 = 1; i1 < abyte0.length - 1; i1++)
-      l += abyte0[i1] & 0xff;
-
-  l &= 0xff;
-  int j1 = abyte0[1] & 0xf;
-  if((abyte0[0] & 0xff) != (byte)(l >> 0 & 0xf) || (abyte0[abyte0.length - 1] & 0xff) != (byte)(l >> 4 & 0xf) || abyte0[1] + abyte0[abyte0.length - 2] != 15)
-      a(16);
-  boolean aflag[] = new boolean[21];
-  byte abyte1[] = new byte[8];
-  int k1 = 1;
-  int l1 = j1;
-  for(int i2 = 0; i2 < abyte1.length; i2++)
+  private static void b(byte abyte0[]) throws IllegalArgumentException
   {
-      for(; aflag[l1 % aflag.length]; l1++);
-      aflag[l1 % aflag.length] = true;
-      abyte1[i2] = abyte0[2 + l1 % aflag.length];
-      k1 += 2;
-      l1 += k1;
-  }
-
-  if((abyte1[1] & 0xf) != 3)
-      a(32);
-  boolean flag = (abyte1[3] & 0xf) >= 8;
-  int j2 = (flag ? abyte1[3] - 8 : abyte1[3]) & 0xf;
-  if(j2 < 1)
-      a(1);
-  if(flag)
-  {
-      Calendar calendar = Calendar.getInstance();
-      calendar.set(1, 2000 + (abyte1[4] & 0xf));
-      calendar.set(2, (abyte1[5] & 0xf) - 1);
-      calendar.set(5, ((abyte1[6] & 0xf) << 4) + (abyte1[7] & 0xf));
-      if(System.currentTimeMillis() - calendar.getTimeInMillis() > 0L)
-          a(18);
-  }
+	  int l = 0;
+	  for(int i1 = 1; i1 < abyte0.length - 1; i1++)
+	      l += abyte0[i1] & 0xff;
+	
+	  l &= 0xff;
+	  int j1 = abyte0[1] & 0xf;
+	  if((abyte0[0] & 0xff) != (byte)(l >> 0 & 0xf) || (abyte0[abyte0.length - 1] & 0xff) != (byte)(l >> 4 & 0xf) || abyte0[1] + abyte0[abyte0.length - 2] != 15)
+	      a(16);
+	  boolean aflag[] = new boolean[21];
+	  byte abyte1[] = new byte[8];
+	  int k1 = 1;
+	  int l1 = j1;
+	  for(int i2 = 0; i2 < abyte1.length; i2++)
+	  {
+	      for(; aflag[l1 % aflag.length]; l1++);
+	      aflag[l1 % aflag.length] = true;
+	      abyte1[i2] = abyte0[2 + l1 % aflag.length];
+	      k1 += 2;
+	      l1 += k1;
+	  }
+	
+	  if((abyte1[1] & 0xf) != 3)
+	      a(32);
+	  boolean flag = (abyte1[3] & 0xf) >= 8;
+	  int j2 = (flag ? abyte1[3] - 8 : abyte1[3]) & 0xf;
+	  if(j2 < 1)
+	      a(1);
+	  if(flag)
+	  {
+	      Calendar calendar = Calendar.getInstance();
+	      calendar.set(1, 2000 + (abyte1[4] & 0xf));
+	      calendar.set(2, (abyte1[5] & 0xf) - 1);
+	      calendar.set(5, ((abyte1[6] & 0xf) << 4) + (abyte1[7] & 0xf));
+	      if(System.currentTimeMillis() - calendar.getTimeInMillis() > 0L)
+	          a(18);
+	  }
 }
 
   private static void a(int paramInt)
