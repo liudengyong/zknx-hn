@@ -30,8 +30,16 @@ import com.zknx.hn.functions.common.ListItemClickListener;
 public class AisView extends FunctionView {
 
 	// 子类可以访问
-	CommonListAdapter mAdapterClass;
-	CommonListAdapter mAdapterSubClass;
+	CommonListAdapter mAdapterClassList;
+	CommonListAdapter mAdapterAisList;
+	
+	// Ais列表视图框架
+	LinearLayout mAisListFrame;
+	// Ais视图框架
+	LinearLayout mAisContentFrame;
+	
+	// 标题
+	String mTitle;
 
 	private int mFrameResId;
 	
@@ -55,9 +63,15 @@ public class AisView extends FunctionView {
 		
 		mFrameResId = frameResId;
 		
+		mTitle = getTitle(function_id);
+		
 		if (mFrameResId == R.layout.func_frame_split) {
-			initAisList(function_id);
+			mAisListFrame = mContentFrame[0];
+			mAisContentFrame = mContentFrame[1];
+			initAisList(mTitle, DataMan.INVALID_ID, null, null);
 		} else if (mFrameResId == R.layout.func_frame_triple) {
+			mAisListFrame = mContentFrame[1];
+			mAisContentFrame = mContentFrame[2];
 			initClass(function_id);
 		} else {
 			Debug.Log("严重错误：AISView mFrameResId");
@@ -69,13 +83,11 @@ public class AisView extends FunctionView {
 	 */
 	void initClass(int function_id) {
 		
-		String title = getTitle(function_id);
+		mAdapterClassList = new CommonListAdapter(mContext, DataMan.GetAisClassList(function_id));
 		
-		mAdapterClass = new CommonListAdapter(mContext, DataMan.GetAisClassList(function_id));
+		CommonListParams listParams = new CommonListParams(mInflater, mContentFrame[0], mAdapterClassList, mOnClickClass);
 		
-		CommonListParams listParams = new CommonListParams(mInflater, mContentFrame[0], mAdapterClass, mOnClickClass);
-		
-		CommonList.Init(listParams, title);
+		CommonList.Init(listParams, mTitle);
 		
 		// 默认第一个分类
 		initAisList(0);
@@ -101,18 +113,9 @@ public class AisView extends FunctionView {
 	 * @param position
 	 */
 	void initAisList(int position) {
-		initAisList(position, null, null);
-	}
-	
-	/**
-	 * 初始化Ais子分类
-	 * @param position
-	 */
-	protected void initAisList(int position, LinearLayout header, LinearLayout footer) {
-		
-		ListItemMap mapItem = mAdapterClass.getItem(position);
+		ListItemMap mapItem = mAdapterClassList.getItem(position);
+
 		String title = "AIS分类";
-		
 		int class_id = DataMan.INVALID_ID;
 
 		if (mapItem != null) {
@@ -120,9 +123,18 @@ public class AisView extends FunctionView {
 			class_id = mapItem.getInt(DataMan.KEY_AIS_CLASS_ID);
 		}
 		
-		mAdapterSubClass = new CommonListAdapter(mContext, DataMan.GetAisSubClassList(class_id));
+		initAisList(title, class_id, null, null);
+	}
+	
+	/**
+	 * 初始化Ais子分类
+	 * @param position
+	 */
+	protected void initAisList(String title, int class_id, LinearLayout header, LinearLayout footer) {
 		
-		CommonListParams listParams = new CommonListParams(mInflater, mContentFrame[1], mAdapterSubClass, new ListItemClickListener() {
+		mAdapterAisList = new CommonListAdapter(mContext, DataMan.GetAisSubClassList(class_id));
+		
+		CommonListParams listParams = new CommonListParams(mInflater, mAisListFrame, mAdapterAisList, new ListItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 				super.onItemClick(parent, view, position, id);
@@ -139,8 +151,8 @@ public class AisView extends FunctionView {
 	}
 	
 	void attachAisView(int position) {
-		int ais_id = mAdapterSubClass.getItemMapInt(position, DataMan.KEY_AIS_CLASS_ID);
-		attachAisView(ais_id, mContentFrame[2]);
+		int ais_id = mAdapterAisList.getItemMapInt(position, DataMan.KEY_AIS_CLASS_ID);
+		attachAisView(ais_id, mAisContentFrame);
 	}
 
 	void attachAisView(int ais_id, LinearLayout root) {
@@ -185,7 +197,12 @@ public class AisView extends FunctionView {
 		initContent(mAisTitle, layout, mAisViewRoot);
 	}
 
-	String getTitle(int function_id) {
+	/**
+	 * 获取标题
+	 * @param function_id
+	 * @return
+	 */
+	private String getTitle(int function_id) {
 		switch (function_id) {
 		// 中科农信
 		case UIConst.FUNCTION_ID_ARGRI_TECH:

@@ -46,7 +46,7 @@ public class Expert extends AisView {
 		LinearLayout inforLayout  = getExpertInfo(position);
 		LinearLayout askBtnLayout = getExpertAskButton(position);
 
-		super.initAisList(position, inforLayout, askBtnLayout);
+		super.initAisList("专家信息", DataMan.INVALID_ID, inforLayout, askBtnLayout);
 	}
 
 	/**
