@@ -55,7 +55,13 @@ public class AisView extends FunctionView {
 		
 		mFrameResId = frameResId;
 		
-		initClass(function_id);
+		if (mFrameResId == R.layout.func_frame_split) {
+			initAisList(function_id);
+		} else if (mFrameResId == R.layout.func_frame_triple) {
+			initClass(function_id);
+		} else {
+			Debug.Log("严重错误：AISView mFrameResId");
+		}
 	}
 
 	/**
@@ -72,14 +78,14 @@ public class AisView extends FunctionView {
 		CommonList.Init(listParams, title);
 		
 		// 默认第一个分类
-		initSubClassOrAisView(0);
+		initAisList(0);
 	}
 	
 	ListItemClickListener mOnClickClass = new ListItemClickListener() {
 		@Override
 		public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 			super.onItemClick(parent, view, position, id);
-			initSubClassOrAisView(position);
+			initAisList(position);
 		}
 	};
 
@@ -89,35 +95,20 @@ public class AisView extends FunctionView {
 	LinearLayout getCutomBottom() {
 		return null;
 	}
-
+	
 	/**
-	 * 初始化子分类视图（三分视图框架）或者初始化Ais视图（两分视图框架）
+	 * 初始化Ais列表
 	 * @param position
 	 */
-	void initSubClassOrAisView(int position) {
-		if (mFrameResId == R.layout.func_frame_split) {
-			int ais_id = mAdapterClass.getItemMapInt(position, DataMan.KEY_AIS_ID);
-			attachAisView(ais_id, mContentFrame[1]); // FIXME clss_id != ais_id
-		} else if (mFrameResId == R.layout.func_frame_triple) {
-			initSubClass(position);
-		} else {
-			Debug.Log("严重错误：AISView.cutomClass2View");
-		}
+	void initAisList(int position) {
+		initAisList(position, null, null);
 	}
 	
 	/**
 	 * 初始化Ais子分类
 	 * @param position
 	 */
-	void initSubClass(int position) {
-		initSubClass(position, null, null);
-	}
-	
-	/**
-	 * 初始化Ais子分类
-	 * @param position
-	 */
-	protected void initSubClass(int position, LinearLayout header, LinearLayout footer) {
+	protected void initAisList(int position, LinearLayout header, LinearLayout footer) {
 		
 		ListItemMap mapItem = mAdapterClass.getItem(position);
 		String title = "AIS分类";
@@ -136,7 +127,7 @@ public class AisView extends FunctionView {
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 				super.onItemClick(parent, view, position, id);
 				
-				initSubClassAisView(position);
+				attachAisView(position);
 			}
 		});
 		
@@ -144,10 +135,10 @@ public class AisView extends FunctionView {
 		CommonList.Init(listParams, title, header, footer);
 		
 		// 默认第一个AIS视图
-		initSubClassAisView(0);
+		attachAisView(0);
 	}
 	
-	void initSubClassAisView(int position) {
+	void attachAisView(int position) {
 		int ais_id = mAdapterSubClass.getItemMapInt(position, DataMan.KEY_AIS_CLASS_ID);
 		attachAisView(ais_id, mContentFrame[2]);
 	}

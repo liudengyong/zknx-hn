@@ -42,11 +42,11 @@ public class Expert extends AisView {
 	 * @param position
 	 */
 	@Override
-	void initSubClass(int position) {
+	void initAisList(int position) {
 		LinearLayout inforLayout  = getExpertInfo(position);
 		LinearLayout askBtnLayout = getExpertAskButton(position);
 
-		super.initSubClass(position, inforLayout, askBtnLayout);
+		super.initAisList(position, inforLayout, askBtnLayout);
 	}
 
 	/**
@@ -136,7 +136,7 @@ public class Expert extends AisView {
 			@Override
 			public void onClick(View arg0) {
 				// 默认第一个AIS视图
-				initSubClassAisView(0);
+				attachAisView(0);
 			}
 		});
 		
