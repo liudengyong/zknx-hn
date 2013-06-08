@@ -15,6 +15,8 @@ public class DataInterface {
 	protected static final String FILE_NAME_MARKETS = "markets.txt";
 	// 产品（所有市场）列表文件名
 	protected static final String FILE_NAME_PRODUCTS = "products.txt";
+	// 产品名字
+	protected static final String FILE_NAME_COMMODITY = "commodity.txt";
 	// 自选产品列表
 	protected static final String FILE_NAME_MY_PRODUCTS = "my_products.txt";
 	// 产品分类列表文件名
@@ -26,7 +28,7 @@ public class DataInterface {
 	// 所有商友留言文件名
 	protected static final String FILE_NAME_MY_GROUP_MESSAGE = "my_group_message.txt";
 	// ais列表文件名
-	protected static final String FILE_NAME_AIS_LIST = "ais_list.txt";
+	protected static final String FILE_NAME_AIS_LIST = "ais_file_list.txt";
 	// ais分类列表文件名
 	protected static final String FILE_NAME_AIS_CLASS = "ais_class.txt";
 	// 获取ais文件接口

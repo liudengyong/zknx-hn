@@ -8,6 +8,7 @@ import java.util.List;
 
 import com.zknx.hn.common.Debug;
 import com.zknx.hn.data.DataMan;
+import com.zknx.hn.data.FileUtils;
 
 public class AisDoc {
 
@@ -83,7 +84,7 @@ public class AisDoc {
 	 * 通过ais_id构造AisDoc
 	 * @param ais_id
 	 */
-	AisDoc(int ais_id) {
+	AisDoc(String ais_id) {
 		parseAisDoc(ais_id);
 	}
 
@@ -153,17 +154,23 @@ public class AisDoc {
 	 * @param ais_id
 	 * @return
 	 */
-	private boolean parseAisDoc(int ais_id) {
-		if (ais_id == DataMan.INVALID_ID) {
+	private boolean parseAisDoc(String ais_id) {
+		if (ais_id == null) {
 			Debug.Log("严重错误：parseAisDoc，ais_id为空");
 			return false;
 		}
 
 		String filePathName = DataMan.GetAisFilePathName(ais_id);
-		filePathName = DataMan.DataFile("test.ais"); // TODO 待删除
+		
+		if (!FileUtils.IsFileExist(filePathName)) {
+			Debug.Log("Ais文件没找到：" + filePathName);
+			return false;
+		}
+		
 		Debug.Log("解析ais文件：" + filePathName);
 		
 		try {
+			
 			FileInputStream file = new FileInputStream(filePathName);
 
 			// 文件太短，格式错误

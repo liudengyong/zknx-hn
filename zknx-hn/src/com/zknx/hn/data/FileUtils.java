@@ -186,7 +186,8 @@ public class FileUtils {
         }    
         catch (Exception e) {   
             e.printStackTrace();
-            err = "写文件错误";   
+            err = "写文件错误";
+            Debug.Log("WriteText：" + e.getMessage());
         }   
         finally{   
             try {

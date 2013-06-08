@@ -11,9 +11,12 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import android.os.Environment;
 
@@ -826,6 +829,10 @@ public class DataMan extends DataInterface {
 	 */
 	public static List<ListItemMap> GetAisClassList(int function_id) {
 
+		if (!FileUtils.IsFileExist(DataMan.DataFile(FILE_NAME_AIS_CLASS))) {
+			GenerateAisClassCache();
+		}
+
 		List<ListItemMap> list = ReadCommonIdName(FILE_NAME_AIS_CLASS, KEY_AIS_CLASS_ID);
 
 		// 遍历列表并删除不满足条件的项
@@ -839,6 +846,59 @@ public class DataMan extends DataInterface {
         }
 
         return list;
+	}
+	
+	/**
+	 * 生成Ais分类文件（优化效率）
+	 */
+	private static void GenerateAisClassCache() {
+		List<String> lines = ReadLines(FILE_NAME_AIS_LIST);
+		
+		Map<String, String> map = new HashMap<String, String>();
+		
+		String id, name, content = "";
+		for (String line : lines) {
+			String[] token = line.split(TOKEN_SEP);
+			
+			id = token[1];
+			name = FindCommodityName(id);
+			
+			// 如果没有名字就以id为名字
+			if (name == null)
+				name = id;
+
+			if (map.get(id) == null) {
+				map.put(id, "name:"+token[1]); // TODO 产品分类名字
+				
+				content += id + TOKEN_SEP + name + "\n";
+			}
+		}
+		
+		FileUtils.WriteText(DataFile(""), FILE_NAME_AIS_CLASS, content);
+	}
+	
+	/**
+	 * 查找商品名字
+	 * @param id
+	 * @return
+	 */
+	private static String FindCommodityName(String id) {
+		List<String> lines = ReadLines(FILE_NAME_COMMODITY);
+		
+		int intId = ParseInt(id);
+		if (intId == INVALID_ID)
+			return null;
+
+		String[] token;
+		for (String line : lines) {
+			token = line.split(TOKEN_SEP);
+			if (token != null && token.length >= 2) {
+				if (intId == ParseInt(token[0]))
+					return token[1];
+			}
+		}
+
+		return null;
 	}
 	
 	/**
@@ -1007,24 +1067,19 @@ public class DataMan extends DataInterface {
 	 * @param ais_id
 	 * @return
 	 */
-	public static String GetAisFilePathName(int ais_id) {
-		return GetAisFolder() + FromatAisFileName(ais_id);
-	}
+	public static String GetAisFilePathName(String ais_id) {
+		List<String> lines = DataMan.ReadLines(DataMan.FILE_NAME_AIS_LIST);
 
-	/**
-	 * 获取ais文件存放路径
-	 * @return
-	 */
-	private static String GetAisFolder() {
-		return DataFile(AIS_FOLDER);
-	}
+		String token[];
+		for (String line : lines) {
+			token = line.split(DataMan.COMMON_TOKEN);
+			
+			if (token != null && token.length >= 4 && token[0].equals(ais_id)) {
+				return DataMan.DataFile(token[2] + AIS_SURFIX);
+			}
+		}
 
-	/**
-	 * 格式化ais文件名
-	 * @return
-	 */
-	private static String FromatAisFileName(int ais_id) {
-		return ais_id + AIS_SURFIX;
+		return "空";
 	}
 
 	/**

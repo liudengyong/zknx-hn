@@ -62,7 +62,7 @@ public class AisParser {
 	 * @return
 	 */
 	@SuppressLint("SetJavaScriptEnabled")
-	public AisLayout GetAisLayout(int ais_id, LayoutInflater inflater, Object jsInterface) {
+	public AisLayout GetAisLayout(String ais_id, LayoutInflater inflater, Object jsInterface) {
 		
 		LinearLayout aisLayout = (LinearLayout) inflater.inflate(R.layout.ais_view, null);
 
@@ -126,7 +126,7 @@ public class AisParser {
 	 * @param root
 	 * @return
 	 */
-	private String parseAis(int ais_id, LinearLayout root, WebView webView) {
+	private String parseAis(String ais_id, LinearLayout root, WebView webView) {
 		// 获取解析后的ais文档
 		AisDoc aisDoc = new AisDoc(ais_id);
 		String title = aisDoc.getTitle();
