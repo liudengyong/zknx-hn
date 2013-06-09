@@ -66,10 +66,10 @@ public class DataMan extends DataInterface {
 	public static final int INVALID_ID = -1;
 	// 用于查询我的留言的标志
 	public static final int MY_MESSAGE = 0;
-	
+
 	// 通用分隔符
 	public static final String COMMON_TOKEN = ",";
-	
+
 	/**
 	 * 按行读取文本文件
 	 * @param fileName
@@ -111,7 +111,7 @@ public class DataMan extends DataInterface {
 		// 无论有无值，都返回实例，调用者不用判断是否空
 		return list;
 	}
-	
+
 	/**
 	 * 去除UTF8文件标志头，如果存在的话
 	 * @param line
@@ -119,18 +119,20 @@ public class DataMan extends DataInterface {
 	 */
 	private static String RemoveIfContainsUTF8Flags(String line) {
 		final byte[] bom = new byte[] { (byte)0xEF, (byte)0xBB, (byte)0xBF }; 
-		
-		byte[] bytes = line.getBytes();
-		
-		if (bytes[0] == bom[0] && 
-			bytes[1] == bom[1] && 
-			bytes[2] == bom[2]) {
-			return new String(line.substring(2));
+
+		if (line.length() > 3) {
+			byte[] bytes = line.getBytes();
+
+			if (bytes[0] == bom[0] && 
+				bytes[1] == bom[1] && 
+				bytes[2] == bom[2]) {
+				return new String(line.substring(2));
+			}
 		}
-		
+
 		return new String(line);
 	}
-	
+
 	/**
 	 * 以逗号分割一行数据
 	 */
@@ -141,7 +143,7 @@ public class DataMan extends DataInterface {
 		else
 			return new String[0]; // 调用者只需要判断token长度，不用判断是否为空
 	}
-	
+
 	/**
 	 * 字符串转int
 	 * @param value
@@ -285,7 +287,7 @@ public class DataMan extends DataInterface {
         		String product_name = token[3];
         		String minPrice = token[4];
         		String maxPrice = token[5];
-        		String averagePrice = token[6];
+        		String averagePrice = "junjia";//token[6];
         		String hostPrice = "chandi";// token[7];
         		String unit = "unit";//token[8];
         		boolean isMyProduct = IsMyProduct(product_id); /* 添加自选按钮状态 */
