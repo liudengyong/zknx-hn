@@ -83,11 +83,20 @@ public class DataMan extends DataInterface {
 			String filePathName = DataFile(fileName);
 			
 			BufferedReader br = new BufferedReader(new InputStreamReader(
-					new FileInputStream(filePathName)));
-
+					new FileInputStream(filePathName), "UTF-8"));
+			
 			String line;
-			while((line = br.readLine()) != null)
-				list.add(line);
+			boolean fistLine = true;
+			while ((line = br.readLine()) != null) {
+				// 第一行如果有UTF8文件头，去掉
+				if (fistLine) {
+					String newline = RemoveIfContainsUTF8Flags(line);
+					fistLine = false;
+					list.add(newline);
+				} else {
+					list.add(line);
+				}
+			}
 			
 			br.close();
 
@@ -101,6 +110,26 @@ public class DataMan extends DataInterface {
 		
 		// 无论有无值，都返回实例，调用者不用判断是否空
 		return list;
+	}
+	
+	/**
+	 * 去除UTF8文件标志头，如果存在的话
+	 * @param line
+	 * @return
+	 */
+	private static String RemoveIfContainsUTF8Flags(String line) {
+		final byte[] bom = new byte[] { (byte)0xEF, (byte)0xBB, (byte)0xBF }; 
+		
+		byte[] bytes = line.getBytes();
+		
+		if (bytes[0] == bom[0] && 
+			bytes[1] == bom[1] && 
+			bytes[2] == bom[2]) {
+			Debug.Log("bytes : hit ");
+			return new String(line.substring(2));
+		}
+		
+		return new String(line);
 	}
 	
 	/**
@@ -174,7 +203,29 @@ public class DataMan extends DataInterface {
 	 * @return
 	 */
 	public static List<ListItemMap> GetAddressList() {
-		return ReadCommonIdName(FILE_NAME_ADDRESS_PROVINCE, KEY_ADDRESS_ID);
+		
+	    ArrayList<ListItemMap> list = new ArrayList<ListItemMap>();
+        List<String> lines = ReadLines(FILE_NAME_ADDRESS);
+        
+        for (String line : lines) {
+        	// id,名字
+        	String[] token = GetToken(line);
+        	if (token.length == 2) {
+
+        		int id =  ParseInt(token[0]);
+
+        		// 只需要省份
+        		if (id != INVALID_ID && id < 99) {
+
+	        		String name = token[1];
+	        		Debug.Log("name = " + name);
+	
+	        		list.add(new ListItemMap(name/* 名字 */, KEY_ADDRESS_ID, token[0]/* id */));
+        		}
+        	}
+        }
+
+        return list;
 	}
 
 	/**

@@ -349,7 +349,7 @@ public class AisDoc {
 		// Ö÷Ìâ
 		header.title = readText(buffer, offset, size = 12);
 		offset += size;
-		
+
 		return header;
 	}
 	

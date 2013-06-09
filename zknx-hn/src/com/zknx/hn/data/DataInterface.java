@@ -10,7 +10,9 @@ public class DataInterface {
 	public final static String RTMP_SERVER = "rtmp://192.168.0.101/zknx-hn";
 	
 	// 省级地址列表文件名
+	protected static final String FILE_NAME_ADDRESS = "address.txt";
 	protected static final String FILE_NAME_ADDRESS_PROVINCE = "province.txt";
+	
 	// 市场（所有地区）列表文件名
 	protected static final String FILE_NAME_MARKETS = "markets.txt";
 	// 产品（所有市场）列表文件名
