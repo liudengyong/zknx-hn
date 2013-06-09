@@ -267,7 +267,9 @@ public class DataMan extends DataInterface {
         for (String line : lines)
         {
         	String[] token = GetToken(line);
-        	if (token.length == 9) {
+        	// 0101301,北京昌平区水屯农副产品批发市场,0101001000,0101301,13.5,元/公斤
+        	// TODO 接口确定
+        	if (token.length == 6) {
         		// market_id,市场名字,product_id,产品名,最低价,最高价,平均价,产地价,价格单位
         		int market_id_parsed = ParseInt(token[0]);
         		if (market_id_parsed != market_id)
@@ -284,8 +286,8 @@ public class DataMan extends DataInterface {
         		String minPrice = token[4];
         		String maxPrice = token[5];
         		String averagePrice = token[6];
-        		String hostPrice = token[7];
-        		String unit = token[8];
+        		String hostPrice = "chandi";// token[7];
+        		String unit = "unit";//token[8];
         		boolean isMyProduct = IsMyProduct(product_id); /* 添加自选按钮状态 */
         		
         		//list.add(new ProductListItemMap("名字", "最低价", "最高价", "平均价", "产地价", "单位", "添加"));
