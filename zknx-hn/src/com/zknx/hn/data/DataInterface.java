@@ -14,7 +14,7 @@ public class DataInterface {
 	protected static final String FILE_NAME_ADDRESS_PROVINCE = "province.txt";
 	
 	// 市场（所有地区）列表文件名
-	protected static final String FILE_NAME_MARKETS = "markets.txt";
+	protected static final String FILE_NAME_MARKETS = "market.txt";
 	// 产品（所有市场）列表文件名
 	protected static final String FILE_NAME_PRODUCTS = "products.txt";
 	// 产品名字
@@ -83,7 +83,10 @@ public class DataInterface {
 	 */
 	protected static boolean AddressMatch(int address_id, int address_id_parsed) {
 		// TODO interface 地址编号分析，是否属于当前区域
-		return (address_id == address_id_parsed);
+		int max = (address_id + 1) * 1000;;
+		int min = address_id * 1000;
+		
+		return (address_id_parsed > min  && address_id_parsed < max);
 	}
 	
 	/**

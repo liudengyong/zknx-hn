@@ -125,7 +125,6 @@ public class DataMan extends DataInterface {
 		if (bytes[0] == bom[0] && 
 			bytes[1] == bom[1] && 
 			bytes[2] == bom[2]) {
-			Debug.Log("bytes : hit ");
 			return new String(line.substring(2));
 		}
 		
@@ -218,7 +217,6 @@ public class DataMan extends DataInterface {
         		if (id != INVALID_ID && id < 99) {
 
 	        		String name = token[1];
-	        		Debug.Log("name = " + name);
 	
 	        		list.add(new ListItemMap(name/* Ãû×Ö */, KEY_ADDRESS_ID, token[0]/* id */));
         		}
