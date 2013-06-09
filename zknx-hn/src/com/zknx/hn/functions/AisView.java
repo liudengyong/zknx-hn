@@ -45,7 +45,7 @@ public class AisView extends FunctionView {
 	
 	// 点击图片返回时用到
 	private LinearLayout mAisViewRoot;
-	private int mCurAisId;
+	private String mCurAisId;
 	
 	private static final String DEFAULT_TITLE = "内容";
 	private String mAisTitle = DEFAULT_TITLE;
@@ -65,6 +65,7 @@ public class AisView extends FunctionView {
 		
 		mTitle = getTitle(function_id);
 		
+		// 初始化分类（三栏）或者初始化Ais列表（两栏）
 		if (mFrameResId == R.layout.func_frame_split) {
 			mAisListFrame = mContentFrame[0];
 			mAisContentFrame = mContentFrame[1];
@@ -132,7 +133,7 @@ public class AisView extends FunctionView {
 	 */
 	protected void initAisList(String title, int class_id, LinearLayout header, LinearLayout footer) {
 		
-		mAdapterAisList = new CommonListAdapter(mContext, DataMan.GetAisSubClassList(class_id));
+		mAdapterAisList = new CommonListAdapter(mContext, DataMan.GetAisList(class_id));
 		
 		CommonListParams listParams = new CommonListParams(mInflater, mAisListFrame, mAdapterAisList, new ListItemClickListener() {
 			@Override
@@ -151,15 +152,16 @@ public class AisView extends FunctionView {
 	}
 	
 	void attachAisView(int position) {
-		int ais_id = mAdapterAisList.getItemMapInt(position, DataMan.KEY_AIS_CLASS_ID);
+		String ais_id = mAdapterAisList.getItemMapString(position, DataMan.KEY_AIS_ID);
 		attachAisView(ais_id, mAisContentFrame);
 	}
 
-	void attachAisView(int ais_id, LinearLayout root) {
+	void attachAisView(String ais_id, LinearLayout root) {
 		String title = DEFAULT_TITLE;
 		LinearLayout layout = null;
-		// TODO int id 转换
-		AisParser.AisLayout aisLayout = mAisParser.GetAisLayout("" + ais_id, mInflater, mJsInterface);
+		Debug.Log("ais_id = " + ais_id);
+		
+		AisParser.AisLayout aisLayout = mAisParser.GetAisLayout(ais_id, mInflater, mJsInterface);
 		
 		if (aisLayout != null) {
 			title = aisLayout.getTitle();

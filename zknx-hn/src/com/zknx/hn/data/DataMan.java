@@ -146,7 +146,7 @@ public class DataMan extends DataInterface {
 	 */
 	private static List<ListItemMap> ReadCommonIdName(String fileName, String key) {
 
-        ArrayList<ListItemMap> list = new ArrayList<ListItemMap>();  
+        ArrayList<ListItemMap> list = new ArrayList<ListItemMap>();
         List<String> lines = ReadLines(fileName);
         
         for (String line : lines)  
@@ -903,21 +903,27 @@ public class DataMan extends DataInterface {
 	/**
 	 * 获取AIS第二级分类列表
 	 * @param class_id
+	 * INVALID返回所有
 	 * @return
 	 */
-	public static List<ListItemMap> GetAisSubClassList(int class_id) {
+	public static List<ListItemMap> GetAisList(int class_id) {
 
-		List<ListItemMap> list = ReadCommonIdName(FILE_NAME_AIS_CLASS, KEY_AIS_CLASS_ID);
-
-		// 遍历列表并删除不满足条件的项
-		Iterator<ListItemMap> it = list.iterator();
-
-        while (it.hasNext()) {
-        	ListItemMap item = it.next();
-
-        	if (!AisSubClassMatch(class_id, item.getInt(KEY_AIS_CLASS_ID)))
-				it.remove();
-        }
+		List<ListItemMap> list = new ArrayList<ListItemMap>();
+		List<String> lines = ReadLines(FILE_NAME_AIS_LIST);
+		
+		String[] token;
+		for (String line : lines) {
+			token = line.split(TOKEN_SEP);
+			if (token != null && token.length >= 2) {
+				String calssId = token[1];
+				if (class_id == INVALID_ID || class_id == ParseInt(calssId)) {
+					// 符合条件
+					String id = token[0];
+					String name = token[2];
+					list.add(new ListItemMap(name, KEY_AIS_ID, id));
+				}
+			}
+		}
 
         return list;
 	}
