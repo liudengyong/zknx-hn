@@ -504,24 +504,51 @@ public class DataMan extends DataInterface {
 	 * @return
 	 */
 	public static List<ListItemMap> GetProductClassList() {
-		return ReadCommonIdName(FILE_NAME_PRODUCT_CLASS, KEY_PRODUCT_CLASS_ID);
+		//return ReadCommonIdName(FILE_NAME_PRODUCT_CLASS, KEY_PRODUCT_CLASS_ID);
+		
+		ArrayList<ListItemMap> list = new ArrayList<ListItemMap>();
+        List<String> lines = ReadLines(FILE_NAME_COMMODITY);
+        
+        for (String line : lines)  
+        {
+        	// id,名字
+        	String[] token = GetToken(line);
+        	if (token.length == 2) {
+
+        		int id =  ParseInt(token[0]);
+
+        		// id 编码：两位数是分类
+        		if (id != INVALID_ID && id < 100) {
+
+	        		String name = token[1];
+
+	        		list.add(new ListItemMap(name/* 名字 */, KEY_PRODUCT_CLASS_ID, token[0]/* id */));
+        		}
+        	}
+        }
+
+        return list;
 	}
 	
 	/**
 	 * 根据产品分类获取供求信息列表
 	 * @return
 	 */
-	private static List<ListItemMap> GetSupplyDemandList(int product_class_id) {
+	interface SupplyDemandListener {
+		boolean meetCondition(String[] token);
+	}
+	private static List<ListItemMap> GetSupplyDemandList(SupplyDemandListener listener) {
 		ArrayList<ListItemMap> list = new ArrayList<ListItemMap>();
 		List<String> lines = ReadLines(FILE_NAME_SUPPLY_DEMAND_INFO);
-        
+
         for (String line : lines)
         {
         	// product_id,产品名,供求信息id(第一位编码0代表供应，1代表求购),user,标题,供求信息内容,发布时间,有效期,数量,单价,产地,产品特点,联系人名字,联系电话,手机号,详细地址
         	String[] token = GetToken(line);
         	if (token.length != 16)
         		continue;
-        	
+
+        	/*
         	int product_id = ParseInt(token[0]);
     		if (!ProductClassMatch(product_class_id, product_id))
     			continue;
@@ -529,8 +556,10 @@ public class DataMan extends DataInterface {
     		int supply_demand_id = ParseInt(token[2]);
     		if (supply_demand_id == INVALID_ID)
     			continue;
-    				
-    		list.add(GetSupplyDemandMap(token));  
+    		*/
+    		
+    		if (listener.meetCondition(token))
+    			list.add(GetSupplyDemandMap(token));  
         }
 
         return list;
@@ -540,24 +569,26 @@ public class DataMan extends DataInterface {
 	 * 获取供求信息列表
 	 * @return
 	 */
-	public static List<ListItemMap> GetSupplyDemandList(int product_class_id, boolean supply) {
+	public static List<ListItemMap> GetSupplyDemandList(final int product_class_id, final boolean supply) {
 
-		List<ListItemMap> list = GetSupplyDemandList(product_class_id);
-		
-		// 遍历列表并删除不满足条件的项
-		Iterator<ListItemMap> it = list.iterator();
+		SupplyDemandListener listener = new SupplyDemandListener() {
+			@Override
+			public boolean meetCondition(String[] token) {
+				
+				int product_id = ParseInt(token[0]);
+	    		if (!ProductClassMatch(product_class_id, product_id))
+	    			return false;
 
-        while (it.hasNext()) {
-        	ListItemMap item = it.next();
+	    		int supply_demand_id = ParseInt(token[2]);
+	    		if (supply_demand_id == INVALID_ID ||
+	    			IsSupply(supply_demand_id) != supply)
+	    			return false;
 
-        	int supply_demand_id = item.getInt(KEY_SUPPLY_DEMAND_INFO_ID);
+	    		return true;
+			}
+		};
 
-        	// 如果不匹配则从列表中删除
-    		if (IsSupply(supply_demand_id) != supply)
-    			it.remove();
-        }
-
-        return list;
+		return GetSupplyDemandList(listener);
 	}
 
 	// 产品分类id
@@ -660,50 +691,62 @@ public class DataMan extends DataInterface {
 	 * 获取供求对接信息列表(不分供求)
 	 * @return
 	 */
-	public static List<ListItemMap> GetSupplyDemandPairList(int product_class_id) {
+	public static List<ListItemMap> GetSupplyDemandPairList(final int product_class_id) {
 		
 		ArrayList<ListItemMap> list = new ArrayList<ListItemMap>();
 		ArrayList<SupplayDemandPairInfo> listMine = new ArrayList<SupplayDemandPairInfo>(); // 我的供求信息id列表
-		List<ListItemMap> listAll = GetSupplyDemandList(product_class_id);
-		String curUserId = UserMan.GetCurrentUserId();
+		
+		final String curUserId = UserMan.GetCurrentUserId();
 		
 		Debug.Log("curUserId=" + curUserId);
+		
+		SupplyDemandListener listener = new SupplyDemandListener() {
+			@Override
+			public boolean meetCondition(String[] token) {
 
-		// 筛选我的供求信息
-        for (ListItemMap item : listAll)
-        {
-        	// 判断是当用户自己的供求信息
-        	if (curUserId.equals(item.get(SUPPLY_DEMAND_INFO_KEY_USER))) {
-        		// 保存产品分类id和供求信息id
-        		int product_class    = item.getInt(SUPPLY_DEMAND_INFO_PRODUCT_CLASS);
-        		int supply_demand_id = item.getInt(KEY_SUPPLY_DEMAND_INFO_ID);
-        		
-        		// 产品分类
-        		if (product_class == product_class_id)
-        			listMine.add(new SupplayDemandPairInfo(product_class, supply_demand_id));
-        	}
-        }
-        
-        // 筛选我的供求对接信息
-        for (ListItemMap item : listAll)
-        {
-        	// 判断是当用户自己的供求信息
-        	if (curUserId.equals(item.get(SUPPLY_DEMAND_INFO_KEY_USER)))
-        		continue;
-        	
-        	// 判断是否对接
-        	for (SupplayDemandPairInfo pairInfo : listMine) {
-        		int product_class    = item.getInt(SUPPLY_DEMAND_INFO_PRODUCT_CLASS);
-        		int supply_demand_id = item.getInt(KEY_SUPPLY_DEMAND_INFO_ID);
-        		
-        		// 用到亦或操作
-        		if (product_class == pairInfo.product_class_id && (IsSupply(supply_demand_id) ^ IsSupply(pairInfo.supply_demand_id))) {
-        			list.add(item);
-        		}
-        	}
-        }
+				// 筛选我的供求信息
+	        	// 判断是当用户自己的供求信息
+	        	if (curUserId.equals(token[3])) {
+	        		// 保存产品分类id和供求信息id
+	        		int product_id = ParseInt(token[0]);
+	        		int product_class    = ProductClassDecode(product_id);
+	        		
+	        		// 产品分类
+	        		if (product_class == product_class_id)
+	        			return true;
+	        	}
 
-        return list;
+	    		return false;
+			}
+		};
+		
+		final List<ListItemMap> myInfoList = GetSupplyDemandList(listener);
+		
+		SupplyDemandListener listener2 = new SupplyDemandListener() {
+			@Override
+			public boolean meetCondition(String[] token) {
+	        
+	        	// 判断是当用户自己的供求信息
+	        	if (curUserId.equals(token[3]))
+	        		return false;
+	        	
+	        	// 判断是否对接
+	        	for (ListItemMap pairInfo : myInfoList) {
+	        		int product_class    = ParseInt(token[0]);
+	        		int supply_demand_id = ParseInt(token[2]);
+	        		
+	        		// 用到亦或操作
+	        		if (product_class == ListItemMap.GetMapInt(pairInfo, KEY_PRODUCT_CLASS_ID) && 
+	        			(IsSupply(supply_demand_id) ^ IsSupply(ListItemMap.GetMapInt(pairInfo, KEY_SUPPLY_DEMAND_INFO_ID)))) {
+	        			return true;
+	        		}
+	        	}
+
+	    		return false;
+			}
+		};
+		
+		return GetSupplyDemandList(listener2);
 	}
 
 	/**
