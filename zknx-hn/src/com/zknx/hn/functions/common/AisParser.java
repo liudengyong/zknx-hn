@@ -7,6 +7,7 @@ import java.util.List;
 import com.zknx.hn.R;
 import com.zknx.hn.common.Debug;
 import com.zknx.hn.data.DataMan;
+import com.zknx.hn.data.FileUtils;
 import com.zknx.hn.functions.common.AisDoc.AisItem;
 import com.zknx.hn.functions.common.AisDoc.ItemType;
 
@@ -14,6 +15,7 @@ import android.annotation.SuppressLint;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.view.LayoutInflater;
+import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.widget.LinearLayout;
 
@@ -74,6 +76,7 @@ public class AisParser {
 		
 		// 添加JS接口
 		webView.getSettings().setJavaScriptEnabled(true); // 启用JS脚本
+		webView.getSettings().setCacheMode(WebSettings.LOAD_NO_CACHE); // 禁用cache
         webView.addJavascriptInterface(jsInterface, "ais");
 
 		String title = parseAis(ais_id, contentLayout, webView);
@@ -154,7 +157,7 @@ public class AisParser {
 			if (imageItems != null) {
 				for (AisItem item : imageItems) {
 					if (item != null)
-						imageTags += genImgTag(item, imageIndex++);
+						imageTags += genImgTag(ais_id, item, imageIndex++);
 				}
 			}
 
@@ -225,9 +228,9 @@ public class AisParser {
 	 * @param item
 	 * @return
 	 */
-	private String genImgTag(AisItem item, int imageIndex) {
+	private String genImgTag(String aisId, AisItem item, int imageIndex) {
 		
-		String imageFilePathName = DataMan.DataFile("image" + imageIndex + ".bmp");
+		String imageFilePathName = DataMan.DataFile(aisId + "_image" + imageIndex + ".bmp");
 		String imageAlt = "图片找不到：" + imageFilePathName;
 		
 		// 保存图片
@@ -247,6 +250,9 @@ public class AisParser {
 	private void saveImageToFile(byte[] data, String fileName) {
 		if (data != null) {
 			try {
+				if (FileUtils.IsFileExist(fileName))
+					FileUtils.DeleteFile(fileName);
+
 				Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
 				FileOutputStream out = new FileOutputStream(fileName);
 				bitmap.compress(Bitmap.CompressFormat.PNG, 90, out);

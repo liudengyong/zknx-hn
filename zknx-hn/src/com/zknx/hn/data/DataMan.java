@@ -678,23 +678,11 @@ public class DataMan extends DataInterface {
 		return map;
 	}
 
-	private static class SupplayDemandPairInfo {
-		public int product_class_id;
-		public int supply_demand_id;
-
-		SupplayDemandPairInfo(int _product_class_id, int _supply_demand_id) {
-			product_class_id = _product_class_id;
-			supply_demand_id = _supply_demand_id;
-		}
-	}
 	/**
 	 * 获取供求对接信息列表(不分供求)
 	 * @return
 	 */
 	public static List<ListItemMap> GetSupplyDemandPairList(final int product_class_id) {
-		
-		ArrayList<ListItemMap> list = new ArrayList<ListItemMap>();
-		ArrayList<SupplayDemandPairInfo> listMine = new ArrayList<SupplayDemandPairInfo>(); // 我的供求信息id列表
 		
 		final String curUserId = UserMan.GetCurrentUserId();
 		
