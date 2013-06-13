@@ -159,6 +159,18 @@ public class DataMan extends DataInterface {
 		
 		return INVALID_ID; // 返回错误
 	}
+	
+	/**
+	 * 判断字符串是否为空，为空返回true
+	 * @param str
+	 * @return
+	 */
+	public boolean IsStringEmpty(String str) {
+		if (str != null && str.length() > 0)
+			return false;
+		else
+			return true;
+	}
 
 	/**
 	 * 字符串转boolean
@@ -684,7 +696,7 @@ public class DataMan extends DataInterface {
 	 */
 	public static List<ListItemMap> GetSupplyDemandPairList(final int product_class_id) {
 		
-		final String curUserId = UserMan.GetCurrentUserId();
+		final String curUserId = UserMan.GetUserId();
 		
 		Debug.Log("curUserId=" + curUserId);
 		
@@ -857,7 +869,7 @@ public class DataMan extends DataInterface {
 	        		String poster = token[4];
 
 	        		// 查询我的留言
-        			if (MY_MESSAGE == fiend_id && !token[1].equals(UserMan.GetCurrentUserId())) {
+        			if (MY_MESSAGE == fiend_id && !token[1].equals(UserMan.GetUserId())) {
         				continue;
         			}
 
@@ -1177,7 +1189,42 @@ public class DataMan extends DataInterface {
 	 * @param product_id
 	 * @return
 	 */
-	public static boolean PostSupplyDemandInfo(int product_id) {
+	public static class SupplyDemandInfo {
+		public int type;
+		public String title;
+		public String commodityid;
+		public String count;
+		public String publishdate;
+		public String validity;
+		public String place;
+		public String unit;
+		public String price;
+	}
+	
+	public static boolean PostSupplyDemandInfo(SupplyDemandInfo info) {
+		//type=0&title=供应西红柿&userid=linshi&addressid=06056&commodityid=0305002000&count=大量&price=5&unit=元/公斤&phonenumber=15941652887&place=辽宁锦州凌海市新庄子乡小马村范坨&linkman=刘春宇&remark=备注&validity=2013-06-24&publishdate=2013-05-25
+		String params = "type=" + info.type + 
+			"&title=" + info.title + 
+			"&userid=" + UserMan.GetUserId() + 
+			"&addressid=" + UserMan.GetUserAddressId() +
+			"&commodityid=" + info.commodityid + 
+			"&count=" + info.count +
+			"&price=" + info.price + 
+			"&unit=" + info.unit + 
+			"&phonenumber=" + UserMan.GetUserPhone() + 
+			"&place=" + info.place + 
+			"&linkman=" + UserMan.GetUserName() + 
+			"&remark=" + // NO need remark 
+			"&validity=" + info.validity + 
+			"&publishdate=" + info.publishdate;
+		
+		String ret = Downloader.PostUrl(URL_SEVER + URL_POST_SUPPLY_DEMAND_INFO, params);
+
+		if (ret.equals("0"))
+			return true;
+		
+		Debug.Log("发布供求信息错误：返回：" + ret);
+
 		return false;
 	}
 	

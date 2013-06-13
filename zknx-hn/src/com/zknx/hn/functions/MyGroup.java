@@ -385,7 +385,7 @@ public class MyGroup extends FunctionView {
 	 */
 	private void postNewMessage(final String friendId) {
 		
-		final String userId = UserMan.GetCurrentUserId();
+		final String userId = UserMan.GetUserId();
 
 		if (userId == null || userId.length() == 0) {
 			Debug.Log("ÑÏÖØ´íÎó£ºpostNewMessage,userIdÎª¿Õ");

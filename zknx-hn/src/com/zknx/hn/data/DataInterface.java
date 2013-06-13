@@ -63,6 +63,9 @@ public class DataInterface {
 	protected static final String URL_POST_MESSAGE = "post_message.aspx";
 	// TODO interface post专家提问的url
 	protected static final String URL_ASK_EXPERT = "ask_expert.asp";
+	// post供求信息
+	// http://218.106.254.101:8077/post_supply_demand_info.aspx?type=0&title=供应西红柿&userid=linshi&addressid=06056&commodityid=0305002000&count=大量&price=5&unit=元/公斤&phonenumber=15941652887&place=辽宁锦州凌海市新庄子乡小马村范坨&linkman=刘春宇&remark=备注&validity=2013-06-24&publishdate=2013-05-25
+	protected static final String URL_POST_SUPPLY_DEMAND_INFO = "post_supply_demand_info.aspx";
 	
 	// Ais解析
 	public static final char AIS_TOKEN = '\\';

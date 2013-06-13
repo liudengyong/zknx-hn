@@ -39,7 +39,7 @@ public class UserMan {
 	 * @return
 	 * 如果用户已经登录，则返回用户id
 	 */
-	public static String GetCurrentUserId() {
+	public static String GetUserId() {
 		return (mUserInfo != null) ? mUserInfo.userId : null;
 	}
 	
@@ -48,7 +48,7 @@ public class UserMan {
 	 * @return
 	 * 如果用户已经登录，则返回用户名字
 	 */
-	public static String GetCurrentUserName() {
+	public static String GetUserName() {
 		return (mUserInfo != null) ? mUserInfo.userName : null;
 	}
 	
@@ -57,7 +57,7 @@ public class UserMan {
 	 * @return
 	 * 如果用户已经登录，则返回用户地址id
 	 */
-	public static String GetCurrentUserAddressId() {
+	public static String GetUserAddressId() {
 		return (mUserInfo != null) ? mUserInfo.addrId : null;
 	}
 
@@ -66,7 +66,7 @@ public class UserMan {
 	 * @return
 	 * 如果用户已经登录，则返回用户地址
 	 */
-	public static String GetCurrentUserAddress() {
+	public static String GetUserAddress() {
 		return (mUserInfo != null) ? mUserInfo.address : null;
 	}
 	
@@ -75,7 +75,7 @@ public class UserMan {
 	 * @return
 	 * 如果用户已经登录，则返回用户电话
 	 */
-	public static String GetCurrentUserPhone() {
+	public static String GetUserPhone() {
 		return (mUserInfo != null) ? mUserInfo.phone : null;
 	}
 	/**

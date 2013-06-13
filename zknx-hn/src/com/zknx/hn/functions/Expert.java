@@ -163,7 +163,7 @@ public class Expert extends AisView {
 
 								int ret = 0;
 								
-								if (DataMan.AskExpert(UserMan.GetCurrentUserId(), expertId, subject, question))
+								if (DataMan.AskExpert(UserMan.GetUserId(), expertId, subject, question))
 									ret = 1;
 
 								Message msg = new Message();

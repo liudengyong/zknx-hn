@@ -1,6 +1,9 @@
 package com.zknx.hn.functions;
 
+import java.util.List;
+
 import android.content.DialogInterface;
+import android.text.Editable;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,8 +21,14 @@ import android.widget.Toast;
 
 import com.zknx.hn.R;
 import com.zknx.hn.common.Dialog;
+import com.zknx.hn.common.ListBox;
+import com.zknx.hn.common.Radio;
+import com.zknx.hn.common.WaitDialog;
 import com.zknx.hn.common.Dialog.ConfirmListener;
+import com.zknx.hn.common.WaitDialog.WaitListener;
 import com.zknx.hn.data.DataMan;
+import com.zknx.hn.data.ListItemMap;
+import com.zknx.hn.data.UserMan;
 import com.zknx.hn.functions.common.CommonList;
 import com.zknx.hn.functions.common.CommonListAdapter;
 import com.zknx.hn.functions.common.FunctionView;
@@ -132,30 +141,84 @@ public class MySupplyDemand extends FunctionView {
 		@Override
 		public void onClick(View view) {
 
-			// TODO 完善发布供求信息：检查供求信息填写内容
+			// 检查供求信息填写内容
+			if (mIsSupply.getCheckedRadioButtonId() == -1 ||
+				mProductClass.getSelectedItemPosition() == -1 ||
+				IsEditEmpty(mContent) ||
+				IsEditEmpty(mValidDate) ||
+				IsEditEmpty(mAmount) ||
+				IsEditEmpty(mUnit) ||
+				IsEditEmpty(mHost)) {
+				Toast.makeText(mContext, "输入不能为空", Toast.LENGTH_LONG).show();
+				return;
+			}
 			
-			final int product_id = DataMan.INVALID_ID;
+			if (IsEditEmpty(mAddress) ||
+				IsEditEmpty(mPhone) ||
+				IsEditEmpty(mMobilePhone) ||
+				IsEditEmpty(mName)) {
+				Toast.makeText(mContext, "个人信息不完善", Toast.LENGTH_LONG).show();
+				return;
+			}
+			
+			final DataMan.SupplyDemandInfo info = new DataMan.SupplyDemandInfo();
+			
+			info.type = mIsSupply.getCheckedRadioButtonId();
+			// 获取产品分类id
+			String productClassId = mProductList.get(mProductClass.getSelectedItemPosition()).getString(DataMan.KEY_PRODUCT_CLASS_ID);
+			info.commodityid =  productClassId;
+			info.count = mAmount.getEditableText().toString();
+			info.place = mHost.getEditableText().toString();
+			info.price = mPrice.getEditableText().toString();
+			info.publishdate = DataMan.GetCurrentTime(false); // 发布日期
+			info.title = mContent.getEditableText().toString();
+			info.unit = mUnit.getEditableText().toString();
+			info.validity = mValidDate.getEditableText().toString();
 
+			// 确认发布信息
 			Dialog.Confirm(mContext, R.string.confirm_post_supply_demand_info, new ConfirmListener() {
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
 
-					int msg;
-					if (DataMan.PostSupplyDemandInfo(product_id)) {
-						msg = R.string.post_supply_demand_info_ok;
-					} else {
-						msg = R.string.post_supply_demand_info_failed;
-					}
-					
-					Toast.makeText(mContext, msg, Toast.LENGTH_LONG).show();
+					WaitListener waitListener = new WaitListener() {
+						@Override
+						public void startWait() {
+							if (DataMan.PostSupplyDemandInfo(info)) {
+								Toast.makeText(mContext, R.string.post_supply_demand_info_ok, Toast.LENGTH_LONG).show();
+							} else {
+								Toast.makeText(mContext, R.string.post_supply_demand_info_failed, Toast.LENGTH_LONG).show();
+							}
+						}
+					};
+
+					WaitDialog.Show(mContext, "请稍等", "正在发布信息", waitListener);
 				}
 			});
 		}
 	};
+	
+	/**
+	 * 判断输入控件是否为空，为空返回true
+	 * @param et
+	 * @return
+	 */
+	private boolean IsEditEmpty(EditText et) {
+		Editable editable = et.getEditableText();
+		if (editable == null || editable.toString().length() == 0)
+			return true;
+		else
+			return false;
+	}
 
 	/**
 	 * 初始化发布信息内容
 	 */
+	private Radio mIsSupply;
+	private ListBox mProductClass;
+	private List<ListItemMap> mProductList;
+	private EditText mContent, mValidDate, mAmount, mPrice, mUnit, mHost;
+	private LabeText mAddress, mPhone, mMobilePhone, mName;
+	
 	private TableLayout initCreateInfo() {
 		// 新建TableLayout 实例  
         TableLayout tableLayout = new TableLayout(mContext);
@@ -166,20 +229,55 @@ public class MySupplyDemand extends FunctionView {
         tableLayout.setColumnShrinkable(0, true);
         tableLayout.setColumnStretchable(1, true);
     	
-        tableLayout.addView(GetTableRow("内容", new EditText(mContext)), params);
-        tableLayout.addView(GetTableRow("发布时间", new EditText(mContext)), params);
-        tableLayout.addView(GetTableRow("有效期", new EditText(mContext)), params);
-        tableLayout.addView(GetTableRow("数量", new EditText(mContext)), params);
-        tableLayout.addView(GetTableRow("单价", new EditText(mContext)), params);
-        tableLayout.addView(GetTableRow("产地", new EditText(mContext)), params);
-        tableLayout.addView(GetTableRow("联系人", new EditText(mContext)), params);
-        tableLayout.addView(GetTableRow("联系电话", new EditText(mContext)), params);
-        tableLayout.addView(GetTableRow("手机", new EditText(mContext)), params);
-        tableLayout.addView(GetTableRow("地址", new EditText(mContext)), params);
+        // 用户填写信息
+        String[] list = {"供应", "求购"};
+        mIsSupply = new Radio(mContext, list, 0); // 默认供应
+        // 只初始化一次产品分类列表
+        if (mProductList == null)
+        	mProductList = DataMan.GetProductClassList();
+        mProductClass = new ListBox(mContext, mProductList);
+        mContent = new EditText(mContext);
+        mValidDate = new EditText(mContext);
+        mAmount = new EditText(mContext);
+        mPrice = new EditText(mContext);
+        mUnit = new EditText(mContext);
+        mHost = new EditText(mContext);
+        
+        tableLayout.addView(GetTableRow("供求", mIsSupply), params);
+        tableLayout.addView(GetTableRow("产品分类", mProductClass), params);
+        tableLayout.addView(GetTableRow("内容", mContent), params);
+        tableLayout.addView(GetTableRow("有效期", mValidDate), params);
+        tableLayout.addView(GetTableRow("数量", mAmount), params);
+        tableLayout.addView(GetTableRow("价格", mPrice), params);
+        tableLayout.addView(GetTableRow("单位", mUnit), params);
+        tableLayout.addView(GetTableRow("产地", mHost), params);
+
+        // 系统调用用户信息
+        mName = new LabeText(UserMan.GetUserName());
+        mPhone = new LabeText(UserMan.GetUserPhone());
+        mMobilePhone = new LabeText(UserMan.GetUserPhone());
+        mAddress = new LabeText(UserMan.GetUserAddress());
+        
+        tableLayout.addView(GetTableRow("联系人", mName), params);
+        tableLayout.addView(GetTableRow("联系电话", mPhone), params);
+        tableLayout.addView(GetTableRow("手机", mMobilePhone), params);
+        tableLayout.addView(GetTableRow("地址", mAddress), params);
 
         tableLayout.setGravity(Gravity.CENTER);
         
         return tableLayout;
+	}
+	
+	/**
+	 * 标签用的EditText
+	 * @author Dengyong
+	 */
+	private class LabeText extends EditText {
+		LabeText(String value) {
+			super(mContext);
+			setText(value);
+			setEnabled(false);
+		}
 	}
 	
 	private TableRow GetTableRow(String label, View inputControl) {
@@ -190,7 +288,7 @@ public class MySupplyDemand extends FunctionView {
         // 显示标签
         TextView tv = new TextView(mContext);
         
-        tv.setGravity(Gravity.RIGHT);
+        tv.setGravity(Gravity.RIGHT | Gravity.CENTER_VERTICAL);
         tv.setText(label);
         tv.setMinimumWidth(100);
         tv.setPadding(0, 0, 10, 0); // 右边padding 10

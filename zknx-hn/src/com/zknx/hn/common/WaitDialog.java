@@ -3,6 +3,7 @@ package com.zknx.hn.common;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
 
 public class WaitDialog extends ProgressDialog {
@@ -67,7 +68,7 @@ public class WaitDialog extends ProgressDialog {
 	 */
 	public static WaitDialog Show(Context context, String title, String message, WaitListener waitListener) {
 
-		WaitDialog waitDialog = new WaitDialog(context, waitListener);
+		final WaitDialog waitDialog = new WaitDialog(context, waitListener);
 		
 		waitDialog.setTitle(title);
 		waitDialog.setMessage(message);
@@ -79,11 +80,17 @@ public class WaitDialog extends ProgressDialog {
 		
 		new Thread() {
 	         public void run(){
+
+	        	 // 主线程以外的线程里创建AsynTask实例
+	        	 Looper.prepare();
+
 	            // 需要等待的动作，时间可能会比较长
 				if (mWaitListener != null)
 					mWaitListener.startWait();
 				else
 					Debug.Log("严重错误：startWait为空");
+				
+				waitDialog.dismiss();
 	         }
 	      }.start();
 		

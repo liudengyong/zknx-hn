@@ -274,7 +274,7 @@ public class Function extends Activity {
     private static boolean isNeedLogin(int id) {
 
     	// 检查登录状态，如果已经登录则无需重复
-    	if (UserMan.GetCurrentUserId() != null)
+    	if (UserMan.GetUserId() != null)
     		return false;
 
     	switch (id) {
