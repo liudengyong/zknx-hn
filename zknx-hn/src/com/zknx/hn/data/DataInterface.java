@@ -81,6 +81,10 @@ public class DataInterface {
 	public static final char AIS_TOKEN_VIDEO = 'V';
 	// Ais音频
 	public static final char AIS_TOKEN_AUDIO = 'M';
+	// Ais问卷答案长度
+	public static final char AIS_TOKEN_COURSE_ANSWER = 'C';
+	// Ais问卷分数的长度
+	public static final char AIS_TOKEN_COURSE_GRADE = 'S';
 	
 	/**
 	 * market是否匹配（是否属当前区域）

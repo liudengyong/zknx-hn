@@ -790,7 +790,7 @@ public class DataMan extends DataInterface {
 	        		String name = token[2];
 	        		String address = token[4];
 	        		String telephone = token[5];
-	        		String introduce = token[6];
+	        		String introduce = "TODO介绍";//token[6];
 	        		
 	        		if (myFriend) {
 	        			// TODO 判断是否我的好友
