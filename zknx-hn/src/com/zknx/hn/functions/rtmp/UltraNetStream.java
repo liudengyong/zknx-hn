@@ -12,7 +12,7 @@ import com.smaxe.uv.client.a.c;
 import com.smaxe.uv.client.video.EmptyVideo;
 import com.smaxe.uv.stream.MediaData;
 
-@SuppressWarnings({ "rawtypes", "unchecked" })
+@SuppressWarnings({ "rawtypes", "all" })
 public final class UltraNetStream extends c
   implements INetStream
 {

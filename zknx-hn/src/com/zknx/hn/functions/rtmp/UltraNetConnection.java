@@ -18,7 +18,7 @@ import com.smaxe.uv.client.a.h;
 import com.smaxe.uv.client.a.i;
 import com.smaxe.uv.client.a.k;
 
-@SuppressWarnings({"unchecked", "rawtypes", "unused"})
+@SuppressWarnings({"rawtypes", "all"})
 public final class UltraNetConnection extends i
   implements INetConnection
 {
@@ -65,7 +65,8 @@ public final class UltraNetConnection extends i
     this.b.a(paramString, paramBoolean, paramObject);
   }
 
-  public void call(String paramString, Responder paramResponder, Object[] paramArrayOfObject)
+  //public void call(String paramString, Responder paramResponder, Object[] paramArrayOfObject)
+  public void call(String paramString, Responder paramResponder, Object... paramArrayOfObject)
   {
     if (!connected())
       return;
