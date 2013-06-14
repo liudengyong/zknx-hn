@@ -3,9 +3,9 @@ package com.zknx.hn.data;
 public class DataInterface {
 
 	// TODO interface 服务器地址，接口
-	//public static final String URL_SEVER = "http://www.yczjxt.com.cn/appfora/";
-	public static final String URL_SEVER = "http://218.106.254.101:8077/";
-	public static final String URL_GET_USER_INFO = URL_SEVER + "getuserinfo.asp";
+	//public static final String URL_SERVER = "http://www.yczjxt.com.cn/appfora/";
+	public static final String URL_SERVER = "http://218.106.254.101:8077/";
+	public static final String URL_GET_USER_INFO = URL_SERVER + "getuserinfo.asp";
 	// TODO 语言对讲服务器地址
 	public final static String RTMP_SERVER = "rtmp://192.168.0.101/zknx-hn";
 	
@@ -61,6 +61,10 @@ public class DataInterface {
 	// post留言的url
 	// http://218.106.254.101:8077/post_message.aspx?user=linshi&friend=liu&message=来电话了。
 	protected static final String URL_POST_MESSAGE = "post_message.aspx";
+	// 获取留言
+	protected static final String URL_GET_MESSAGE = "get_message.aspx";
+	// 新留言文件
+	protected static final String FILE_NAME_NEW_MESSAGE = "new_messages.txt";
 	// TODO interface post专家提问的url
 	protected static final String URL_ASK_EXPERT = "ask_expert.asp";
 	// post供求信息

@@ -46,6 +46,8 @@ public class DataMan extends DataInterface {
 	public static final String KEY_FRIEND_ADDRESS = "friend_address";
 	// 我的商友 联系电话
 	public static final String KEY_FRIEND_TELEPHONE = "friend_telephone";
+	// 我的商友 自我介绍
+	public static final String KEY_FRIEND_INTRODUCE = "friend_introduce";
 
 	// 发言人id
 	public static final String KEY_FRIEND_MESSAGE_POSER_ID = "message_poster_id";
@@ -761,14 +763,10 @@ public class DataMan extends DataInterface {
         ArrayList<ListItemMap> list = new ArrayList<ListItemMap>();  
         List<String> lines = ReadLines(FILE_NAME_MY_FRIEND);
         
-        // TODO 测试代码待删除
-        if (!myFriend)
-        	list.add(new ListItemMap("非好友"/* 名字 */, KEY_FRIEND_ID, "friend_id_todo"/* id */));
-        
         for (String line : lines)  
         {
         	// user,名字,专业,联系地址,联系电话
-        	//0,zhangsan,张三,专业1,北京通州,13812341234
+        	//0,zhangsan,张三,专业1,北京通州,13812341234,自我介绍
         	String[] token = GetToken(line);
         	if (token.length == 6) {
 
@@ -792,6 +790,7 @@ public class DataMan extends DataInterface {
 	        		String name = token[2];
 	        		String address = token[4];
 	        		String telephone = token[5];
+	        		String introduce = token[6];
 	        		
 	        		if (myFriend) {
 	        			// TODO 判断是否我的好友
@@ -802,6 +801,7 @@ public class DataMan extends DataInterface {
 	        		map.put(KEY_FRIEND_MAJOR, major);
 	        		map.put(KEY_FRIEND_ADDRESS, address);
 	        		map.put(KEY_FRIEND_TELEPHONE, telephone);
+	        		map.put(KEY_FRIEND_INTRODUCE, introduce);
 	        		
 	        		list.add(map);
         		}
@@ -834,14 +834,15 @@ public class DataMan extends DataInterface {
 	 * 获取我的商圈朋友留言列表
 	 * TODO (讨论)朋友留言内容
 	 * fiend_id:INVALID_ID 即返回所有留言信息
+	 * 0 表示返回我的留言
 	 * @return
 	 */
-	public static List<ListItemMap> GetMyGroupMessageList(String friendId) {
+	public static List<ListItemMap> GetMyGroupMessageList(int fiend_id) {
 		
 		ArrayList<ListItemMap> list = new ArrayList<ListItemMap>();  
         List<String> lines = ReadLines(FILE_NAME_MY_GROUP_MESSAGE);
         
-        int fiend_id = ParseInt(friendId);
+        //int  = ParseInt(friendId);
         
         // TODO 待删除测试代码
         list.add(new ListItemMap("我的自我介绍……"/* 名字 */, KEY_MY_GROUP_MESSAGE_ID, "friend"/* id */));
@@ -859,10 +860,11 @@ public class DataMan extends DataInterface {
         		if (id != INVALID_ID) {
         			
         			// INVALID_ID 表示获取全部信息
-        			if (id != fiend_id && fiend_id != INVALID_ID)
+        			if ((id != fiend_id && fiend_id != INVALID_ID) ||
+        				(fiend_id != 0 && !UserMan.GetUserId().equals(token[1])))
         				continue;
-        			
-	        		int owner_id = ParseInt(token[1]);
+
+        			int owner_id = ParseInt(token[1]);
 	        		String owner = token[2];
 	        		
 	        		int poster_id = ParseInt(token[3]);
@@ -905,9 +907,9 @@ public class DataMan extends DataInterface {
 	 */
 	public static boolean PostNewMessage(String userId, String friendId, String message) {
 		// TODO interface 留言参数需调整? encoding?
-		String params = "user=" + userId + ",friend=" + friendId + ",message=" + message;
+		String params = "user=" + userId + "&friend=" + friendId + "&message=" + message;
 
-		String ret = Downloader.PostUrl(URL_SEVER + URL_POST_MESSAGE, params);
+		String ret = Downloader.PostUrl(URL_SERVER + URL_POST_MESSAGE, params);
 
 		if (ret.equals("true"))
 			return true;
@@ -1092,6 +1094,8 @@ public class DataMan extends DataInterface {
 		while(x-- > 0)
 			Debug.Log("" + x);
 		*/
+		
+		GetNewMessages();
 
 		// 检查时间戳
 		if (ShouldUpdateData()) {
@@ -1099,6 +1103,13 @@ public class DataMan extends DataInterface {
 		}
 		
 		return false;
+	}
+	
+	/**
+	 * 获取当前用户新的留言
+	 */
+	private static void GetNewMessages() {
+		Downloader.DownFile(URL_GET_MESSAGE + "?userid=" + UserMan.GetUserId(), DataFile(""), FILE_NAME_NEW_MESSAGE);
 	}
 	
 	/**
@@ -1218,7 +1229,7 @@ public class DataMan extends DataInterface {
 			"&validity=" + info.validity + 
 			"&publishdate=" + info.publishdate;
 		
-		String ret = Downloader.PostUrl(URL_SEVER + URL_POST_SUPPLY_DEMAND_INFO, params);
+		String ret = Downloader.PostUrl(URL_SERVER + URL_POST_SUPPLY_DEMAND_INFO, params);
 
 		if (ret.equals("0"))
 			return true;

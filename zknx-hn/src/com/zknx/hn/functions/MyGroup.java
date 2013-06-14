@@ -64,9 +64,16 @@ public class MyGroup extends FunctionView {
 	// 商友列表视图
 	ListView mFriendListView;
 	
-	// 保存当前好友
-	private String mCurFriendId;
-	private String mCurFriendName;
+	// 保存当前好友信息
+	private FriendInfo mCurFriendInfo;
+	class FriendInfo {
+		private String id;
+		private String name;
+		private String major;
+		private String introduce;
+		private String address;
+		private String phone;
+	}
 	
 	public MyGroup(LayoutInflater inflater, LinearLayout frameRoot, int frameResId) {
 		super(inflater, frameRoot, frameResId);
@@ -113,22 +120,37 @@ public class MyGroup extends FunctionView {
 	/**
 	 * 初始化商友信息
 	 */
-	Test test = new Test();
+	Test test = new Test(); // TODO 语音测试
 	void initGroupFriendInfo(int position) {
-		mCurFriendId = mAdapterFriend.getItemMapString(position, DataMan.KEY_FRIEND_ID);
 		
-		Debug.Log("mCurFriendId:" + mCurFriendId);
+		ListItemMap info = mAdapterFriend.getItem(position);
+		
+		if (info != null) {
+			if (mCurFriendInfo == null)
+				mCurFriendInfo = new FriendInfo();
+
+			mCurFriendInfo.id = info.getString(DataMan.KEY_FRIEND_ID);
+			mCurFriendInfo.name = info.getString(DataMan.KEY_NAME);
+			mCurFriendInfo.major = info.getString(DataMan.KEY_FRIEND_MAJOR);
+			mCurFriendInfo.address = info.getString(DataMan.KEY_FRIEND_ADDRESS);
+			mCurFriendInfo.phone = info.getString(DataMan.KEY_FRIEND_TELEPHONE);
+			mCurFriendInfo.introduce = info.getString(DataMan.KEY_FRIEND_INTRODUCE);
+			
+			Debug.Log("mCurFriendId:" + mCurFriendInfo.id);
+		}
 		
 		RelativeLayout layout = (RelativeLayout)mInflater.inflate(R.layout.group_friend_info, null);
 		LinearLayout layoutContent = (LinearLayout)layout.findViewById(R.id.group_friend_info_contact);
 		
+		// 按钮
 		OnClickListener listener = new OnClickListener() {
 			@Override
 			public void onClick(View view) {
 				switch (view.getId()) {
 				case R.id.common_btn_pair1:
 					// 切换为新建留言界面，传参我的留言组id（返回我的留言tab）
-					initNewMessageView(mCurFriendName, mCurFriendId, R.id.my_group_message_my_message);
+					if (mCurFriendInfo != null)
+						initNewMessageView(mCurFriendInfo.name, mCurFriendInfo.id, R.id.my_group_message_my_message);
 					break;
 				case R.id.common_btn_pair2:
 					// TODO 实现语音对讲
@@ -145,27 +167,22 @@ public class MyGroup extends FunctionView {
 		
 		// TODO 实现语音对讲
 		layoutContent.findViewById(R.id.common_btn_pair2).setEnabled(false);
-		
-		ListItemMap info = DataMan.GetMyFriendInfo(mCurFriendId);
-		
-		if (info != null) {
+
+		// 初始化好友界面
+		if (mCurFriendInfo != null) {
 			TextView tv = (TextView)layout.findViewById(R.id.my_friend_info_name);
-			// 保存当前好友名字
-			mCurFriendName = info.getString(DataMan.KEY_NAME);
-			tv.setText(mCurFriendName);
+			tv.setText(mCurFriendInfo.name);
 			
 			tv = (TextView)layout.findViewById(R.id.my_friend_info_major);
-			tv.setText(info.getString(DataMan.KEY_FRIEND_MAJOR));
+			tv.setText(mCurFriendInfo.major);
 			
 			tv = (TextView)layout.findViewById(R.id.my_friend_info_address);
-			tv.setText(info.getString(DataMan.KEY_FRIEND_ADDRESS));
+			tv.setText(mCurFriendInfo.address);
 			
 			tv = (TextView)layout.findViewById(R.id.my_friend_info_telephone);
-			tv.setText(info.getString(DataMan.KEY_FRIEND_TELEPHONE));
-		} else {
-			mCurFriendName = "未知好友"; // 容错处理
+			tv.setText(mCurFriendInfo.phone);
 		}
-		
+	
 		// 清除第二区后添加视图
 		initContent("商友信息", layout, mContentFrame[1]);
 	}
@@ -250,10 +267,11 @@ public class MyGroup extends FunctionView {
 			initMyMessageView();
 			break;
 		case R.id.my_group_message_friend_message:
-			initFriendMessage(mCurFriendId);
+			initFriendMessage();
 			break;
 		case R.id.my_group_message_group:
-			initMajorGroup(DataMan.GetMajor(mCurFriendId));
+			// 所有专业传参null
+			initMajorGroup();
 			break;
 		}
 		
@@ -269,7 +287,7 @@ public class MyGroup extends FunctionView {
 		RelativeLayout myMessageLayout = (RelativeLayout) mInflater.inflate(R.layout.group_my_message, null);
 		LinearLayout listViewLayout = (LinearLayout) myMessageLayout.findViewById(R.id.my_group_my_message_listview);
 		
-		CommonListAdapter adapter = new CommonListAdapter(mContext, DataMan.GetMyGroupMessageList(DataMan.MY_MESSAGE + ""));
+		CommonListAdapter adapter = new CommonListAdapter(mContext, DataMan.GetMyGroupMessageList(DataMan.MY_MESSAGE));
 		CommonListParams listParams = new CommonListParams(mInflater, listViewLayout, adapter, null);
 		
 		// 初始化我的留言列表
@@ -283,8 +301,13 @@ public class MyGroup extends FunctionView {
 	/**
 	 * 初始化当前商友留言
 	 */
-	private void initFriendMessage(String friendId) {
+	private void initFriendMessage() {
 		
+		int friendId = DataMan.INVALID_ID;
+		
+		if (mCurFriendInfo != null)
+			friendId = DataMan.ParseInt(mCurFriendInfo.id);
+
 		mAdapterFriendMessage = new CommonListAdapter(mContext, DataMan.GetMyGroupMessageList(friendId));
 		
 		CommonListParams listParams = new CommonListParams(mInflater, mMessageContent, mAdapterFriendMessage, new ListItemClickListener() {
@@ -307,10 +330,15 @@ public class MyGroup extends FunctionView {
 	 * 初始化商圈（专业）用户列表
 	 * @param friend_id
 	 */
-	private void initMajorGroup(int majorId) {
-		
+	private void initMajorGroup() {
+
+		int majorId = DataMan.INVALID_ID;
+
+		if (mCurFriendInfo != null)
+			majorId = DataMan.ParseInt(mCurFriendInfo.major);
+
 		mAdapterMajor = new CommonListAdapter(mContext, DataMan.GetMyGroupFriendList(majorId, false));
-		
+
 		CommonListParams listParams = new CommonListParams(mInflater, mMessageContent, mAdapterMajor, new ListItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -353,6 +381,7 @@ public class MyGroup extends FunctionView {
 					postNewMessage(friendId);
 					break;
 				case R.id.new_message_back:
+					// 返回
 					initMessageTab(tabBtnId);
 					break;
 				}
@@ -363,7 +392,7 @@ public class MyGroup extends FunctionView {
 		mNewMessageBack.setOnClickListener(clickPost);
 
 		// TODO 自我介绍
-		mNewMessageSelfIntroduce.setText(messageOwner + "的自我介绍……");
+		mNewMessageSelfIntroduce.setText(mCurFriendInfo.introduce);
 		mNewMessageReply.setText("回复：" + messageOwner);
 		mNewMessageDate.setText("日期：" + DataMan.GetCurrentTime(true));
 

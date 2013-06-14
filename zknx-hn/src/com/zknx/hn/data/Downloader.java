@@ -21,10 +21,31 @@ import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.protocol.HTTP;
 
+import android.os.StrictMode;
+
 import com.zknx.hn.App;
 import com.zknx.hn.common.Debug;
 
 public class Downloader {
+	
+	static void FixNetworkException() {
+		String strVer = "4.0"; // GetVersion.GetSystemVersion();
+		strVer = strVer.substring(0, 3).trim();
+		float fv = Float.valueOf(strVer);
+		if (fv > 2.3) {
+			StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
+			.detectDiskReads()
+			.detectDiskWrites()
+			.detectNetwork() // 这里可以替换为detectAll() 就包括了磁盘读写和网络I/O
+			.penaltyLog() //打印logcat，当然也可以定位到dropbox，通过文件保存相应的log
+			.build());
+			StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
+			.detectLeakedSqlLiteObjects() //探测SQLite数据库操作
+			.penaltyLog() //打印logcat
+			.penaltyDeath()
+			.build()); 
+		}
+	}
 
 	static HttpURLConnection GetConnection(String strUrl) throws IOException
 	{
@@ -53,10 +74,12 @@ public class Downloader {
      */   
     public static int DownFile(String _interface, String path, String fileName)
     {    	
-        try {   
+        try {
         	String tmpFileName = fileName + ".tmp";
         	
-        	String urlStr = DataMan.URL_SEVER + _interface;
+        	FixNetworkException();
+        	
+        	String urlStr = DataMan.URL_SERVER + _interface;
         	
             HttpURLConnection urlConn = GetConnection(urlStr);
             
@@ -93,7 +116,8 @@ public class Downloader {
         	Debug.Log("下载失败,DownFile,文件没找到 ： " + e.getMessage());
         } catch (IOException e) {   
         	Debug.Log("下载失败,DownFile,IOException： " + e.getMessage());
-        } catch (Exception e) {   
+        } catch (Exception e) {
+        	e.printStackTrace();
         	Debug.Log("下载失败,DownFile,Exception： " + e.getMessage());
         }
 
