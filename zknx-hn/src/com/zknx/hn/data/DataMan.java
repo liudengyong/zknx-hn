@@ -907,7 +907,7 @@ public class DataMan extends DataInterface {
 		// TODO interface 留言参数需调整? encoding?
 		String params = "user=" + userId + ",friend=" + friendId + ",message=" + message;
 
-		String ret = Downloader.PostUrl(URL_POST_MESSAGE, params);
+		String ret = Downloader.PostUrl(URL_SEVER + URL_POST_MESSAGE, params);
 
 		if (ret.equals("true"))
 			return true;

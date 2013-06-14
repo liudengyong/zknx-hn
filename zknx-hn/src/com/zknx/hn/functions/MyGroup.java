@@ -19,6 +19,8 @@ import com.zknx.hn.common.Dialog;
 import com.zknx.hn.common.Dialog.ConfirmListener;
 import com.zknx.hn.common.UIConst;
 import com.zknx.hn.common.UIConst.L_LAYOUT_TYPE;
+import com.zknx.hn.common.WaitDialog;
+import com.zknx.hn.common.WaitDialog.WaitListener;
 import com.zknx.hn.data.DataMan;
 import com.zknx.hn.data.ListItemMap;
 import com.zknx.hn.data.UserMan;
@@ -130,24 +132,19 @@ public class MyGroup extends FunctionView {
 					break;
 				case R.id.common_btn_pair2:
 					// TODO 实现语音对讲
+					String friendId = "jun";
+					String userId = "yong";
+					test.start(DataMan.RTMP_SERVER, userId, friendId);
+					//view.setEnabled(false)
 					break;
 				}
 			}
 		};
 
-		layoutContent.addView(getLinearLayoutBtnPair(R.string.new_message, R.string.friend_interphone, listener ), UIConst.GetLayoutParams(L_LAYOUT_TYPE.H_WRAP));
+		layoutContent.addView(getLinearLayoutBtnPair(R.string.new_message, R.string.friend_interphone, listener), UIConst.GetLayoutParams(L_LAYOUT_TYPE.H_WRAP));
 		
 		// TODO 实现语音对讲
-		//layoutContent.findViewById(R.id.common_btn_pair2).setEnabled(false);
-		layoutContent.findViewById(R.id.common_btn_pair2).setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View view) {
-				String friendId = "jun";
-				String userId = "yong";
-				test.start(DataMan.RTMP_SERVER, userId, friendId);
-				//view.setEnabled(false)
-			}
-		});
+		layoutContent.findViewById(R.id.common_btn_pair2).setEnabled(false);
 		
 		ListItemMap info = DataMan.GetMyFriendInfo(mCurFriendId);
 		
@@ -402,13 +399,20 @@ public class MyGroup extends FunctionView {
 		Dialog.Confirm(mContext, R.string.confirm_post_message, new ConfirmListener() {
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
-				if (!DataMan.PostNewMessage(userId, friendId, newMessage)) {
-					Toast.makeText(mContext, "发布留言失败", Toast.LENGTH_LONG).show();
-					return;
-				}
-				
-				Toast.makeText(mContext, "发布留言成功", Toast.LENGTH_LONG).show();
-				mNewMessageContent.setText(""); // 成功发布留言后清空留言内容
+				WaitListener waitListener = new WaitListener() {
+					@Override
+					public void startWait() {
+						if (!DataMan.PostNewMessage(userId, friendId, newMessage)) {
+							Toast.makeText(mContext, "发布留言失败", Toast.LENGTH_LONG).show();
+							return;
+						}
+						
+						Toast.makeText(mContext, "发布留言成功", Toast.LENGTH_LONG).show();
+						mNewMessageContent.setText(""); // 成功发布留言后清空留言内容
+					}
+				};
+
+				WaitDialog.Show(mContext, "请稍等", "正在发布留言", waitListener);
 			}
 		});
 	}

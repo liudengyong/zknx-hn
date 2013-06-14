@@ -13,13 +13,6 @@ import com.zknx.hn.functions.rtmp.RtmpMediaData.OnMediaDataListener;
 public class RtmpClient {
 
 	private final static String subTAG = "RtmpClient";
-	
-	// TODO ÆÆ½â
-	/*
-	static {
-		License.setKey("5719B-F1E0E-023C7-7E600-48689");
-	}
-	*/
 
 	private String SERVER_URL;
 	private String STREAM = "";
