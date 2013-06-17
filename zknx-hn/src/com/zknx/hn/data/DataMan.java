@@ -503,35 +503,70 @@ public class DataMan extends DataInterface {
 	 */
 	public static List<ListItemMap> GetMarketListByProduct(int product_id) {
 
+		List<String> lines = null;
 		ArrayList<ListItemMap> list = new ArrayList<ListItemMap>();
-		List<String> lines = ReadLines(FILE_NAME_PRODUCTS);
-        
+		String productMarketFileName = "product_" + product_id + "_markets.txt";
+
+		// 优化
+		if (FileUtils.IsFileExist(DataFile(productMarketFileName))) {
+			lines = ReadLines(productMarketFileName);
+			
+			for (String line : lines)
+	        {
+	        	String[] token = GetToken(line);
+	    		
+	        	String marketId = token[0];
+	    		String market_name = token[1];
+	    		String minPrice = token[2];
+	    		String maxPrice = token[3];
+	    		String averagePrice = token[4];
+	    		String hostPrice = token[5];
+	    		String unit = token[5];
+	    		boolean addToMyProduct = false; /* 隐藏自选按钮 */
+	        	
+	        	list.add(new ProductListItemMap(DataMan.KEY_MARKET_ID, marketId, market_name, minPrice, maxPrice, averagePrice, hostPrice, unit, addToMyProduct));
+	        }
+			
+			return list;
+		}
+		
+		String productMarketLines = "";
+		lines = ReadLines(FILE_NAME_PRODUCTS);
+		
         for (String line : lines)
         {
+        	// 0101301,北京昌平区水屯农副产品批发市场,0101001000,0101301,13.5,元/公斤
         	// market_id,市场名字,product_id,产品名,最低价,最高价,平均价,产地价,价格单位
         	// product_id,product_name
         	String[] token = GetToken(line);
-        	if (token.length != 9)
+        	if (token.length != 6)
         		continue;
         	
         	int product_id_parsed = ParseInt(token[2]);
     		if (product_id_parsed != product_id)
     			continue;
     		
-    		int market_id = ParseInt(token[0]);
+    		String marketId = token[0];
+    		int market_id = ParseInt(marketId);
     		if (market_id == INVALID_ID)
     			continue;
     		
     		String market_name = token[1];
     		String minPrice = token[4];
-    		String maxPrice = token[5];
-    		String averagePrice = token[6];
-    		String hostPrice = token[7];
-    		String unit = token[8];
+    		String maxPrice = minPrice;//token[5];
+    		String averagePrice = minPrice;//token[6];
+    		String hostPrice = minPrice;//token[7];
+    		String unit = token[5];
     		boolean addToMyProduct = false; /* 隐藏自选按钮 */
         	
-        	list.add(new ProductListItemMap(DataMan.KEY_MARKET_ID, token[0], market_name, minPrice, maxPrice, averagePrice, hostPrice, unit, addToMyProduct));
+        	list.add(new ProductListItemMap(DataMan.KEY_MARKET_ID, marketId, market_name, minPrice, maxPrice, averagePrice, hostPrice, unit, addToMyProduct));
+        	
+        	productMarketLines += marketId + COMMON_TOKEN + market_name + COMMON_TOKEN +
+        			minPrice + COMMON_TOKEN + maxPrice + COMMON_TOKEN + 
+        			averagePrice + COMMON_TOKEN + hostPrice + COMMON_TOKEN + unit + "\n";
         }
+        
+        FileUtils.WriteText(DataFile(""), productMarketFileName, productMarketLines);
 
         return list;
 	}
