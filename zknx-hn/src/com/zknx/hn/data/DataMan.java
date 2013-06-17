@@ -220,6 +220,12 @@ public class DataMan extends DataInterface {
 	public static List<ListItemMap> GetAddressList() {
 		
 	    ArrayList<ListItemMap> list = new ArrayList<ListItemMap>();
+	    
+	    // 优化效率 省级地址
+	    if (FileUtils.IsFileExist(DataFile(FILE_NAME_ADDRESS_PROVINCE)))
+	    	return ReadCommonIdName(FILE_NAME_ADDRESS_PROVINCE, KEY_ADDRESS_ID);
+
+	    String provinceLines = "";
         List<String> lines = ReadLines(FILE_NAME_ADDRESS);
         
         for (String line : lines) {
@@ -227,17 +233,22 @@ public class DataMan extends DataInterface {
         	String[] token = GetToken(line);
         	if (token.length == 2) {
 
-        		int id =  ParseInt(token[0]);
+        		String strId = token[0];
+        		int id =  ParseInt(strId);
 
         		// 只需要省份
         		if (id != INVALID_ID && id < 99) {
 
 	        		String name = token[1];
 	
-	        		list.add(new ListItemMap(name/* 名字 */, KEY_ADDRESS_ID, token[0]/* id */));
+	        		list.add(new ListItemMap(name/* 名字 */, KEY_ADDRESS_ID, strId/* id */));
+	        		
+	        		provinceLines += strId + COMMON_TOKEN + name + "\n";
         		}
         	}
         }
+        
+        FileUtils.WriteText(DataFile(""), FILE_NAME_ADDRESS_PROVINCE, provinceLines);
 
         return list;
 	}
@@ -248,7 +259,14 @@ public class DataMan extends DataInterface {
 	 */
 	public static List<ListItemMap> GetMarketListByArea(int address_id) {
 
-        ArrayList<ListItemMap> list = new ArrayList<ListItemMap>();  
+		String marketCacheFileName = "market_" + address_id + ".txt";
+        ArrayList<ListItemMap> list = new ArrayList<ListItemMap>();
+        
+        // 优化效率
+        if (FileUtils.IsFileExist(DataFile(marketCacheFileName)))
+        	return ReadCommonIdName(marketCacheFileName, KEY_MARKET_ID);
+        
+        String marketLines = "";
         List<String> lines = ReadLines(FILE_NAME_MARKETS);
         
         for (String line : lines)  
@@ -261,9 +279,16 @@ public class DataMan extends DataInterface {
         		if (!AddressMatch(address_id, address_id_parsed))
         			continue;
 
-        		list.add(new ListItemMap(token[3]/* 市场名字 */, KEY_MARKET_ID, token[2]/* 市场id */));
+        		String id = token[2];
+        		String name = token[3];
+        		
+        		list.add(new ListItemMap(name/* 市场名字 */, KEY_MARKET_ID, id/* 市场id */));
+        		
+        		marketLines += id + COMMON_TOKEN + name + "\n";
         	}
         }
+        
+        FileUtils.WriteText(DataFile(""), marketCacheFileName, marketLines);
 
         return list;
 	}
@@ -277,9 +302,41 @@ public class DataMan extends DataInterface {
         ArrayList<ListItemMap> list = new ArrayList<ListItemMap>();
         if (market_id == INVALID_ID)
         	return list;
-
-        List<String> lines = ReadLines(FILE_NAME_PRODUCTS);
         
+        List<String> lines;
+        String marketProductsFileName = "market_" + market_id + "_products.txt";
+        
+        // 优化
+        if (FileUtils.IsFileExist(DataFile(marketProductsFileName))) {
+        	lines = ReadLines(marketProductsFileName);
+        	for (String line : lines)
+            {
+            	String[] token = GetToken(line);
+            	
+            	String productId = token[0];
+        		int product_id = ParseInt(productId);
+        		if (product_id == INVALID_ID)
+        			continue;
+        		
+            	String product_name = token[1];
+        		String minPrice = token[2];
+        		String maxPrice = token[3];
+        		String averagePrice = token[4];
+        		String hostPrice = token[5];
+        		String unit = token[6];
+        		boolean isMyProduct = IsMyProduct(product_id); /* 添加自选按钮状态 */
+        		
+        		AddProductList(list, productId, product_name, minPrice, maxPrice, averagePrice, hostPrice, unit, isMyProduct);
+            }
+
+        	return list;
+        }
+
+        // 在内存中查找
+        List<ListItemMap> productList = GetProductList();
+        
+        String marketProductLines = "";
+        lines = ReadLines(FILE_NAME_PRODUCTS);
         for (String line : lines)
         {
         	String[] token = GetToken(line);
@@ -294,24 +351,44 @@ public class DataMan extends DataInterface {
         		// 暂不需要市场名字
         		// String market_name = token[1];
 
-        		int product_id = ParseInt(token[2]);
+        		String productId = token[2];
+        		int product_id = ParseInt(productId);
         		if (product_id == INVALID_ID)
         			continue;
-        		
-        		String product_name = token[3];
+
+        		String product_name = FindCommodityName(productList, KEY_PRODUCT_ID, productId);
         		String minPrice = token[4];
-        		String maxPrice = token[5];
-        		String averagePrice = "junjia";//token[6];
-        		String hostPrice = "chandi";// token[7];
-        		String unit = "unit";//token[8];
+        		String maxPrice = minPrice;//token[5];
+        		String averagePrice = minPrice;//token[6];
+        		String hostPrice = minPrice;// token[7];
+        		String unit = token[5];
         		boolean isMyProduct = IsMyProduct(product_id); /* 添加自选按钮状态 */
         		
         		//list.add(new ProductListItemMap("名字", "最低价", "最高价", "平均价", "产地价", "单位", "添加"));
-        		list.add(new ProductListItemMap(DataMan.KEY_PRODUCT_ID, token[2], product_name, minPrice, maxPrice, averagePrice, hostPrice, unit, isMyProduct));
+        		AddProductList(list, productId, product_name, minPrice, maxPrice, averagePrice, hostPrice, unit, isMyProduct);
+        		
+        		marketProductLines += productId + COMMON_TOKEN + 
+        				product_name +COMMON_TOKEN + 
+        				minPrice + COMMON_TOKEN +
+        				maxPrice + COMMON_TOKEN +
+        				averagePrice + COMMON_TOKEN +
+        				hostPrice + COMMON_TOKEN +
+        				unit + "\n";
         	}
         }
 
+        FileUtils.WriteText(DataFile(""), marketProductsFileName, marketProductLines);
+
         return list;
+	}
+	
+	/**
+	 * 添加产品列表
+	 */
+	private static void AddProductList(ArrayList<ListItemMap> list, String productId, 
+			String product_name, String minPrice, String maxPrice, 
+			String averagePrice, String hostPrice, String unit, boolean isMyProduct) {
+		list.add(new ProductListItemMap(DataMan.KEY_PRODUCT_ID, productId, product_name, minPrice, maxPrice, averagePrice, hostPrice, unit, isMyProduct));
 	}
 
 	/**
@@ -537,6 +614,36 @@ public class DataMan extends DataInterface {
 	        		String name = token[1];
 
 	        		list.add(new ListItemMap(name/* 名字 */, KEY_PRODUCT_CLASS_ID, token[0]/* id */));
+        		}
+        	}
+        }
+
+        return list;
+	}
+	
+	/**
+	 * 获取产品列表
+	 * @return
+	 */
+	public static List<ListItemMap> GetProductList() {
+		
+		ArrayList<ListItemMap> list = new ArrayList<ListItemMap>();
+        List<String> lines = ReadLines(FILE_NAME_COMMODITY);
+        
+        for (String line : lines)  
+        {
+        	// id,名字
+        	String[] token = GetToken(line);
+        	if (token.length == 2) {
+
+        		int id =  ParseInt(token[0]);
+
+        		// id 编码
+        		if (id != INVALID_ID && id > 100) {
+
+	        		String name = token[1];
+
+	        		list.add(new ListItemMap(name/* 名字 */, KEY_PRODUCT_ID, token[0]/* id */));
         		}
         	}
         }
@@ -953,12 +1060,14 @@ public class DataMan extends DataInterface {
 		
 		Map<String, String> map = new HashMap<String, String>();
 		
+		List<ListItemMap> productClassList = GetProductClassList();
+		
 		String id, name, content = "";
 		for (String line : lines) {
 			String[] token = line.split(TOKEN_SEP);
 			
 			id = token[1];
-			name = FindCommodityName(id);
+			name = FindCommodityName(productClassList, KEY_PRODUCT_CLASS_ID, id);
 			
 			// 如果没有名字就以id为名字
 			if (name == null)
@@ -979,7 +1088,8 @@ public class DataMan extends DataInterface {
 	 * @param id
 	 * @return
 	 */
-	private static String FindCommodityName(String id) {
+	private static String FindCommodityName(List<ListItemMap> productList, String key, String id) {
+		/*
 		List<String> lines = ReadLines(FILE_NAME_COMMODITY);
 		
 		int intId = ParseInt(id);
@@ -993,6 +1103,12 @@ public class DataMan extends DataInterface {
 				if (intId == ParseInt(token[0]))
 					return token[1];
 			}
+		}
+		*/
+		
+		for (ListItemMap item : productList) {
+			if (item.getString(key).equals(id))
+				return item.getString(KEY_NAME);
 		}
 
 		return null;
