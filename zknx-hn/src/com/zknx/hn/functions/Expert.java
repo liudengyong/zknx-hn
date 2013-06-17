@@ -127,19 +127,18 @@ public class Expert extends AisView {
 	 */
 	private void initAskView(final String expertId, String expertName) {
 		RelativeLayout askLayout = (RelativeLayout) mInflater.inflate(R.layout.expert_ask, null);
-		
+
 		mAskSubject = (EditText) askLayout.findViewById(R.id.expert_ask_subject);
 		mAskQuestion = (EditText) askLayout.findViewById(R.id.expert_ask_question);
-		
-		// TODO 返回按钮
+
 		askLayout.findViewById(R.id.expert_ask_back).setOnClickListener(new OnClickListener() {
 			@Override
-			public void onClick(View arg0) {
+			public void onClick(View view) {
 				// 默认第一个AIS视图
 				attachAisView(0);
 			}
 		});
-		
+
 		// TODO 提问按钮
 		askLayout.findViewById(R.id.expert_ask_ask).setOnClickListener(new OnClickListener() {
 			@Override
