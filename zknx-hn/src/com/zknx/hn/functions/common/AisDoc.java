@@ -192,36 +192,15 @@ public class AisDoc {
 			int v;
 			AisItem.ByteArray textBytes = new AisItem.ByteArray(0);
 			
+			// TODO 空读24个字节？文件头改变？
+			byte[] buf = new byte[24];
+			file.read(buf);
+			
 			while ((v = file.read()) >= 0) {
 				if (v != DataMan.AIS_TOKEN) {
-					int length = -1;
-					if (v == DataMan.AIS_TOKEN_COURSE_ANSWER) {
-						length = readInt(file, INT_SIZE);
-						
-						byte[] data = new byte[4];
-						if (length != file.read(data)) {
-							Debug.Log("严重错误：Ais解析，读取数据错误！");
-							return false;
-						}
-						
-						Debug.Log("答案data = " + data);
-						continue;
-					}
-					else if (v == DataMan.AIS_TOKEN_COURSE_GRADE) {
-						length = readInt(file, INT_SIZE);
-						
-						byte[] data = new byte[4];
-						if (length != file.read(data)) {
-							Debug.Log("严重错误：Ais解析，读取数据错误！");
-							return false;
-						}
-						
-						Debug.Log("分数data = " + data);
-						continue;
-					}
 					// 字符处理
 					textBytes.append((byte)v);
-					textBytes.append((byte)file.read());
+					//textBytes.append((byte)file.read());
 					continue;
 				}
 
@@ -271,10 +250,14 @@ public class AisDoc {
 					Debug.Log("字体结构：" + data);
 					break;
 				case DataMan.AIS_TOKEN_COURSE_ANSWER:
-					Debug.Log("答案：" + data);
+					for (byte b : data) {
+						Debug.Log("答案 = " + (char)b);
+					}
 					break;
 				case DataMan.AIS_TOKEN_COURSE_GRADE:
-					Debug.Log("分数：" + data);
+					for (byte b : data) {
+						Debug.Log("分数 = " + (char)b);
+					}
 					break;
 				case DataMan.AIS_TOKEN_IMAGE:
 					if (mImageItems == null)

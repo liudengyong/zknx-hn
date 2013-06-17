@@ -29,6 +29,7 @@ import com.zknx.hn.common.Debug;
 public class Downloader {
 	
 	static void FixNetworkException() {
+		/* TODO FixNetworkException
 		String strVer = "4.0"; // GetVersion.GetSystemVersion();
 		strVer = strVer.substring(0, 3).trim();
 		float fv = Float.valueOf(strVer);
@@ -45,6 +46,7 @@ public class Downloader {
 			.penaltyDeath()
 			.build()); 
 		}
+		*/
 	}
 
 	static HttpURLConnection GetConnection(String strUrl) throws IOException

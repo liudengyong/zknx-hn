@@ -1095,11 +1095,11 @@ public class DataMan extends DataInterface {
 			Debug.Log("" + x);
 		*/
 		
-		GetNewMessages();
+		// TODO GetNewMessages();
 
 		// ºÏ≤È ±º‰¥¡
 		if (ShouldUpdateData()) {
-			return UpdateTodayData();
+			// TODO return UpdateTodayData();
 		}
 		
 		return false;

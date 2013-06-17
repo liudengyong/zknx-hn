@@ -40,6 +40,17 @@
             android:windowSoftInputMode="stateVisible|adjustPan"
             android:exported="false"
             android:theme="@style/Popup" />
+        
+        <activity
+            android:name=".Home"
+            android:screenOrientation="landscape"
+            android:launchMode="singleInstance" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+           </intent-filter>
+        </activity>
+
     </application>
 
 </manifest>
