@@ -29,7 +29,7 @@ public class UIConst {
 	public static final int FUNCTION_ID_HAPPAY           = FUNCTION_CLASS_ID_PARTY + 6;
 	public static final int FUNCTION_ID_LAW              = FUNCTION_CLASS_ID_PARTY + 7;
 	public static final int FUNCTION_ID_POLICY           = FUNCTION_CLASS_ID_PARTY + 8;
-	public static final String[] FUNCTIONS_PARTY = {"时政要闻", "精选课件", "先锋党员", "典型经验",
+	public static final String[] FUNCTIONS_PARTY = {"时政要闻", "精选课件", "优秀党员", "党建模范",
 		                                            "致富模范", "快乐农家", "法律法规", "惠农政策"};
 	
 	public static final int FUNCTION_CLASS_ID_SETTING    = 400;
