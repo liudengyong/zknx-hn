@@ -1,7 +1,5 @@
 package com.zknx.hn;
 
-import com.zknx.hn.data.DataMan;
-
 import android.app.Service;
 import android.content.Intent;
 import android.os.Binder;
@@ -57,9 +55,10 @@ public class DataService extends Service {
 	// 数据更新Runnable
 	private Runnable mCheckDataRunnable= new Runnable() {    
         public void run() {
-
+/* TODO 检查数据更新
         	if (DataMan.CheckBroadcastData())
         		mHandler.sendEmptyMessage(MESSAGE_NEW_DATA);
+        	*/
 
         	mHandler.postDelayed(this, mCheckDataInterval * 1000);
         }
