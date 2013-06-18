@@ -85,6 +85,8 @@ public class DataInterface {
 	public static final char AIS_TOKEN_COURSE_ANSWER = 'C';
 	// Ais问卷分数的长度
 	public static final char AIS_TOKEN_COURSE_GRADE = 'S';
+	// Ais问卷答案解析
+	public static final char AIS_TOKEN_COURSE_NOTE = 'K';
 	
 	/**
 	 * market是否匹配（是否属当前区域）

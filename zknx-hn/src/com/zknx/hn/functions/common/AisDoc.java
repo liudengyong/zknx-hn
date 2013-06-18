@@ -15,7 +15,7 @@ public class AisDoc {
 	public enum ItemType {TEXT, CHEKCBOX, IMAGE, VIDEO, AUDIO}
 
 	// Ais文件头的字节数
-	private static final int AIS_HEADER_SIZE = 140;
+	private static final int AIS_HEADER_SIZE = 164;
 	// 整形大小
 	private static final int INT_SIZE = 4;
 	// 字体结构大小
@@ -33,24 +33,42 @@ public class AisDoc {
 	} TEXTFONT;
 	长度：52字节
 
+typedef struct tagAisHeader
+{
+	char szType[5];     //AIS标志
+	//char dwFormat;   //包含的内容种类,目前末用
+	char fileId[18];  //文件唯一ID
+	BYTE bColumn;     //栏目ID
+	char child_column[20]; //子栏目名
+	BYTE bSeazon;
+	//char szReserved1[3];
+	char bColumn_child[4];
+	char dwAddress[9];  //所属地区ID,不区分地区时为0
+	char szMajor[32];   //所属专业ID,每个BIT对应一个专业,不区分专业时为0
+	char szFileDate[12];//文件发布日期,到期的文件才会发布
+	char szValidDate[12];//有郊日期,过了日期不显示
+	char szTitle[50];   //主题词
+	//char szReserved2[1];
+}TAisHeader;
 
-	typedef struct tagAisHeader
-	{
-		char szType[5];     //AIS标志
-		//char dwFormat;   //包含的内容种类,目前末用
-		char fileId[18];  //文件唯一ID
-		BYTE bColumn;     //栏目ID
-		BYTE bSeazon;
-		//char szReserved1[3];
-		char dwAddress[9];  //所属地区ID,不区分地区时为0
-		char szMajor[32];   //所属专业ID,每个BIT对应一个专业,不区分专业时为0
-		char szFileDate[12];//文件发布日期,到期的文件才会发布
-		char szValidDate[12];//有郊日期,过了日期不显示
-		char szTitle[50];   //主题词
-		//char szReserved2[1];
-	} TAisHeader;
 	长度：140字节
 	*/
+	
+	/*
+	00：农业技术
+	01：专家指导
+	02：专家施肥
+	03：时政要闻
+	04：精选课件
+	05：先锋党员
+	06：典型经验
+	07：致富模范
+	08：快乐农家
+	09：法律法规
+	10：惠农政策
+	 */
+	
+	private static int COLUMN_COURSE = 4;
 
 	/**
 	 * Ais文件头
@@ -61,7 +79,9 @@ public class AisDoc {
 		String type;   //AIS标志
 		String fileId; //文件唯一ID
 		byte column;   //栏目ID
-		byte seazon;
+		String childColumn; // 子栏目名
+		String childColumnId; // 子栏目id
+		byte seazon; // 季节
 		String address;  //所属地区ID,不区分地区时为0
 		String major;    //所属专业ID,每个BIT对应一个专业,不区分专业时为0
 		String fileDate; //文件发布日期,到期的文件才会发布
@@ -173,16 +193,8 @@ public class AisDoc {
 			
 			FileInputStream file = new FileInputStream(filePathName);
 
-			// 文件太短，格式错误
-			byte[] buffer = new byte[AIS_HEADER_SIZE];
-			if (file.read(buffer, 0, AIS_HEADER_SIZE) != AIS_HEADER_SIZE) {
-				Debug.Log("严重错误：parseAisDoc，ais文件格式错误");
-				file.close();
-				return false;
-			}
-			
 			// 解析Ais头
-			mHeader = parseAisHeader(buffer);
+			mHeader = parseAisHeader(file);
 			
 			// 生成行树
 			mItemTree = new ArrayList<List<AisItem>>();
@@ -191,11 +203,6 @@ public class AisDoc {
 
 			int v;
 			AisItem.ByteArray textBytes = new AisItem.ByteArray(0);
-			
-			// TODO 空读24个字节？文件头改变？
-			byte[] buf = new byte[24];
-			file.read(buf);
-			
 			while ((v = file.read()) >= 0) {
 				if (v != DataMan.AIS_TOKEN) {
 					// 字符处理
@@ -227,7 +234,7 @@ public class AisDoc {
 					return false;
 				}
 
-				Debug.Log("item长度：" + length);
+				//Debug.Log("item长度：" + length);
 
 				byte[] data;
 				try {
@@ -250,31 +257,29 @@ public class AisDoc {
 					Debug.Log("字体结构：" + data);
 					break;
 				case DataMan.AIS_TOKEN_COURSE_ANSWER:
-					for (byte b : data) {
-						Debug.Log("答案 = " + (char)b);
-					}
-					break;
 				case DataMan.AIS_TOKEN_COURSE_GRADE:
-					for (byte b : data) {
-						Debug.Log("分数 = " + (char)b);
-					}
+				case DataMan.AIS_TOKEN_COURSE_NOTE:
+					addQuestion(v, data);
 					break;
 				case DataMan.AIS_TOKEN_IMAGE:
-					if (mImageItems == null)
-						mImageItems = new AisItem[3];
-
-					// 换行
-					AisItem imageItem = new AisItem(ItemType.IMAGE, data);
-					
-					if (mImageItems[0] == null)
-						mImageItems[0] = imageItem;
-					else if (mImageItems[1] == null)
-						mImageItems[1] = imageItem;
-					else if (mImageItems[2] == null)
-						mImageItems[2] = imageItem;
-					else
-						Debug.Log("解析Ais警告：多余三个图片Item");
-					
+					if (mHeader.column == COLUMN_COURSE)
+						addQuestion(v, data);
+					else {
+						if (mImageItems == null)
+							mImageItems = new AisItem[3];
+	
+						// 换行
+						AisItem imageItem = new AisItem(ItemType.IMAGE, data);
+						
+						if (mImageItems[0] == null)
+							mImageItems[0] = imageItem;
+						else if (mImageItems[1] == null)
+							mImageItems[1] = imageItem;
+						else if (mImageItems[2] == null)
+							mImageItems[2] = imageItem;
+						else
+							Debug.Log("解析Ais警告：多余三个图片Item");
+					}
 					break;
 				case DataMan.AIS_TOKEN_VIDEO:
 					// 只有一个视频Item
@@ -310,16 +315,76 @@ public class AisDoc {
 	}
 
 	/**
+	 * 添加答案到当前问题
+	 */
+	private class Question {
+		public Question(byte[] data) {
+			//data为图片数据
+			imageData = data;
+		}
+
+		byte[] imageData;
+		int grade;
+		byte[] answer;
+		String note;
+	}
+	private List<Question> mQuestionList;
+	private void addQuestion(int v, byte[] data) throws IOException {
+		if (mHeader.column != COLUMN_COURSE) {
+			throw new IOException("Ais结构错误：非试卷不应有答案结构，" + mHeader.column);
+		}
+
+		switch (v) {
+		// 题干图片
+		case DataMan.AIS_TOKEN_IMAGE:
+			if (mQuestionList == null)
+				mQuestionList = new ArrayList<Question>();
+			
+			mQuestionList.add(new Question(data));
+			break;
+		// 添加分数
+		case DataMan.AIS_TOKEN_COURSE_GRADE:
+			mQuestionList.get(mQuestionList.size() - 1).grade = DataMan.ParseInt(new String(data));
+			break;
+		case DataMan.AIS_TOKEN_COURSE_ANSWER:
+			if (data.length != 4)
+				Debug.Log("答案长度错误：" + data.length);
+			mQuestionList.get(mQuestionList.size() - 1).answer = data;
+			break;
+		case DataMan.AIS_TOKEN_COURSE_NOTE:
+			mQuestionList.get(mQuestionList.size() - 1).note = readText(data);
+			break;
+		}
+	}
+
+	/**
 	 * 解析ais头
 	 * @param buffer
 	 * @return
+	 * @throws IOException 
 	 */
-	private AisHeader parseAisHeader(byte[] buffer) {
+	private AisHeader parseAisHeader(FileInputStream file) throws IOException {
 		
-		if (buffer == null || buffer.length != AIS_HEADER_SIZE) {
-			Debug.Log("严重错误：getAisHeader，buffer " + buffer);
-			return null;
+		// 文件太短，格式错误
+		byte[] buffer = new byte[AIS_HEADER_SIZE];
+		if (file.read(buffer, 0, AIS_HEADER_SIZE) != AIS_HEADER_SIZE) {
+			file.close();
+			throw new IOException("Ais头严重错误：parseAisDoc，ais文件格式错误");
 		}
+
+		/*
+	char szType[5];     //AIS标志
+	char fileId[18];  //文件唯一ID
+	BYTE bColumn;     //栏目ID
+	char child_column[20]; //子栏目名
+	BYTE bSeazon;
+	char bColumn_child[4];
+	char dwAddress[9];  //所属地区ID,不区分地区时为0
+	char szMajor[32];   //所属专业ID,每个BIT对应一个专业,不区分专业时为0
+	char szFileDate[12];//文件发布日期,到期的文件才会发布
+	char szValidDate[12];//有郊日期,过了日期不显示
+	char szTitle[50];   //主题词
+		 */
 		
 		AisHeader header = new AisHeader();
 		
@@ -339,11 +404,21 @@ public class AisDoc {
 		header.column = buffer[offset];
 		offset += size;
 		
-		//
+		Debug.Log("column = " + header.column);
+		
+		// 子栏目名
+		header.childColumn = readText(buffer, offset, size = 20);//new String(buffer, offset, size = 20);
+		offset += size;
+		
+		// 季节
 		size = 1;
 		header.seazon = buffer[offset];
 		offset += size;
 		
+		// 子栏目id
+		header.childColumnId = new String(buffer, offset, size = 4);
+		offset += size;
+
 		// 地区id
 		header.address = new String(buffer, offset, size = 9);
 		offset += size;
@@ -361,8 +436,7 @@ public class AisDoc {
 		offset += size;
 		
 		// 主题
-		header.title = readText(buffer, offset, size = 12);
-		offset += size;
+		header.title = readText(buffer, offset, size = 50);
 
 		return header;
 	}
@@ -407,17 +481,28 @@ public class AisDoc {
 	 * @param len
 	 * @return
 	 */
-    private static String readText(byte[] buffer, int offset, int len) {
-
-    	try {
-			return new String(buffer, offset, len, "GB2312");
-		} catch (UnsupportedEncodingException e) {
-			Debug.Log("编码错误：" + e.getMessage());
-		}
-    	
-    	// 错误处理？
-    	return "标题";
+    private static String readText(byte[] buffer) {
+    	return readText(buffer, 0, buffer.length);
     }
+    
+    /**
+   	 * 从buffer读取String
+   	 * @param buffer
+   	 * @param offset
+   	 * @param len
+   	 * @return
+   	 */
+       private static String readText(byte[] buffer, int offset, int len) {
+
+       	try {
+   			return new String(buffer, offset, len, "GB2312");
+   		} catch (UnsupportedEncodingException e) {
+   			Debug.Log("编码错误：" + e.getMessage());
+   		}
+       	
+       	// 错误处理？
+       	return "";
+       }
 
     /**
      * 获取音频Item
