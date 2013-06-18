@@ -1,6 +1,8 @@
 package com.zknx.hn.functions;
 
 import android.content.Context;
+import android.os.Handler;
+import android.os.Message;
 import android.text.util.Linkify;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -18,7 +20,9 @@ import android.widget.TextView;
 import com.zknx.hn.R;
 import com.zknx.hn.common.Debug;
 import com.zknx.hn.common.UIConst;
+import com.zknx.hn.common.WaitDialog;
 import com.zknx.hn.common.UIConst.L_LAYOUT_TYPE;
+import com.zknx.hn.common.WaitDialog.WaitListener;
 import com.zknx.hn.data.DataMan;
 import com.zknx.hn.data.ListItemMap;
 import com.zknx.hn.functions.common.CommonList;
@@ -127,21 +131,65 @@ public class SupplyDemand extends FunctionView {
 	private boolean mIsCurrentSuply = true;
 	
 	/**
+	 * 等待更新数据
+	 * @author John
+	 *
+	 */
+	private class GetSupplyDemandListListener implements WaitListener {
+		@Override
+		public void startWait() {
+			String product_class_id = mAdapterProductClass.getItemMapString(position, DataMan.KEY_PRODUCT_CLASS_ID);
+			
+			mAdapterInfo = new CommonListAdapter(mContext, DataMan.GetSupplyDemandList(product_class_id, supply));
+		}
+		
+		int position;
+		boolean supply;
+	}
+	
+	// 等待更新数据
+	private GetSupplyDemandListListener mGetSupplyDemandListListener = new GetSupplyDemandListListener();
+	
+	// 处理消息
+	private static final int REFRESH_INFO_LIST = 0;
+	
+	Handler mHandler = new Handler() {
+		@Override
+		public void handleMessage(Message msg){
+		   super.handleMessage(msg);
+
+		   //WaitDialog.finish(msg.what);
+		   
+		   if (msg.what == REFRESH_INFO_LIST)
+			   refreshInfoList();
+		}
+	};
+	
+	/**
+	 * 属性供求信息列表
+	 */
+	private void refreshInfoList() {
+		boolean supply = mGetSupplyDemandListListener.supply;
+   
+		mListViewInfo.setAdapter(mAdapterInfo);
+			
+		mBtnSupply.setEnabled(!supply);
+		mBtnDemand.setEnabled(supply);
+			
+		// 默认第一个信息
+		initSupplyDemandView(0, supply);
+	}
+	
+	/**
 	 * 初始化供应或者求购信息
 	 * @param suppy
 	 */
 	void initInfoList(int position, boolean supply) {
-		String product_class_id = mAdapterProductClass.getItemMapString(position, DataMan.KEY_PRODUCT_CLASS_ID);
 		
-		mAdapterInfo = new CommonListAdapter(mContext, DataMan.GetSupplyDemandList(product_class_id, supply));
-
-		mListViewInfo.setAdapter(mAdapterInfo);
+		mGetSupplyDemandListListener.position = position;
+		mGetSupplyDemandListListener.supply = supply;
 		
-		mBtnSupply.setEnabled(!supply);
-		mBtnDemand.setEnabled(supply);
-		
-		// 默认第一个信息
-		initSupplyDemandView(0, supply);
+		WaitDialog.Show(mContext, mHandler, REFRESH_INFO_LIST, "读取供求数据", mGetSupplyDemandListListener);
 	}
 	
 	void initSupplyDemandView(int position, boolean supply) {
