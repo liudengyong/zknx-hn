@@ -78,14 +78,26 @@ public class DataMan extends DataInterface {
 	 * @return
 	 */
 	public static List<String> ReadLines(String fileName) {
+		// 默认编码
+		return ReadLines(fileName, "UTF-8");
+	}
+	
+	/**
+	 * 按行读取文本文件
+	 * @param fileName
+	 * @return
+	 */
+	public static List<String> ReadLines(String fileName, String encoding) {
 		
 		ArrayList<String> list = new ArrayList<String>();
 		
 		try {
 			String filePathName = DataFile(fileName);
 			
+			Debug.Log("读取：" + filePathName);
+			
 			BufferedReader br = new BufferedReader(new InputStreamReader(
-					new FileInputStream(filePathName), "UTF-8"));
+					new FileInputStream(filePathName), encoding));
 			
 			String line;
 			boolean fistLine = true;
@@ -128,7 +140,8 @@ public class DataMan extends DataInterface {
 			if (bytes[0] == bom[0] && 
 				bytes[1] == bom[1] && 
 				bytes[2] == bom[2]) {
-				return new String(line.substring(2));
+				
+				return new String(bytes, 3, bytes.length - 3);
 			}
 		}
 
@@ -632,6 +645,12 @@ public class DataMan extends DataInterface {
 	public static List<ListItemMap> GetProductClassList() {
 		//return ReadCommonIdName(FILE_NAME_PRODUCT_CLASS, KEY_PRODUCT_CLASS_ID);
 		
+		// 优化效率 省级地址
+		String productClassCacheFileName = "productClass.txt";
+	    if (FileUtils.IsFileExist(DataFile(productClassCacheFileName)))
+	    	return ReadCommonIdName(productClassCacheFileName, KEY_PRODUCT_CLASS_ID);
+		
+	    String productClassLines = "";
 		ArrayList<ListItemMap> list = new ArrayList<ListItemMap>();
         List<String> lines = ReadLines(FILE_NAME_COMMODITY);
         
@@ -641,17 +660,22 @@ public class DataMan extends DataInterface {
         	String[] token = GetToken(line);
         	if (token.length == 2) {
 
-        		int id =  ParseInt(token[0]);
+        		String strId =  token[0];
+        		int id =  ParseInt(strId);
 
         		// id 编码：两位数是分类
         		if (id != INVALID_ID && id < 100) {
 
 	        		String name = token[1];
 
-	        		list.add(new ListItemMap(name/* 名字 */, KEY_PRODUCT_CLASS_ID, token[0]/* id */));
+	        		list.add(new ListItemMap(name/* 名字 */, KEY_PRODUCT_CLASS_ID, strId/* id */));
+	        		
+	        		productClassLines += strId + COMMON_TOKEN + name + "\n";
         		}
         	}
         }
+
+        FileUtils.WriteText(DataFile(""), productClassCacheFileName, productClassLines);
 
         return list;
 	}
@@ -691,15 +715,20 @@ public class DataMan extends DataInterface {
 	 * @return
 	 */
 	interface SupplyDemandListener {
-		boolean meetCondition(String[] token);
+		boolean meetCondition(String[] token, String line/* FIXME 临时的*/);
 	}
+	private static List<String> GetSupplyDemandLinesCache = null;
 	private static List<ListItemMap> GetSupplyDemandList(SupplyDemandListener listener) {
-		ArrayList<ListItemMap> list = new ArrayList<ListItemMap>();
-		List<String> lines = ReadLines(FILE_NAME_SUPPLY_DEMAND_INFO);
+		
+		List<ListItemMap> list = new ArrayList<ListItemMap>();
+		
+		if (GetSupplyDemandLinesCache == null)
+			GetSupplyDemandLinesCache = ReadLines(FILE_NAME_SUPPLY_DEMAND_INFO, "GB2312");
 
-        for (String line : lines)
+        for (String line : GetSupplyDemandLinesCache)
         {
         	// product_id,产品名,供求信息id(第一位编码0代表供应，1代表求购),user,标题,供求信息内容,发布时间,有效期,数量,单价,产地,产品特点,联系人名字,联系电话,手机号,详细地址
+        	// 1003021000,果树苗,0,,供应各种果树苗、绿化苗,,2011-2-23,2011-3-22,,面议,北京市,,王敏,13521120562,13521120562,陆辛庄华源发苗木市场
         	String[] token = GetToken(line);
         	if (token.length != 16)
         		continue;
@@ -714,7 +743,7 @@ public class DataMan extends DataInterface {
     			continue;
     		*/
     		
-    		if (listener.meetCondition(token))
+    		if (listener.meetCondition(token, line))
     			list.add(GetSupplyDemandMap(token));  
         }
 
@@ -725,13 +754,38 @@ public class DataMan extends DataInterface {
 	 * 获取供求信息列表
 	 * @return
 	 */
-	public static List<ListItemMap> GetSupplyDemandList(final int product_class_id, final boolean supply) {
+	private static String supplyDemandClassLines = "";
+	public static List<ListItemMap> GetSupplyDemandList(final String product_class_id, final boolean supply) {
+		
+		String supplyDemandClassCache = "supplyDemandClass_" + product_class_id + "_" + supply +"_.txt";
+		
+		// 优化效率 省级地址
+	    if (FileUtils.IsFileExist(DataFile(supplyDemandClassCache))) {
+	    	List<String> lines = ReadLines(supplyDemandClassCache);
+	    	List<ListItemMap> list = new ArrayList<ListItemMap>();
 
+	        for (String line : lines)
+	        {
+	        	// product_id,产品名,供求信息id(第一位编码0代表供应，1代表求购),user,标题,供求信息内容,发布时间,有效期,数量,单价,产地,产品特点,联系人名字,联系电话,手机号,详细地址
+	        	// 1003021000,果树苗,0,,供应各种果树苗、绿化苗,,2011-2-23,2011-3-22,,面议,北京市,,王敏,13521120562,13521120562,陆辛庄华源发苗木市场
+	        	String[] token = GetToken(line);
+	        	if (token.length != 16)
+	        		continue;
+
+	    		list.add(GetSupplyDemandMap(token));  
+	        }
+	        
+	        return list;
+	    }
+	    
+	    supplyDemandClassLines = "";
+	    
 		SupplyDemandListener listener = new SupplyDemandListener() {
 			@Override
-			public boolean meetCondition(String[] token) {
+			public boolean meetCondition(String[] token, String line) {
 				
-				int product_id = ParseInt(token[0]);
+				String product_id = token[0];
+				//int product_id = ParseInt(token[0]);
 	    		if (!ProductClassMatch(product_class_id, product_id))
 	    			return false;
 
@@ -739,12 +793,18 @@ public class DataMan extends DataInterface {
 	    		if (supply_demand_id == INVALID_ID ||
 	    			IsSupply(supply_demand_id) != supply)
 	    			return false;
+	    		
+	    		supplyDemandClassLines += line + "\n";
 
 	    		return true;
 			}
 		};
 
-		return GetSupplyDemandList(listener);
+		List<ListItemMap> list = GetSupplyDemandList(listener);
+		
+		FileUtils.WriteText(DataFile(""), supplyDemandClassCache, supplyDemandClassLines);
+		
+		return list;
 	}
 
 	// 产品分类id
@@ -768,7 +828,7 @@ public class DataMan extends DataInterface {
 	// 产品特点
 	public final static String SUPPLY_DEMAND_INFO_KEY_FEATURE = "feature";
 	// 联系人名字
-	public final static String SUPPLY_DEMAND_INFO_KEY_CONTACT_NAME = "name";
+	public final static String SUPPLY_DEMAND_INFO_KEY_CONTACT_NAME = "contact_name";
 	// 联系人电话
 	public final static String SUPPLY_DEMAND_INFO_KEY_CONTACT_TEL = "tel";
 	// 联系人手机
@@ -781,11 +841,13 @@ public class DataMan extends DataInterface {
 	 * @param supply_demand_id
 	 * @return
 	 */
+	/*
 	public static ListItemMap GetSupplyDemandInfo(int supply_demand_id) {
 
-		List<String> lines = ReadLines(FILE_NAME_SUPPLY_DEMAND_INFO);
+		if (GetSupplyDemandLinesCache == null)
+			GetSupplyDemandLinesCache = ReadLines(FILE_NAME_SUPPLY_DEMAND_INFO);
         
-        for (String line : lines)
+        for (String line : GetSupplyDemandLinesCache)
         {
         	// product_id,产品名,供求信息id(第一位编码0代表供应，1代表求购),标题,供求信息内容,发布时间,有效期,数量,单价,产地,产品特点,联系人名字,联系电话,手机号,详细地址
         	String[] token = GetToken(line);
@@ -802,22 +864,23 @@ public class DataMan extends DataInterface {
 
 		return null;
 	}
+	*/
 	
 	/**
 	 * 保存详细供求信息map
 	 */
 	private static ListItemMap GetSupplyDemandMap(String[] token) {
-		String title = token[3];
-		int supply_demand_id = ParseInt(token[2]);
+		String title = token[4];
 		
-		ListItemMap map = new ListItemMap(title, KEY_SUPPLY_DEMAND_INFO_ID, supply_demand_id + "");
+		String supply_demand_id = title; // TODO interface 没有供求信息id
+		ListItemMap map = new ListItemMap(title, KEY_SUPPLY_DEMAND_INFO_ID, supply_demand_id);
 		
-		if (supply_demand_id != INVALID_ID) {
-			int product_id = ParseInt(token[0]);
-			
+		// 1003021000,果树苗,0,,供应各种果树苗、绿化苗,,2011-2-23,2011-3-22,,面议,北京市,,王敏,13521120562,13521120562,陆辛庄华源发苗木市场
+		int product_id = ParseInt(token[0]);
+		if (product_id != INVALID_ID) {
 			map.put(SUPPLY_DEMAND_INFO_PRODUCT_CLASS,       ProductClassDecode(product_id));
-			map.put(SUPPLY_DEMAND_INFO_KEY_USER,            token[3]);
-			map.put(SUPPLY_DEMAND_INFO_KEY_TITLE,           token[4]);
+			map.put(SUPPLY_DEMAND_INFO_KEY_USER,            "TODO");
+			map.put(SUPPLY_DEMAND_INFO_KEY_TITLE,           title);
 			map.put(SUPPLY_DEMAND_INFO_KEY_MESSAGE,         token[5]);
 			map.put(SUPPLY_DEMAND_INFO_KEY_POST_TIME,       token[6]);
 			map.put(SUPPLY_DEMAND_INFO_KEY_INVALIDATE_DATE, token[7]);
@@ -838,7 +901,7 @@ public class DataMan extends DataInterface {
 	 * 获取供求对接信息列表(不分供求)
 	 * @return
 	 */
-	public static List<ListItemMap> GetSupplyDemandPairList(final int product_class_id) {
+	public static List<ListItemMap> GetSupplyDemandPairList(final String product_class_id) {
 		
 		final String curUserId = UserMan.GetUserId();
 		
@@ -846,17 +909,17 @@ public class DataMan extends DataInterface {
 		
 		SupplyDemandListener listener = new SupplyDemandListener() {
 			@Override
-			public boolean meetCondition(String[] token) {
+			public boolean meetCondition(String[] token, String line) {
 
 				// 筛选我的供求信息
 	        	// 判断是当用户自己的供求信息
 	        	if (curUserId.equals(token[3])) {
 	        		// 保存产品分类id和供求信息id
-	        		int product_id = ParseInt(token[0]);
-	        		int product_class    = ProductClassDecode(product_id);
+	        		String product_id = token[0];
+	        		//int product_class    = ProductClassDecode(product_id);
 	        		
 	        		// 产品分类
-	        		if (product_class == product_class_id)
+	        		if (ProductClassMatch(product_class_id, product_id))
 	        			return true;
 	        	}
 
@@ -868,19 +931,21 @@ public class DataMan extends DataInterface {
 		
 		SupplyDemandListener listener2 = new SupplyDemandListener() {
 			@Override
-			public boolean meetCondition(String[] token) {
+			public boolean meetCondition(String[] token, String line) {
 	        
 	        	// 判断是当用户自己的供求信息
 	        	if (curUserId.equals(token[3]))
 	        		return false;
 	        	
+	        	//int product_class    = ParseInt(token[0]);
+	        	String product_class    = token[0];
+        		int supply_demand_id = ParseInt(token[2]);
+        		
 	        	// 判断是否对接
 	        	for (ListItemMap pairInfo : myInfoList) {
-	        		int product_class    = ParseInt(token[0]);
-	        		int supply_demand_id = ParseInt(token[2]);
 	        		
 	        		// 用到亦或操作
-	        		if (product_class == ListItemMap.GetMapInt(pairInfo, KEY_PRODUCT_CLASS_ID) && 
+	        		if (ProductClassMatch(ListItemMap.GetMapString(pairInfo, KEY_PRODUCT_CLASS_ID), product_class) && 
 	        			(IsSupply(supply_demand_id) ^ IsSupply(ListItemMap.GetMapInt(pairInfo, KEY_SUPPLY_DEMAND_INFO_ID)))) {
 	        			return true;
 	        		}

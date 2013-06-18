@@ -106,13 +106,17 @@ public class DataInterface {
 	 * @param product_id
 	 * @return
 	 */
-	protected static boolean ProductClassMatch(int product_class_id, int product_id) {
+	protected static boolean ProductClassMatch(String product_class_id, String product_id) {
 		// TODO interface 产品id定义，算法判断前几位包含
 
+		/*
 		int max_product_id = (product_class_id + 1) * 1000;
 		int min_product_id = product_class_id * 1000;
 
 		return (product_id > min_product_id && product_id < max_product_id);
+		*/
+		
+		return product_id.startsWith(product_class_id);
 	}
 
 	/**
@@ -123,7 +127,9 @@ public class DataInterface {
 	protected static boolean IsSupply(int supply_demand_id) {
 		// TODO interface 根据首位编码判断（首位是0则是供应，首位是1则是需求）
 		// 大于或者小于编码位数（编码位数需固定）
-		return (supply_demand_id > 100000);
+		//return (supply_demand_id > 100000);
+		
+		return (supply_demand_id == 0);
 	}
 
 	/**

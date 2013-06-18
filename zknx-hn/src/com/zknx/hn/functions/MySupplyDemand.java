@@ -75,7 +75,7 @@ public class MySupplyDemand extends FunctionView {
 	void initPairList(int position) {
 		
 		// 产品分类
-		int product_class_id = mAdapterClass.getItemMapInt(position, DataMan.KEY_PRODUCT_CLASS_ID);
+		String product_class_id = mAdapterClass.getItemMapString(position, DataMan.KEY_PRODUCT_CLASS_ID);
 		
 		mAdapterPair = new CommonListAdapter(mContext, DataMan.GetSupplyDemandPairList(product_class_id));
 		
@@ -89,12 +89,12 @@ public class MySupplyDemand extends FunctionView {
 	
 	void initSupplyDemandInfo(int position) {
 		
-		int supply_demand_id = mAdapterPair.getItemMapInt(position, DataMan.KEY_SUPPLY_DEMAND_INFO_ID);
+		//int supply_demand_id = mAdapterPair.getItemMapInt(position, DataMan.KEY_SUPPLY_DEMAND_INFO_ID);
 
 		// 新建TableLayout 实例  
         TableLayout tableLayout = new TableLayout(mContext);
         
-        String title = SupplyDemand.GetSupplyDemandInfo(supply_demand_id, tableLayout);
+        String title = SupplyDemand.GetSupplyDemandInfo(mAdapterPair.getItem(position), tableLayout);
         
 		initContent(title, tableLayout, mContentFrame[2]);
 	}

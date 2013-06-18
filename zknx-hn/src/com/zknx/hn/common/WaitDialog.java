@@ -96,4 +96,44 @@ public class WaitDialog extends ProgressDialog {
 		
 		return waitDialog;
 	}
+	
+	/**
+	 * 生成并弹出进度条对话框
+	 * @param context
+	 * @param string
+	 * @param string2
+	 * @return
+	 */
+	public static WaitDialog Show(Context context, final Handler handler, final int what, String message, WaitListener waitListener) {
+
+		final WaitDialog waitDialog = new WaitDialog(context, waitListener);
+		
+		waitDialog.setTitle("请稍等");
+		waitDialog.setMessage(message);
+
+		// 可以手动取消更新
+		waitDialog.setCancelable(true);
+
+		waitDialog.show();
+		
+		new Thread() {
+	         public void run(){
+
+	        	 // 主线程以外的线程里创建AsynTask实例
+	        	 Looper.prepare();
+
+	            // 需要等待的动作，时间可能会比较长
+				if (mWaitListener != null) {
+					mWaitListener.startWait();
+					handler.sendEmptyMessage(what);
+				}
+				else
+					Debug.Log("严重错误：startWait为空");
+				
+				waitDialog.dismiss();
+	         }
+	      }.start();
+		
+		return waitDialog;
+	}
 }
