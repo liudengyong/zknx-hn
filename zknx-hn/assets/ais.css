@@ -1,0 +1,62 @@
+/* Off state for a ARC checkbox */
+#.checkboxOff {
+	display: inline;
+	margin: 0px;
+	padding: 2px; /* NS 6 problem */
+	padding-left: 20px;
+	color: #666;
+	line-height: 16px;
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: .8em;
+	background-image: url(checkbox_off.gif);
+	background-repeat: no-repeat;
+	background-position: 0% 50%;
+	border: 0px;
+}
+/* On state for a ARC checkbox */
+#.checkboxOn {
+	display: inline;
+	margin: 0px;
+	padding: 2px; /* NS 6 problem */
+	padding-left: 20px;
+	color: #000;
+	line-height: 16px;
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: .8em;
+	background-image: url(checkbox_on.gif);
+	background-repeat: no-repeat;
+	background-position: 0% 50%;
+	border: 0px;
+}
+
+
+/* Off state for a ARC checkbox */
+#.altCheckboxOff {
+	display: inline;
+	padding: 20px 2px; /* NS 6 problem */
+	padding-left: 70px;
+	color: #666;
+	line-height: 60px;
+	font-family: "Courier New", Courier, mono;
+	font-size: 1.2em;
+	background-image: url(alt_checkbox_off.gif);
+	background-repeat: no-repeat;
+	background-position: 0% 50%;
+	border: 0px;
+	cursor: pointer;
+}
+/* On state for a ARC checkbox */
+#.altCheckboxOn {
+	display: inline;
+	padding: 20px 2px; /* NS 6 problem */
+	padding-left: 70px;
+	color: #000;
+	line-height: 60px;
+	font-family: "Courier New", Courier, mono;
+	font-size: 1.2em;
+	font-weight: bold;
+	background-image: url(alt_checkbox_on.gif);
+	background-repeat: no-repeat;
+	background-position: 0% 50%;
+	border: 0px;
+}

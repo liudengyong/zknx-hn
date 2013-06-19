@@ -68,7 +68,7 @@ typedef struct tagAisHeader
 	10：惠农政策
 	 */
 	
-	private static int COLUMN_COURSE = 4;
+	private static int COLUMN_COURSE = 12; // TODO 确认
 
 	/**
 	 * Ais文件头
@@ -262,7 +262,7 @@ typedef struct tagAisHeader
 					addQuestion(v, data);
 					break;
 				case DataMan.AIS_TOKEN_IMAGE:
-					if (mHeader.column == COLUMN_COURSE)
+					if (isCourse())
 						addQuestion(v, data);
 					else {
 						if (mImageItems == null)
@@ -318,41 +318,119 @@ typedef struct tagAisHeader
 	 * 添加答案到当前问题
 	 */
 	private class Question {
-		public Question(byte[] data) {
-			//data为图片数据
-			imageData = data;
+		Question(byte[] data) {
+			//data为题干图片数据
+			bitmapData = data;
 		}
 
-		byte[] imageData;
+		byte[] bitmapData;
 		int grade;
 		byte[] answer;
 		String note;
 	}
+
 	private List<Question> mQuestionList;
+
+	/**
+	 * 获取题目个数
+	 * @return
+	 */
+	public int getQuestionCount() {
+		return mQuestionList != null ? mQuestionList.size() : 0;
+	}
+	
+	/**
+	 * 获取题干图片
+	 * @return
+	 */
+	public byte[] getQuestionBitmapData(int i) {
+		if (mQuestionList == null || mQuestionList.size() < i)
+			return null;
+		
+		byte[] data = mQuestionList.get(i).bitmapData;
+		//return BitmapFactory.decodeByteArray(data, 0, data.length);
+		return data;
+	}
+	
+	/**
+	 * 获取题目答案
+	 * @return
+	 */
+	public byte[] getQuestionAnswer(int i) {
+		if (mQuestionList == null || mQuestionList.size() < i)
+			return null;
+		
+		return mQuestionList.get(i).answer;
+	}
+	
+	/**
+	 * 获取题目分数
+	 * @return
+	 */
+	public int getQuestionGrade(int i) {
+		if (mQuestionList == null || mQuestionList.size() < i)
+			return DataMan.INVALID_ID;
+		
+		return mQuestionList.get(i).grade;
+	}
+	
+	/**
+	 * 获取题目解析
+	 * @return
+	 */
+	public String getQuestionNote(int i) {
+		if (mQuestionList == null || mQuestionList.size() < i)
+			return "无";
+		
+		return mQuestionList.get(i).note;
+	}
+	
+	/**
+	 * 是否试题Ais
+	 * @return
+	 */
+	public boolean isCourse() {
+		return (mHeader != null) ? (mHeader.column == COLUMN_COURSE) : false;
+	}
+
+	/**
+	 * 添加试题
+	 * @param v
+	 * @param data
+	 * @throws IOException
+	 */
 	private void addQuestion(int v, byte[] data) throws IOException {
-		if (mHeader.column != COLUMN_COURSE) {
+		if (!isCourse()) {
 			throw new IOException("Ais结构错误：非试卷不应有答案结构，" + mHeader.column);
 		}
 
-		switch (v) {
 		// 题干图片
-		case DataMan.AIS_TOKEN_IMAGE:
+		if (v == DataMan.AIS_TOKEN_IMAGE) {
 			if (mQuestionList == null)
 				mQuestionList = new ArrayList<Question>();
 			
 			mQuestionList.add(new Question(data));
-			break;
+			
+			return;
+		}
+		
+		Question lastQuestion = mQuestionList.get(mQuestionList.size() - 1);
+
+		switch (v) {
 		// 添加分数
 		case DataMan.AIS_TOKEN_COURSE_GRADE:
-			mQuestionList.get(mQuestionList.size() - 1).grade = DataMan.ParseInt(new String(data));
+			// TODO 分数只有两位数？
+			lastQuestion.grade = DataMan.ParseInt(new String(data, 0, 2));
 			break;
 		case DataMan.AIS_TOKEN_COURSE_ANSWER:
-			if (data.length != 4)
+			if (data.length != 4) {
 				Debug.Log("答案长度错误：" + data.length);
-			mQuestionList.get(mQuestionList.size() - 1).answer = data;
+				return;
+			}
+			lastQuestion.answer = data;
 			break;
 		case DataMan.AIS_TOKEN_COURSE_NOTE:
-			mQuestionList.get(mQuestionList.size() - 1).note = readText(data);
+			lastQuestion.note = readText(data);
 			break;
 		}
 	}
@@ -495,6 +573,14 @@ typedef struct tagAisHeader
        private static String readText(byte[] buffer, int offset, int len) {
 
        	try {
+
+    		for (int i = 0; i < len ; ++i) {
+    			if (buffer[offset + i] == 0) {
+    				len = i; // 字符串实际长度
+    				break; // 查找字符串结尾标志
+    			}
+    		}
+
    			return new String(buffer, offset, len, "GB2312");
    		} catch (UnsupportedEncodingException e) {
    			Debug.Log("编码错误：" + e.getMessage());

@@ -133,62 +133,150 @@ public class AisParser {
 		// 获取解析后的ais文档
 		AisDoc aisDoc = new AisDoc(ais_id);
 		String title = aisDoc.getTitle();
-		List<List<AisItem>> aisItemTree = aisDoc.getItemTree();
-		
-		if (title != null && aisItemTree != null) {
-
-			// 初始化音视频图标监听
-			mAudioItem = aisDoc.getAudioItem();
-			mVideoItem = aisDoc.getVideoItem();
-			
-			if (mAudioItem == null)
-			    Debug.Log("mAudioItem is null");
-			else
-				Debug.Log("mAudioItem is not null");
-			if (mVideoItem == null)
-				Debug.Log("mVideoItem is null");
-			
-			// 解析普通视图为webview
-			AisItem imageItems[] = aisDoc.getImageItems();
-			
-			// 添加图片
-			String imageTags = "";
-			int imageIndex = 0;
-			if (imageItems != null) {
-				for (AisItem item : imageItems) {
-					if (item != null)
-						imageTags += genImgTag(ais_id, item, imageIndex++);
-				}
-			}
-
-			// 添加文字
-			String text = "";
-			for (List<AisItem> aisLine : aisItemTree) {
-				for (AisItem aisItem : aisLine) {
-					if (aisItem != null && aisItem.type == ItemType.TEXT)
-						try {
-							text += new String(aisItem.data, "GBK");
-						} catch (UnsupportedEncodingException e) {
-							Debug.Log("编码错误：" + e.getMessage());
-						}
-				}
-			}
-			
-			// html文本
-			String htmlString = genHtmlString(genMediaIconTags(), imageTags, text);
-
-			// 加载webview
-			webView.loadData(htmlString, "text/html", "GBK");
-			webView.loadDataWithBaseURL(null, htmlString, "text/html", "UTF-8", null);
-			webView.setBackgroundColor(0); // 设置透明
-			
-			return title;
-		}
+		boolean isCourse = aisDoc.isCourse();
 		
 		mAudioItem = null;
 		mVideoItem = null;
 		
-		return null;
+		if (title == null)
+			return null;
+		
+		String htmlString =null;
+		if (isCourse)
+			htmlString = genAisCourseWebview(ais_id, webView, aisDoc);
+		else
+			htmlString = genAisWebview(ais_id, webView, aisDoc);
+		
+		// 加载webview
+		if (htmlString != null) {
+			//webView.loadData(htmlString, "text/html", "GBK");
+			webView.loadDataWithBaseURL(null, htmlString, "text/html", "UTF-8", null);
+		}
+
+		webView.setBackgroundColor(0); // 设置透明
+
+		return title;
+	}
+
+	/**
+	 * 生成Ais视图
+	 * @param ais_id
+	 * @param webView
+	 * @param aisDoc
+	 */
+	private String genAisWebview(String ais_id, WebView webView, AisDoc aisDoc) {
+
+		List<List<AisItem>> aisItemTree = aisDoc.getItemTree();
+		
+		if (aisItemTree == null)
+			return null;
+
+		// 初始化音视频图标监听
+		mAudioItem = aisDoc.getAudioItem();
+		mVideoItem = aisDoc.getVideoItem();
+		
+		// 解析普通视图为webview
+		AisItem imageItems[] = aisDoc.getImageItems();
+		
+		// 添加图片
+		String imageTags = "";
+		int imageIndex = 0;
+		if (imageItems != null) {
+			for (AisItem item : imageItems) {
+				if (item != null)
+					imageTags += genImgTag(ais_id, item, imageIndex++);
+			}
+		}
+
+		// 添加文字
+		String text = "";
+		for (List<AisItem> aisLine : aisItemTree) {
+			for (AisItem aisItem : aisLine) {
+				if (aisItem != null && aisItem.type == ItemType.TEXT)
+					try {
+						text += new String(aisItem.data, "GBK");
+					} catch (UnsupportedEncodingException e) {
+						Debug.Log("编码错误：" + e.getMessage());
+					}
+			}
+		}
+		
+		// html文本
+		return genHtmlString(genMediaIconTags(), imageTags, text);
+	}
+	
+	/**
+	 * 生成Ais试卷视图
+	 * @param ais_id
+	 * @param webView
+	 * @param aisDoc
+	 */
+	private String genAisCourseWebview(String ais_id, WebView webView, AisDoc aisDoc) {
+
+		String htmlString = "";
+		for (int i = 0; i < aisDoc.getQuestionCount(); ++i) {
+			htmlString += genQuestionTags(aisDoc, ais_id, i);
+		}
+
+		String cssLink = "<link href=\"file:///android_asset/ais.css\" rel=\"stylesheet\" type=\"text/css\">";
+		return cssLink + "<ol>" + htmlString + "</ol>";
+	}
+	
+	/**
+	 * 生成Ais试卷题目
+	 * @param i
+	 * @return
+	 */
+	private String genQuestionTags(AisDoc aisDoc, String aisId, int i) {
+		// 标题  + 图片 + CheckBox
+		
+		String imageFilePathName = DataMan.DataFile(aisId + "_question" + i + ".bmp");
+		String imageAlt = "图片找不到：" + imageFilePathName;
+		
+		// 保存图片
+		saveImageToFile(aisDoc.getQuestionBitmapData(i), imageFilePathName);
+
+		// 各题目之间的间隔
+		String paddingTop = "";
+		if (i != 0)
+			paddingTop = "style=\"padding-top:40px;\"";
+
+		String tagQuestionBitmap = "<li " + paddingTop + "><img src=\"file://" + imageFilePathName + "\"" + 
+				" alt=\"" + imageAlt + "\"" +
+				" style=\"vertical-align:text-top;\"" +
+				"</li>";
+		
+		char[] anwsers = {'A', 'B', 'C', 'D'};
+		String tagAnswer = "<div/>回答：";
+		for (char anwser : anwsers) {
+			tagAnswer += (anwser + "<input type=checkbox name=answer id=" + GetAnswerTagId(aisId, i, anwser) + " value=" + anwser + ">"); 
+		}
+
+		// 隐藏和小时解析
+		String noteTagId = GetNoteTagId(aisId, i);
+		String tagNote = "<div/><label id=" + noteTagId + " style=\"display:none;\">解析：" + aisDoc.getQuestionNote(i) + "<label/>";
+		
+		return tagQuestionBitmap + tagAnswer + tagNote;
+	}
+	
+	/**
+	 * 获取答案Tag的id
+	 * @param aisId
+	 * @param i
+	 * @return
+	 */
+	private static String GetAnswerTagId(String aisId, int i, char answer) {
+		return aisId + "_answer" + i + "_" + answer;
+	}
+	
+	/**
+	 * 获取解析Tag的id
+	 * @param aisId
+	 * @param i
+	 * @return
+	 */
+	private static String GetNoteTagId(String aisId, int i) {
+		return aisId + "_note" + i;
 	}
 	
 	/**
