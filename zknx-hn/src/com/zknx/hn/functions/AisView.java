@@ -161,7 +161,7 @@ public class AisView extends FunctionView {
 		LinearLayout layout = null;
 		Debug.Log("ais_id = " + ais_id);
 		
-		AisParser.AisLayout aisLayout = mAisParser.GetAisLayout(ais_id, mInflater, mJsInterface);
+		AisParser.AisLayout aisLayout = mAisParser.GetAisLayout(ais_id, mInflater, getJsInterface());
 		
 		if (aisLayout != null) {
 			title = aisLayout.getTitle();
@@ -230,6 +230,14 @@ public class AisView extends FunctionView {
 	
 	// JS接口
 	private JsInterface mJsInterface = new JsInterface();
+	
+	/**
+	 * 子类可以覆盖（试卷ais）
+	 * @return
+	 */
+	protected Object getJsInterface() {
+		return mJsInterface;
+	}
 	
 	class JsInterface {
 		

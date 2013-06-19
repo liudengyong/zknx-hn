@@ -245,7 +245,7 @@ public class AisParser {
 				" alt=\"" + imageAlt + "\"" +
 				" style=\"vertical-align:text-top;\"" +
 				"</li>";
-		
+
 		char[] anwsers = {'A', 'B', 'C', 'D'};
 		String tagAnswer = "<div/>»Ø´ð£º";
 		for (char anwser : anwsers) {

@@ -10,12 +10,16 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewParent;
 import android.view.View.OnClickListener;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
 public class BestCourse extends AisView {
 	
 	private LinearLayout mSubmitLayout;
+	
+	private final static int ID_SUBMIT = R.id.common_btn_pair2;
+	private final static int ID_RESET = R.id.common_btn_pair1;
 
 	public BestCourse(LayoutInflater inflater, LinearLayout frameRoot) {
 		super(inflater, frameRoot, UIConst.FUNCTION_ID_BEST_COUSE, R.layout.func_frame_split);
@@ -43,13 +47,27 @@ public class BestCourse extends AisView {
 
 				@Override
 				public void onClick(View view) {
-					summit();
+					int id = view.getId();
+					switch (id) {
+					case ID_SUBMIT:
+						summit();
+						break;
+					case ID_RESET:
+						reset();
+						break;
+					}
 				}
 			};
+
+			mSubmitLayout = (LinearLayout)mInflater.inflate(R.layout.common_btn_pair, null);
 			
-			mSubmitLayout = (LinearLayout)mInflater.inflate(R.layout.best_course_submit, null);
+			Button btn = (Button) mSubmitLayout.findViewById(ID_SUBMIT);
+			btn.setText("交卷");
+			btn.setOnClickListener(mOnClickSubmit);
 			
-			mSubmitLayout.findViewById(R.id.best_couse_submit).setOnClickListener(mOnClickSubmit);
+			btn = (Button) mSubmitLayout.findViewById(ID_RESET);
+			btn.setText("重做");
+			btn.setOnClickListener(mOnClickSubmit);
 		} else {
 			// 首先脱离父类
 			ViewParent parent = mSubmitLayout.getParent();
@@ -69,6 +87,17 @@ public class BestCourse extends AisView {
 	 */
 	private void summit() {
 		Dialog.Confirm(mContext, R.string.confirm_submit_course, new ConfirmListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				// TODO interface 处理交卷？
+			}
+		});
+	}
+	/**
+	 * 重做按钮
+	 */
+	private void reset() {
+		Dialog.Confirm(mContext, R.string.confirm_reset_course, new ConfirmListener() {
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
 				// TODO interface 处理交卷？
