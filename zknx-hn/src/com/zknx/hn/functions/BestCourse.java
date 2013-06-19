@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewParent;
 import android.view.View.OnClickListener;
+import android.webkit.WebView;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -44,16 +45,16 @@ public class BestCourse extends AisView {
 		if (mSubmitLayout == null) {
 			
 			OnClickListener mOnClickSubmit = new OnClickListener() {
-
 				@Override
 				public void onClick(View view) {
 					int id = view.getId();
+					WebView webView = mAisParser.getWebview();
 					switch (id) {
 					case ID_SUBMIT:
-						summit();
+						summit(webView);
 						break;
 					case ID_RESET:
-						reset();
+						reset(webView);
 						break;
 					}
 				}
@@ -81,26 +82,27 @@ public class BestCourse extends AisView {
 			}
 		}
 	}
-	
+
 	/**
 	 * 交卷按钮
 	 */
-	private void summit() {
+	private void summit(final WebView webView) {
 		Dialog.Confirm(mContext, R.string.confirm_submit_course, new ConfirmListener() {
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
-				// TODO interface 处理交卷？
+				webView.loadUrl("javascript:submitTest()");
 			}
 		});
 	}
+
 	/**
 	 * 重做按钮
 	 */
-	private void reset() {
+	private void reset(final WebView webView) {
 		Dialog.Confirm(mContext, R.string.confirm_reset_course, new ConfirmListener() {
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
-				// TODO interface 处理交卷？
+				webView.loadUrl("javascript:resetTest()");
 			}
 		});
 	}

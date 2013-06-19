@@ -55,7 +55,16 @@ public class AisParser {
 	public byte[] getVideoData() {
 		return (mVideoItem != null) ? mVideoItem.data : null;
 	}
+	
+	// 解析出的WebView
+	private WebView mWebView;
 
+	/**
+	 * 获取解析出的WebView
+	 */
+	public WebView getWebview() {
+		return mWebView;
+	}
 
 	/**
 	 * 获取ais视图
@@ -72,14 +81,14 @@ public class AisParser {
 		LinearLayout contentLayout = (LinearLayout) aisLayout.findViewById(R.id.ais_content_view);
 		
 		// Ais内容滚动视图
-		WebView webView = (WebView) aisLayout.findViewById(R.id.ais_webview);
+		mWebView = (WebView) aisLayout.findViewById(R.id.ais_webview);
 		
 		// 添加JS接口
-		webView.getSettings().setJavaScriptEnabled(true); // 启用JS脚本
-		webView.getSettings().setCacheMode(WebSettings.LOAD_NO_CACHE); // 禁用cache
-        webView.addJavascriptInterface(jsInterface, "ais");
+		mWebView.getSettings().setJavaScriptEnabled(true); // 启用JS脚本
+		mWebView.getSettings().setCacheMode(WebSettings.LOAD_NO_CACHE); // 禁用cache
+		mWebView.addJavascriptInterface(jsInterface, "ais");
 
-		String title = parseAis(ais_id, contentLayout, webView);
+		String title = parseAis(ais_id, contentLayout, mWebView);
 
 		if (title == null) {
 			Debug.Log("严重错误：AIS parse错误");
@@ -219,7 +228,10 @@ public class AisParser {
 		}
 
 		String cssLink = "<link href=\"file:///android_asset/ais.css\" rel=\"stylesheet\" type=\"text/css\">";
-		return cssLink + "<ol>" + htmlString + "</ol>";
+		String jsLink = "<link href=\"file:///android_asset/course.js\" type=\"text/javascript\">";
+		String aisHiddenInfo = "<label id=aisId style=\"display:none;\">" + ais_id + "</label><label id=questionCount style=\"display:none;\">" + aisDoc.getQuestionCount() + "</label>";
+
+		return cssLink + jsLink + aisHiddenInfo + "<ol>" + htmlString + "</ol>";
 	}
 	
 	/**
