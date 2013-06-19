@@ -104,7 +104,7 @@ public class Expert extends AisView {
 		});
 		
 		// TODO  µœ÷”Ô“Ù∂‘Ω≤
-		askLayout.findViewById(R.id.common_btn_pair2).setEnabled(false);
+		askLayout.findViewById(R.id.common_btn_pair_right).setEnabled(false);
 		
 		return askLayout;
 	}

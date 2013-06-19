@@ -18,8 +18,8 @@ public class BestCourse extends AisView {
 	
 	private LinearLayout mSubmitLayout;
 	
-	private final static int ID_SUBMIT = R.id.common_btn_pair2;
-	private final static int ID_RESET = R.id.common_btn_pair1;
+	private final static int ID_SUBMIT = R.id.common_btn_pair_right;
+	private final static int ID_RESET = R.id.common_btn_pair_left;
 
 	public BestCourse(LayoutInflater inflater, LinearLayout frameRoot) {
 		super(inflater, frameRoot, UIConst.FUNCTION_ID_BEST_COUSE, R.layout.func_frame_split);

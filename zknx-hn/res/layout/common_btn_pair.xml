@@ -5,13 +5,13 @@
     android:baselineAligned="false"
     android:orientation="horizontal" >
 
-    <Button android:id="@+id/common_btn_pair1"
+    <Button android:id="@+id/common_btn_pair_left"
 		android:layout_height="wrap_content" 
 		android:layout_width="0sp"
 		android:layout_weight="1"
 		style="@style/ClassBtn"/>
     
-    <Button android:id="@+id/common_btn_pair2"
+    <Button android:id="@+id/common_btn_pair_right"
 		android:layout_height="wrap_content" 
 		android:layout_width="0sp"
 		android:layout_weight="1"

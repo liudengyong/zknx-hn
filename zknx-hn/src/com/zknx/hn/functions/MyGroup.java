@@ -147,12 +147,12 @@ public class MyGroup extends FunctionView {
 			@Override
 			public void onClick(View view) {
 				switch (view.getId()) {
-				case R.id.common_btn_pair1:
+				case R.id.common_btn_pair_left:
 					// 切换为新建留言界面，传参我的留言组id（返回我的留言tab）
 					if (mCurFriendInfo != null)
 						initNewMessageView(mCurFriendInfo.name, mCurFriendInfo.id, R.id.my_group_message_my_message);
 					break;
-				case R.id.common_btn_pair2:
+				case R.id.common_btn_pair_right:
 					// TODO 实现语音对讲
 					String friendId = "jun";
 					String userId = "yong";
@@ -166,7 +166,7 @@ public class MyGroup extends FunctionView {
 		layoutContent.addView(getLinearLayoutBtnPair(R.string.new_message, R.string.friend_interphone, listener), UIConst.GetLayoutParams(L_LAYOUT_TYPE.H_WRAP));
 		
 		// TODO 实现语音对讲
-		layoutContent.findViewById(R.id.common_btn_pair2).setEnabled(false);
+		layoutContent.findViewById(R.id.common_btn_pair_right).setEnabled(false);
 
 		// 初始化好友界面
 		if (mCurFriendInfo != null) {
