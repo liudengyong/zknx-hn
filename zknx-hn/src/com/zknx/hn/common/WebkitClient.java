@@ -8,6 +8,7 @@ import android.content.DialogInterface.OnClickListener;
 import android.content.DialogInterface.OnKeyListener;
 import android.view.KeyEvent;
 import android.view.View;
+import android.webkit.ConsoleMessage;
 import android.webkit.JsPromptResult;
 import android.webkit.JsResult;
 import android.webkit.WebChromeClient;
@@ -22,9 +23,9 @@ public class WebkitClient extends WebChromeClient {
 	 * ¥Ú”°js¥ÌŒÛ
 	 */
 	@Override
-    public void onConsoleMessage(String message, int lineNumber, String sourceID) {
-        Debug.Log("ChromeClient invoked: onConsoleMessage() - " + sourceID + ":" + lineNumber + " - " + message);
-        super.onConsoleMessage(message, lineNumber, sourceID);
+	public boolean onConsoleMessage(ConsoleMessage consoleMessage) {
+        //Debug.Log("ChromeClient invoked: onConsoleMessage() - " + sourceID + ":" + lineNumber + " - " + message);
+        return super.onConsoleMessage(consoleMessage);
     }
 
 	/**

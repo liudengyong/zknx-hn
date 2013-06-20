@@ -30,6 +30,9 @@ public class AisParser {
 	// 用于播放音频
 	private AisItem mAudioItem;
 	private AisItem mVideoItem;
+	
+	private final static String URL_FILE_CRECT_RESULT = "file:///android_asset/icon/crect.png";
+	private final static String URL_FILE_INCRECT_RESULT = "file:///android_asset/icon/increct.png";
 
 	public AisParser(LayoutInflater inflater) {
 		mInflater = inflater;
@@ -152,17 +155,16 @@ public class AisParser {
 		if (title == null)
 			return null;
 		
-		String htmlString = null;
 		if (isCourse) {
-			htmlString = InitCourseHtml(ais_id, webView, aisDoc);
+			InitCourseHtml(ais_id, webView, aisDoc);
 		} else {
-			htmlString = genAisWebview(ais_id, webView, aisDoc);
-		}
-		
-		// 加载webview
-		if (htmlString != null) {
-			//webView.loadData(htmlString, "text/html", "GBK");
-			webView.loadDataWithBaseURL(null, htmlString, "text/html", "UTF-8", null);
+			String htmlString = genAisWebview(ais_id, webView, aisDoc);
+			
+			// 加载webview
+			if (htmlString != null) {
+				//webView.loadData(htmlString, "text/html", "GBK");
+				webView.loadDataWithBaseURL(null, htmlString, "text/html", "UTF-8", null);
+			}
 		}
 
 		webView.setBackgroundColor(0); // 设置透明
@@ -174,12 +176,13 @@ public class AisParser {
 	 * 初始化课件试题
 	 * @param webView
 	 */
-	private static String InitCourseHtml(String aisId, WebView webView, AisDoc aisDoc) {
+	private static void InitCourseHtml(String aisId, WebView webView, AisDoc aisDoc) {
 		
 		int total = 0;
-		String htmlString = "";
-		for (int i = 0; i < aisDoc.getQuestionCount(); ++i) {
-			htmlString += GenQuestionTags(aisDoc, aisId, i);
+		int count = aisDoc.getQuestionCount();
+		String questionTags = "";
+		for (int i = 0; i < count; ++i) {
+			questionTags += GenQuestionTags(aisDoc, aisId, i);
 			total += aisDoc.getQuestionGrade(i);
 		}
 
@@ -187,9 +190,17 @@ public class AisParser {
 		String cssLink = "";//"<link href=\"file:///android_asset/ais.css\" rel=\"stylesheet\" type=\"text/css\">";
 		String jsScript = "<script type=\"text/javascript\" src=\"file:///android_asset/course.js\"></script></head>";
 		String totalPoints = "<div align=\"right\" style=\"margin-top:4px;font-size:18px;color:white;\">总分：" + total + "分</div>";
-		String aisHiddenInfo = "<label id=aisId style=\"display:none;\">" + aisId + "</label><label id=questionCount style=\"display:none;\">" + aisDoc.getQuestionCount() + "</label>";
+		String aisHiddenInfo = "<label id=crectIcon value=\"" + URL_FILE_CRECT_RESULT + "\" style=\"display:none;\"></label>" + 
+				"<label id=increctIcon value=\"" + URL_FILE_INCRECT_RESULT + "\" style=\"display:none;\"></label>";
 
-		return charset + cssLink + jsScript + totalPoints + aisHiddenInfo + "<ol>" + htmlString + "</ol>";
+		String htmlString = charset + cssLink + jsScript + totalPoints + aisHiddenInfo + "<ol>" + questionTags + "</ol>";
+		
+		webView.loadDataWithBaseURL(null, htmlString, "text/html", "UTF-8", null);
+		/*
+		webView.loadUrl("javascript:initTest(" + count + DataMan.COMMON_TOKEN +
+				URL_FILE_CRECT_RESULT +	DataMan.COMMON_TOKEN +
+				URL_FILE_INCRECT_RESULT + ")");
+		*/
 	}
 	
 	/**
@@ -221,8 +232,12 @@ public class AisParser {
 		for (char anwser : anwsers) {
 			tagAnswer += (anwser + "<input type=checkbox name=answer id=" + GetAnswerTagId(i, anwser) + " value=" + anwser + ">"); 
 		}
+		
+		String result = "<img id=" + GetResultTagId(i) + " style=\"display=none;\"/>";
+		
+		tagAnswer += result;
 
-		// 隐藏和小时解析
+		// 隐藏和显示解析
 		String noteTagId = GetNoteTagId(i);
 		String tagNote = "<label id=" + noteTagId + " style=\"display:none;\">解析：" + aisDoc.getQuestionNote(i) + "<label/>";
 		
@@ -232,7 +247,6 @@ public class AisParser {
 	
 	/**
 	 * 获取答案Tag的id
-	 * @param aisId
 	 * @param i
 	 * @return
 	 */
@@ -242,12 +256,20 @@ public class AisParser {
 	
 	/**
 	 * 获取解析Tag的id
-	 * @param aisId
 	 * @param i
 	 * @return
 	 */
 	private static String GetNoteTagId(int i) {
 		return "note" + i;
+	}
+	
+	/**
+	 * 获取结果Tag的id
+	 * @param i
+	 * @return
+	 */
+	private static String GetResultTagId(int i) {
+		return "result" + i;
 	}
 
 	/**

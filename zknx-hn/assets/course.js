@@ -1,83 +1,88 @@
 
-var gQuestionCount = 5;
-var gQuestionArray;
+var gQuestionCount;
+var gCrectImageFile;
+var gIncrectImageFile;
 
-// ³õÊ¼»¯
-function init(aisId, questionCount, questionArray) {
-    this.gAisId = aisId;
+// åˆå§‹åŒ– é—®é¢˜ä¸ªæ•°ï¼Œæ­£ç¡®ç»“æœçš„å›¾æ ‡ï¼Œé”™è¯¯ç»“æœçš„å›¾æ ‡
+function initTest(questionCount, crectImageFile, increctImageFile) {
     this.gQuestionCount = questionCount;
-    this.gQuestionArray = unescape(questionArray);
-
-    // Éú³ÉÎÊÌâ
-    initQuestion();
+    this.gCrectImageFile = crectImageFile;
+    this.gIncrectImageFile = increctImageFile;
 }
 
-// ³õÊ¼»¯ÎÊÌâ
-function initQuestion() {
-    alert(gQuestionArray);
-}
-
+// è·å–ç­”æ¡ˆid
 function getAnwserId(i, anwser) {
     return "anwser" + i + "_" + anwser;
 }
 
-function getResultId(i, anwser) {
-    return "anwser" + i + "_" + anwser;
+// è·å–ç»“æœid
+function getResultId(i) {
+    return "result" + i;
 }
 
+// è·å–è§£æid
 function getNoteId(i) {
     return "note" + i;
 }
 
-// ÖØ×ö
+// é‡åš
 function resetTest() {
 
-    // Çå³ı´ğ°¸£¬Òş²Ø½á¹û£¬Òş²Ø½âÎö
+    // æ¸…é™¤ç­”æ¡ˆï¼Œéšè—ç»“æœï¼Œéšè—è§£æ
     var a,b,c,d,note,result;
-    for (var i = 0; i < this.gQuestionCount; i++) {
+    for (var i = 0; i < gQuestionCount; i++) {
         a = document.getElementById(getAnwserId(i, "A"));
         b = document.getElementById(getAnwserId(i, "B"));
         c = document.getElementById(getAnwserId(i, "C"));
         d = document.getElementById(getAnwserId(i, "D"));           
 
+        a.enabled = true;
         a.checked = false;
+
+        c.enabled = true;
         b.checked = false;
+
+        c.enabled = true;
         c.checked = false;
+
+        d.enabled = true;
         d.checked = false;
 
         note = document.getElementById(getNoteId(i));
-        //result = document.getElementById('result' + i);
+        result = document.getElementById(getResultId(i));
 
-        note.style.display="none";
-        //result.disply = false;
+        note.style.display = "none";
+        result.style.display = "none";
     }
 }
 
-// Ìá½»´ğ°¸
+// æäº¤ç­”æ¡ˆ
 function submitTest() {
 
-/*
-    var grade = checkAnwser(gQuestionCount);
-    showResult();
-    showNote();
-    */
-    
-    var a,b,c,d,note,result;
+    var a, b, c, d, note, result, crectIcon, increctIcon;
+
+    crectIcon = document.getElementById("crectIcon");
+    increctIcon = document.getElementById("increctIcon");
+
     for (var i = 0; i < gQuestionCount; ++i) {
         a = document.getElementById(getAnwserId(i, "A"));
         b = document.getElementById(getAnwserId(i, "B"));
         c = document.getElementById(getAnwserId(i, "C"));
         d = document.getElementById(getAnwserId(i, "D"));
 
-        a.checked = false;
-        b.checked = false;
-        c.checked = false;
-        d.checked = false;
+        a.enabled = false;
+        b.enabled = false;
+        c.enabled = false;
+        d.enabled = false;
 
         note = document.getElementById(getNoteId(i));
+        note.style.display = "block";
 
-        note.style.display="block";
+        result = document.getElementById(getResultId(i));
+
+        result.src = crectIcon.value;
+        result.style.display = "block";
     }
     
-    alert("Äú±¾µØ²âÊÔµÄµÃ·ÖÊÇ£º" + 0);
+    alert("æ‚¨æœ¬åœ°æµ‹è¯•çš„å¾—åˆ†æ˜¯ï¼š" + 0);
 }
