@@ -6,6 +6,7 @@ import java.util.List;
 
 import com.zknx.hn.R;
 import com.zknx.hn.common.Debug;
+import com.zknx.hn.common.WebkitClient;
 import com.zknx.hn.data.DataMan;
 import com.zknx.hn.data.FileUtils;
 import com.zknx.hn.functions.common.AisDoc.AisItem;
@@ -87,6 +88,7 @@ public class AisParser {
 		mWebView.getSettings().setJavaScriptEnabled(true); // 启用JS脚本
 		mWebView.getSettings().setCacheMode(WebSettings.LOAD_NO_CACHE); // 禁用cache
 		mWebView.addJavascriptInterface(jsInterface, "ais");
+		mWebView.setWebChromeClient(new WebkitClient());
 
 		String title = parseAis(ais_id, contentLayout, mWebView);
 
@@ -150,11 +152,12 @@ public class AisParser {
 		if (title == null)
 			return null;
 		
-		String htmlString =null;
-		if (isCourse)
-			htmlString = genAisCourseWebview(ais_id, webView, aisDoc);
-		else
+		String htmlString = null;
+		if (isCourse) {
+			htmlString = InitCourseHtml(ais_id, webView, aisDoc);
+		} else {
 			htmlString = genAisWebview(ais_id, webView, aisDoc);
+		}
 		
 		// 加载webview
 		if (htmlString != null) {
@@ -165,6 +168,84 @@ public class AisParser {
 		webView.setBackgroundColor(0); // 设置透明
 
 		return title;
+	}
+
+	/**
+	 * 初始化课件试题
+	 * @param webView
+	 */
+	private static String InitCourseHtml(String aisId, WebView webView, AisDoc aisDoc) {
+		
+		int total = 0;
+		String htmlString = "";
+		for (int i = 0; i < aisDoc.getQuestionCount(); ++i) {
+			htmlString += GenQuestionTags(aisDoc, aisId, i);
+			total += aisDoc.getQuestionGrade(i);
+		}
+
+		String cssLink = "";//"<link href=\"file:///android_asset/ais.css\" rel=\"stylesheet\" type=\"text/css\">";
+		String jsScript = "<script type=\"text/javascript\" src=\"file:///android_asset/course.js\"></script>";
+		String totalPoints = "<div align=\"right\" style=\"margin-top:4px;font-size:18px;color:white;\">总分：" + total + "分</div>";
+		String aisHiddenInfo = "<label id=aisId style=\"display:none;\">" + aisId + "</label><label id=questionCount style=\"display:none;\">" + aisDoc.getQuestionCount() + "</label>";
+
+		return cssLink + jsScript + totalPoints + aisHiddenInfo + "<ol>" + htmlString + "</ol>";
+	}
+	
+	/**
+	 * 生成Ais试卷题目
+	 * @param i
+	 * @return
+	 */
+	private static String GenQuestionTags(AisDoc aisDoc, String aisId, int i) {
+		// 标题  + 图片 + CheckBox
+		
+		String imageFilePathName = DataMan.DataFile(aisId + "_question" + i + ".bmp");
+		String imageAlt = "图片找不到：" + imageFilePathName;
+		
+		// 保存图片
+		SaveImageToFile(aisDoc.getQuestionBitmapData(i), imageFilePathName);
+
+		// 各题目之间的间隔
+		String paddingTop = "";
+		if (i != 0)
+			paddingTop = "style=\"padding-top:40px;\"";
+
+		String tagQuestionBitmap = "<li " + paddingTop + "><img src=\"file://" + imageFilePathName + "\"" + 
+				" alt=\"" + imageAlt + "\"" +
+				" style=\"vertical-align:text-top;\"" +
+				"</li>";
+
+		char[] anwsers = {'A', 'B', 'C', 'D'};
+		String tagAnswer = "<div/>回答：";
+		for (char anwser : anwsers) {
+			tagAnswer += (anwser + "<input type=checkbox name=answer id=" + GetAnswerTagId(aisId, i, anwser) + " value=" + anwser + ">"); 
+		}
+
+		// 隐藏和小时解析
+		String noteTagId = GetNoteTagId(aisId, i);
+		String tagNote = "<div/><label id=" + noteTagId + " style=\"display:none;\">解析：" + aisDoc.getQuestionNote(i) + "<label/>";
+		
+		return tagQuestionBitmap + tagAnswer + tagNote;
+	}
+	
+	/**
+	 * 获取答案Tag的id
+	 * @param aisId
+	 * @param i
+	 * @return
+	 */
+	private static String GetAnswerTagId(String aisId, int i, char answer) {
+		return aisId + "_answer" + i + "_" + answer;
+	}
+	
+	/**
+	 * 获取解析Tag的id
+	 * @param aisId
+	 * @param i
+	 * @return
+	 */
+	private static String GetNoteTagId(String aisId, int i) {
+		return aisId + "_note" + i;
 	}
 
 	/**
@@ -213,88 +294,7 @@ public class AisParser {
 		// html文本
 		return genHtmlString(genMediaIconTags(), imageTags, text);
 	}
-	
-	/**
-	 * 生成Ais试卷视图
-	 * @param ais_id
-	 * @param webView
-	 * @param aisDoc
-	 */
-	private String genAisCourseWebview(String ais_id, WebView webView, AisDoc aisDoc) {
 
-		int total = 0;
-		String htmlString = "";
-		for (int i = 0; i < aisDoc.getQuestionCount(); ++i) {
-			htmlString += genQuestionTags(aisDoc, ais_id, i);
-			total += aisDoc.getQuestionGrade(i);
-		}
-
-		String cssLink = "<link href=\"file:///android_asset/ais.css\" rel=\"stylesheet\" type=\"text/css\">";
-		String jsScript = "<script type=\"text/javascript\" src=\"file:///android_asset/course.js\"></script>";
-		String totalPoints = "<div align=\"right\" style=\"margin-top:4px;font-size:18px;color:white;\">总分：" + total + "分</div>";
-		String aisHiddenInfo = "<label id=aisId style=\"display:none;\">" + ais_id + "</label><label id=questionCount style=\"display:none;\">" + aisDoc.getQuestionCount() + "</label>";
-
-		return cssLink + jsScript + totalPoints + aisHiddenInfo + "<ol>" + htmlString + "</ol>";
-	}
-	
-	/**
-	 * 生成Ais试卷题目
-	 * @param i
-	 * @return
-	 */
-	private String genQuestionTags(AisDoc aisDoc, String aisId, int i) {
-		// 标题  + 图片 + CheckBox
-		
-		String imageFilePathName = DataMan.DataFile(aisId + "_question" + i + ".bmp");
-		String imageAlt = "图片找不到：" + imageFilePathName;
-		
-		// 保存图片
-		saveImageToFile(aisDoc.getQuestionBitmapData(i), imageFilePathName);
-
-		// 各题目之间的间隔
-		String paddingTop = "";
-		if (i != 0)
-			paddingTop = "style=\"padding-top:40px;\"";
-
-		String tagQuestionBitmap = "<li " + paddingTop + "><img src=\"file://" + imageFilePathName + "\"" + 
-				" alt=\"" + imageAlt + "\"" +
-				" style=\"vertical-align:text-top;\"" +
-				"</li>";
-
-		char[] anwsers = {'A', 'B', 'C', 'D'};
-		String tagAnswer = "答题（" + aisDoc.getQuestionGrade(i) + "分）：";
-		for (char anwser : anwsers) {
-			tagAnswer += (anwser + "<input type=checkbox name=answer id=" + GetAnswerTagId(aisId, i, anwser) + " value=" + anwser + ">"); 
-		}
-
-		// 隐藏和小时解析
-		String noteTagId = GetNoteTagId(aisId, i);
-		String tagNote = "<label id=" + noteTagId + " style=\"display:none;\">解析：" + aisDoc.getQuestionNote(i) + "<label/>";
-		
-		final String DIV = "<div/>"; 
-		return tagQuestionBitmap + DIV + tagAnswer + DIV + tagNote;
-	}
-	
-	/**
-	 * 获取答案Tag的id
-	 * @param aisId
-	 * @param i
-	 * @return
-	 */
-	private static String GetAnswerTagId(String aisId, int i, char answer) {
-		return aisId + "_answer" + i + "_" + answer;
-	}
-	
-	/**
-	 * 获取解析Tag的id
-	 * @param aisId
-	 * @param i
-	 * @return
-	 */
-	private static String GetNoteTagId(String aisId, int i) {
-		return aisId + "_note" + i;
-	}
-	
 	/**
 	 * 获取html文本
 	 * @return
@@ -338,7 +338,7 @@ public class AisParser {
 		String imageAlt = "图片找不到：" + imageFilePathName;
 		
 		// 保存图片
-		saveImageToFile(item.data, imageFilePathName);
+		SaveImageToFile(item.data, imageFilePathName);
 
 		return "<img src=\"file://" + imageFilePathName + "\"" + 
 		        " onclick=\"ais.showImage('" + imageFilePathName + "')\"" +
@@ -351,7 +351,7 @@ public class AisParser {
 	/**
 	 * 保存图片
 	 */
-	private void saveImageToFile(byte[] data, String fileName) {
+	private static void SaveImageToFile(byte[] data, String fileName) {
 		if (data != null) {
 			try {
 				if (FileUtils.IsFileExist(fileName))

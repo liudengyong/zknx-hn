@@ -48,7 +48,7 @@ public class BestCourse extends AisView {
 				public void onClick(View view) {
 					switch (view.getId()) {
 					case ID_SUBMIT:
-						invokeJsMethod(R.string.confirm_submit_course, "submit()");
+						invokeJsMethod(R.string.confirm_submit_course, "submitTest()");
 						break;
 					case ID_RESET:
 						invokeJsMethod(R.string.confirm_reset_course, "resetTest()");
