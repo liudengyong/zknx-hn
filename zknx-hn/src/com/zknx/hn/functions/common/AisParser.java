@@ -222,16 +222,19 @@ public class AisParser {
 	 */
 	private String genAisCourseWebview(String ais_id, WebView webView, AisDoc aisDoc) {
 
+		int total = 0;
 		String htmlString = "";
 		for (int i = 0; i < aisDoc.getQuestionCount(); ++i) {
 			htmlString += genQuestionTags(aisDoc, ais_id, i);
+			total += aisDoc.getQuestionGrade(i);
 		}
 
 		String cssLink = "<link href=\"file:///android_asset/ais.css\" rel=\"stylesheet\" type=\"text/css\">";
 		String jsScript = "<script type=\"text/javascript\" src=\"file:///android_asset/course.js\"></script>";
+		String totalPoints = "<div align=\"right\" style=\"margin-top:4px;font-size:18px;color:white;\">总分：" + total + "分</div>";
 		String aisHiddenInfo = "<label id=aisId style=\"display:none;\">" + ais_id + "</label><label id=questionCount style=\"display:none;\">" + aisDoc.getQuestionCount() + "</label>";
 
-		return cssLink + jsScript + aisHiddenInfo + "<ol>" + htmlString + "</ol>";
+		return cssLink + jsScript + totalPoints + aisHiddenInfo + "<ol>" + htmlString + "</ol>";
 	}
 	
 	/**
@@ -259,16 +262,17 @@ public class AisParser {
 				"</li>";
 
 		char[] anwsers = {'A', 'B', 'C', 'D'};
-		String tagAnswer = "<div/>回答：";
+		String tagAnswer = "答题（" + aisDoc.getQuestionGrade(i) + "分）：";
 		for (char anwser : anwsers) {
 			tagAnswer += (anwser + "<input type=checkbox name=answer id=" + GetAnswerTagId(aisId, i, anwser) + " value=" + anwser + ">"); 
 		}
 
 		// 隐藏和小时解析
 		String noteTagId = GetNoteTagId(aisId, i);
-		String tagNote = "<div/><label id=" + noteTagId + " style=\"display:none;\">解析：" + aisDoc.getQuestionNote(i) + "<label/>";
+		String tagNote = "<label id=" + noteTagId + " style=\"display:none;\">解析：" + aisDoc.getQuestionNote(i) + "<label/>";
 		
-		return tagQuestionBitmap + tagAnswer + tagNote;
+		final String DIV = "<div/>"; 
+		return tagQuestionBitmap + DIV + tagAnswer + DIV + tagNote;
 	}
 	
 	/**
