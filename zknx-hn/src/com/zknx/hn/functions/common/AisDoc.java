@@ -379,7 +379,8 @@ typedef struct tagAisHeader
 	 * @return
 	 */
 	public String getQuestionNote(int i) {
-		if (mQuestionList == null || mQuestionList.size() < i)
+		if (mQuestionList == null || mQuestionList.size() <= 0 ||
+			mQuestionList.get(i).note == null)
 			return "нч";
 		
 		return mQuestionList.get(i).note;

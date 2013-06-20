@@ -24,7 +24,7 @@ public class WebkitClient extends WebChromeClient {
 	 */
 	@Override
 	public boolean onConsoleMessage(ConsoleMessage consoleMessage) {
-        //Debug.Log("ChromeClient invoked: onConsoleMessage() - " + sourceID + ":" + lineNumber + " - " + message);
+        Debug.Log("onConsoleMessage() - " + consoleMessage.message() + ":" + consoleMessage.lineNumber());
         return super.onConsoleMessage(consoleMessage);
     }
 

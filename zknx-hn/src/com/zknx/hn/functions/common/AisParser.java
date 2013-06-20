@@ -190,10 +190,10 @@ public class AisParser {
 		String cssLink = "";//"<link href=\"file:///android_asset/ais.css\" rel=\"stylesheet\" type=\"text/css\">";
 		String jsScript = "<script type=\"text/javascript\" src=\"file:///android_asset/course.js\"></script></head>";
 		String totalPoints = "<div align=\"right\" style=\"margin-top:4px;font-size:18px;color:white;\">总分：" + total + "分</div>";
-		String aisHiddenInfo = "<label id=crectIcon value=\"" + URL_FILE_CRECT_RESULT + "\" style=\"display:none;\"></label>" + 
-				"<label id=increctIcon value=\"" + URL_FILE_INCRECT_RESULT + "\" style=\"display:none;\"></label>";
+		String aisHiddenInfo = "<div id=crectIcon style=\"display:none;\">" + URL_FILE_CRECT_RESULT + "</div>" +
+				"<div id=increctIcon style=\"display:none;\"/>" + URL_FILE_INCRECT_RESULT + "</div>";
 
-		String htmlString = charset + cssLink + jsScript + totalPoints + aisHiddenInfo + "<ol>" + questionTags + "</ol>";
+		String htmlString = charset + cssLink + jsScript + totalPoints + aisHiddenInfo + "<ol style=\"font-size:18px;color:white;\" >" + questionTags + "</ol>";
 		
 		webView.loadDataWithBaseURL(null, htmlString, "text/html", "UTF-8", null);
 		/*
@@ -230,10 +230,10 @@ public class AisParser {
 		char[] anwsers = {'A', 'B', 'C', 'D'};
 		String tagAnswer = "答题（" + aisDoc.getQuestionGrade(i) + "分）";
 		for (char anwser : anwsers) {
-			tagAnswer += (anwser + "<input type=checkbox name=answer id=" + GetAnswerTagId(i, anwser) + " value=" + anwser + ">"); 
+			tagAnswer += (anwser + "<input type=checkbox id=" + GetAnswerTagId(i, anwser) + " value=" + anwser + ">"); 
 		}
 		
-		String result = "<img id=" + GetResultTagId(i) + " style=\"display=none;\"/>";
+		String result = "<img id=" + GetResultTagId(i) + " style=\"visibility:hidden;vertical-align:text-bottom;\"/>";
 		
 		tagAnswer += result;
 

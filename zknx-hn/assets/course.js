@@ -29,30 +29,28 @@ function getNoteId(i) {
 function resetTest() {
 
     // 清除答案，隐藏结果，隐藏解析
-    var a,b,c,d,note,result;
-    for (var i = 0; i < gQuestionCount; i++) {
+    var a, b, c, d, note, result;
+    for (var i = 0; i < 5; i++) {
         a = document.getElementById(getAnwserId(i, "A"));
         b = document.getElementById(getAnwserId(i, "B"));
         c = document.getElementById(getAnwserId(i, "C"));
         d = document.getElementById(getAnwserId(i, "D"));           
-
-        a.enabled = true;
+        
+        a.disabled = false;
+        b.disabled = false;
+        c.disabled = false;
+        d.disabled = false;
+        
         a.checked = false;
-
-        c.enabled = true;
         b.checked = false;
-
-        c.enabled = true;
         c.checked = false;
-
-        d.enabled = true;
         d.checked = false;
 
         note = document.getElementById(getNoteId(i));
         result = document.getElementById(getResultId(i));
 
         note.style.display = "none";
-        result.style.display = "none";
+        result.style.visibility = "hidden";
     }
 }
 
@@ -64,25 +62,25 @@ function submitTest() {
     crectIcon = document.getElementById("crectIcon");
     increctIcon = document.getElementById("increctIcon");
 
-    for (var i = 0; i < gQuestionCount; ++i) {
+    for (var i = 0; i < 5; ++i) {
         a = document.getElementById(getAnwserId(i, "A"));
         b = document.getElementById(getAnwserId(i, "B"));
         c = document.getElementById(getAnwserId(i, "C"));
         d = document.getElementById(getAnwserId(i, "D"));
 
-        a.enabled = false;
-        b.enabled = false;
-        c.enabled = false;
-        d.enabled = false;
+        a.disabled = true;
+        b.disabled = true;
+        c.disabled = true;
+        d.disabled = true;
 
         note = document.getElementById(getNoteId(i));
         note.style.display = "block";
 
         result = document.getElementById(getResultId(i));
 
-        result.src = crectIcon.value;
-        result.style.display = "block";
+        result.src = crectIcon.innerHTML;
+        result.style.visibility = "visible";
     }
     
-    alert("您本地测试的得分是：" + 0);
+    alert("您本地测试的得分是：" + increctIcon.innerHTML);
 }
