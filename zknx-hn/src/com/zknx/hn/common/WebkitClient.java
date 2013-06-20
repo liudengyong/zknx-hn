@@ -85,9 +85,9 @@ public class WebkitClient extends WebChromeClient {
 				return true;
 			}
 		};
-		
+
 		ShowAlertDialog(view.getContext(), message, null, clickPositiveButton, clickNeutralButton, cancelListener, keyListener, true);
-		
+
 		return true;
 		// return super.onJsConfirm(view, url, message, result);
 	}

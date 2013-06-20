@@ -183,12 +183,13 @@ public class AisParser {
 			total += aisDoc.getQuestionGrade(i);
 		}
 
+		String charset = "<head><meta http-equiv=\"Content-Type\" content=\"text/html\"; charset=gb2312/>";
 		String cssLink = "";//"<link href=\"file:///android_asset/ais.css\" rel=\"stylesheet\" type=\"text/css\">";
-		String jsScript = "<script type=\"text/javascript\" src=\"file:///android_asset/course.js\"></script>";
+		String jsScript = "<script type=\"text/javascript\" src=\"file:///android_asset/course.js\"></script></head>";
 		String totalPoints = "<div align=\"right\" style=\"margin-top:4px;font-size:18px;color:white;\">总分：" + total + "分</div>";
 		String aisHiddenInfo = "<label id=aisId style=\"display:none;\">" + aisId + "</label><label id=questionCount style=\"display:none;\">" + aisDoc.getQuestionCount() + "</label>";
 
-		return cssLink + jsScript + totalPoints + aisHiddenInfo + "<ol>" + htmlString + "</ol>";
+		return charset + cssLink + jsScript + totalPoints + aisHiddenInfo + "<ol>" + htmlString + "</ol>";
 	}
 	
 	/**
@@ -218,11 +219,11 @@ public class AisParser {
 		char[] anwsers = {'A', 'B', 'C', 'D'};
 		String tagAnswer = "答题（" + aisDoc.getQuestionGrade(i) + "分）";
 		for (char anwser : anwsers) {
-			tagAnswer += (anwser + "<input type=checkbox name=answer id=" + GetAnswerTagId(aisId, i, anwser) + " value=" + anwser + ">"); 
+			tagAnswer += (anwser + "<input type=checkbox name=answer id=" + GetAnswerTagId(i, anwser) + " value=" + anwser + ">"); 
 		}
 
 		// 隐藏和小时解析
-		String noteTagId = GetNoteTagId(aisId, i);
+		String noteTagId = GetNoteTagId(i);
 		String tagNote = "<label id=" + noteTagId + " style=\"display:none;\">解析：" + aisDoc.getQuestionNote(i) + "<label/>";
 		
 		final String DIV = "<div/>";
@@ -235,8 +236,8 @@ public class AisParser {
 	 * @param i
 	 * @return
 	 */
-	private static String GetAnswerTagId(String aisId, int i, char answer) {
-		return aisId + "_answer" + i + "_" + answer;
+	private static String GetAnswerTagId(int i, char answer) {
+		return "anwser" + i + "_" + answer;
 	}
 	
 	/**
@@ -245,8 +246,8 @@ public class AisParser {
 	 * @param i
 	 * @return
 	 */
-	private static String GetNoteTagId(String aisId, int i) {
-		return aisId + "_note" + i;
+	private static String GetNoteTagId(int i) {
+		return "note" + i;
 	}
 
 	/**
