@@ -42,21 +42,7 @@ public class BestCourse extends AisView {
 	 */
 	private void initCouseView() {
 		if (mSubmitLayout == null) {
-			mSubmitLayout = initButtonPair(R.string.resset, R.string.submit, new OnClickListener() {
-				@Override
-				public void onClick(View view) {
-					int id = view.getId();
-					WebView webView = mAisParser.getWebview();
-					switch (id) {
-					case ID_SUBMIT:
-						summit(webView);
-						break;
-					case ID_RESET:
-						reset(webView);
-						break;
-					}
-				}
-			});
+			mSubmitLayout = initButtonPair(R.string.resset, R.string.submit, mClickJsButton);
 		} else {
 			// 首先脱离父类
 			ViewParent parent = mSubmitLayout.getParent();
@@ -70,27 +56,33 @@ public class BestCourse extends AisView {
 			}
 		}
 	}
-
-	/**
-	 * 交卷按钮
-	 */
-	private void summit(final WebView webView) {
-		Dialog.Confirm(mContext, R.string.confirm_submit_course, new ConfirmListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				webView.loadUrl("javascript:submitTest()");
+	
+	// 点击“交卷”和“重做”
+	OnClickListener mClickJsButton = new OnClickListener() {
+		@Override
+		public void onClick(View view) {
+			int id = view.getId();
+			switch (id) {
+			case ID_SUBMIT:
+				invokeJsMethod(R.string.confirm_submit_course, "submit()");
+				break;
+			case ID_RESET:
+				invokeJsMethod(R.string.confirm_reset_course, "resetTest()");
+				break;
 			}
-		});
-	}
+		}
+	};
 
 	/**
-	 * 重做按钮
+	 * 调用javascript函数
+	 * @param method
 	 */
-	private void reset(final WebView webView) {
-		Dialog.Confirm(mContext, R.string.confirm_reset_course, new ConfirmListener() {
+	private void invokeJsMethod(int msg, final String method) {
+		Dialog.Confirm(mContext, msg, new ConfirmListener() {
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
-				webView.loadUrl("javascript:resetTest()");
+				WebView webView = mAisParser.getWebview();
+				webView.loadUrl("javascript:" + method);
 			}
 		});
 	}
