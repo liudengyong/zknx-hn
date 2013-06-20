@@ -163,7 +163,7 @@ public class MyGroup extends FunctionView {
 			}
 		};
 
-		layoutContent.addView(getLinearLayoutBtnPair(R.string.new_message, R.string.friend_interphone, listener), UIConst.GetLayoutParams(L_LAYOUT_TYPE.H_WRAP));
+		layoutContent.addView(initButtonPair(R.string.new_message, R.string.friend_interphone, listener), UIConst.GetLayoutParams(L_LAYOUT_TYPE.H_WRAP));
 		
 		// TODO  µœ÷”Ô“Ù∂‘Ω≤
 		layoutContent.findViewById(R.id.common_btn_pair_right).setEnabled(false);

@@ -96,7 +96,7 @@ public class Expert extends AisView {
 		final String expertId = "";
 		final String expertName = "Áõ×¨¼Ò";
 
-		LinearLayout askLayout = getLinearLayoutBtnPair(R.string.ask_expert, R.string.ask_expert_interphone, new OnClickListener() {
+		LinearLayout askLayout = initButtonPair(R.string.ask_expert, R.string.ask_expert_interphone, new OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				initAskView(expertId, expertName);

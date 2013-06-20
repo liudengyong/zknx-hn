@@ -11,16 +11,15 @@ import android.view.View;
 import android.view.ViewParent;
 import android.view.View.OnClickListener;
 import android.webkit.WebView;
-import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
 public class BestCourse extends AisView {
-	
+
 	private LinearLayout mSubmitLayout;
-	
-	private final static int ID_SUBMIT = R.id.common_btn_pair_right;
+
 	private final static int ID_RESET = R.id.common_btn_pair_left;
+	private final static int ID_SUBMIT = R.id.common_btn_pair_right;
 
 	public BestCourse(LayoutInflater inflater, LinearLayout frameRoot) {
 		super(inflater, frameRoot, UIConst.FUNCTION_ID_BEST_COUSE, R.layout.func_frame_split);
@@ -43,8 +42,7 @@ public class BestCourse extends AisView {
 	 */
 	private void initCouseView() {
 		if (mSubmitLayout == null) {
-			
-			OnClickListener mOnClickSubmit = new OnClickListener() {
+			mSubmitLayout = initButtonPair(R.string.resset, R.string.submit, new OnClickListener() {
 				@Override
 				public void onClick(View view) {
 					int id = view.getId();
@@ -58,17 +56,7 @@ public class BestCourse extends AisView {
 						break;
 					}
 				}
-			};
-
-			mSubmitLayout = (LinearLayout)mInflater.inflate(R.layout.common_btn_pair, null);
-			
-			Button btn = (Button) mSubmitLayout.findViewById(ID_SUBMIT);
-			btn.setText("交卷");
-			btn.setOnClickListener(mOnClickSubmit);
-			
-			btn = (Button) mSubmitLayout.findViewById(ID_RESET);
-			btn.setText("重做");
-			btn.setOnClickListener(mOnClickSubmit);
+			});
 		} else {
 			// 首先脱离父类
 			ViewParent parent = mSubmitLayout.getParent();

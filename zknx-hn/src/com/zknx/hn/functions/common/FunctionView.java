@@ -116,18 +116,21 @@ public class FunctionView {
 	}
 	
 	/**
-	 * 获取双按钮视图
+	 * 生成并初始化按钮对
+	 * @param clickListener
+	 * @param left
+	 * @param right
 	 * @return
 	 */
-	protected LinearLayout getLinearLayoutBtnPair(int text1, int text2, OnClickListener listener) {
+	protected LinearLayout initButtonPair(int left, int right, OnClickListener listener) {
 
 		LinearLayout layout = (LinearLayout)mInflater.inflate(R.layout.common_btn_pair, null);
 		Button btn = (Button) layout.findViewById(R.id.common_btn_pair_left);
-		btn.setText(text1);
+		btn.setText(left);
 		btn.setOnClickListener(listener);
 		
 		btn = (Button) layout.findViewById(R.id.common_btn_pair_right);
-		btn.setText(text2);
+		btn.setText(right);
 		btn.setOnClickListener(listener);
 
 		return layout;
