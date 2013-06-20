@@ -103,7 +103,7 @@ public class FunctionView {
 	 * 获取按钮视图
 	 * @return
 	 */
-	protected LinearLayout getLinearLayoutBtn(String text, OnClickListener listener) {
+	protected LinearLayout initButton(String text, OnClickListener listener) {
 
 		LinearLayout layout = (LinearLayout)mInflater.inflate(R.layout.common_btn, null);
 		Button btn = (Button) layout.findViewById(R.id.common_btn);

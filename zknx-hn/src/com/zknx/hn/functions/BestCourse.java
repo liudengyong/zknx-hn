@@ -42,7 +42,20 @@ public class BestCourse extends AisView {
 	 */
 	private void initCouseView() {
 		if (mSubmitLayout == null) {
-			mSubmitLayout = initButtonPair(R.string.resset, R.string.submit, mClickJsButton);
+			// 书吃喝交卷和重做按钮
+			mSubmitLayout = initButtonPair(R.string.resset, R.string.submit, new OnClickListener() {
+				@Override
+				public void onClick(View view) {
+					switch (view.getId()) {
+					case ID_SUBMIT:
+						invokeJsMethod(R.string.confirm_submit_course, "submit()");
+						break;
+					case ID_RESET:
+						invokeJsMethod(R.string.confirm_reset_course, "resetTest()");
+						break;
+					}
+				}
+			});
 		} else {
 			// 首先脱离父类
 			ViewParent parent = mSubmitLayout.getParent();
@@ -56,22 +69,6 @@ public class BestCourse extends AisView {
 			}
 		}
 	}
-	
-	// 点击“交卷”和“重做”
-	OnClickListener mClickJsButton = new OnClickListener() {
-		@Override
-		public void onClick(View view) {
-			int id = view.getId();
-			switch (id) {
-			case ID_SUBMIT:
-				invokeJsMethod(R.string.confirm_submit_course, "submit()");
-				break;
-			case ID_RESET:
-				invokeJsMethod(R.string.confirm_reset_course, "resetTest()");
-				break;
-			}
-		}
-	};
 
 	/**
 	 * 调用javascript函数
@@ -82,7 +79,8 @@ public class BestCourse extends AisView {
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
 				WebView webView = mAisParser.getWebview();
-				webView.loadUrl("javascript:" + method);
+				if (webView != null)
+					webView.loadUrl("javascript:" + method);
 			}
 		});
 	}

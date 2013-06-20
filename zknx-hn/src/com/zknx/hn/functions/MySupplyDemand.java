@@ -57,7 +57,7 @@ public class MySupplyDemand extends FunctionView {
 	 */
 	void initClassList() {
 		
-		LinearLayout createInfoBtn = getLinearLayoutBtn("发布新信息", mOnClickCreateInfo);
+		LinearLayout createInfoBtn = initButton("发布新信息", mOnClickCreateInfo);
 		
 		mAdapterClass = new CommonListAdapter(mContext, DataMan.GetProductClassList());
 		

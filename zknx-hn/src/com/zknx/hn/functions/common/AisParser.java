@@ -228,10 +228,10 @@ public class AisParser {
 		}
 
 		String cssLink = "<link href=\"file:///android_asset/ais.css\" rel=\"stylesheet\" type=\"text/css\">";
-		String jsLink = "<link href=\"file:///android_asset/course.js\" type=\"text/javascript\">";
+		String jsScript = "<script type=\"text/javascript\" src=\"file:///android_asset/course.js\"></script>";
 		String aisHiddenInfo = "<label id=aisId style=\"display:none;\">" + ais_id + "</label><label id=questionCount style=\"display:none;\">" + aisDoc.getQuestionCount() + "</label>";
 
-		return cssLink + jsLink + aisHiddenInfo + "<ol>" + htmlString + "</ol>";
+		return cssLink + jsScript + aisHiddenInfo + "<ol>" + htmlString + "</ol>";
 	}
 	
 	/**
