@@ -216,16 +216,17 @@ public class AisParser {
 				"</li>";
 
 		char[] anwsers = {'A', 'B', 'C', 'D'};
-		String tagAnswer = "<div/>回答：";
+		String tagAnswer = "答题（" + aisDoc.getQuestionGrade(i) + "分）";
 		for (char anwser : anwsers) {
 			tagAnswer += (anwser + "<input type=checkbox name=answer id=" + GetAnswerTagId(aisId, i, anwser) + " value=" + anwser + ">"); 
 		}
 
 		// 隐藏和小时解析
 		String noteTagId = GetNoteTagId(aisId, i);
-		String tagNote = "<div/><label id=" + noteTagId + " style=\"display:none;\">解析：" + aisDoc.getQuestionNote(i) + "<label/>";
+		String tagNote = "<label id=" + noteTagId + " style=\"display:none;\">解析：" + aisDoc.getQuestionNote(i) + "<label/>";
 		
-		return tagQuestionBitmap + tagAnswer + tagNote;
+		final String DIV = "<div/>";
+		return tagQuestionBitmap + DIV + tagAnswer + DIV + tagNote;
 	}
 	
 	/**
