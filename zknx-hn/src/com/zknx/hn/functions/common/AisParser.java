@@ -195,7 +195,7 @@ public class AisParser {
 				"<div id=increctIcon style=\"display:none;\"/>" + URL_FILE_INCRECT_RESULT + "</div>";
 
 		String htmlString = charset + cssLink + jsScript + totalPoints + aisHiddenInfo + "<ol style=\"font-size:18px;color:white;\" >" + questionTags + "</ol></body>";
-		
+
 		webView.loadDataWithBaseURL(null, htmlString, "text/html", "UTF-8", null);
 	}
 	
@@ -211,7 +211,8 @@ public class AisParser {
 		String imageAlt = "图片找不到：" + imageFilePathName;
 		
 		// 保存图片
-		SaveImageToFile(aisDoc.getQuestionBitmapData(i), imageFilePathName);
+		if (!FileUtils.IsFileExist(imageFilePathName))
+			SaveImageToFile(aisDoc.getQuestionBitmapData(i), imageFilePathName);
 
 		// 各题目之间的间隔
 		String paddingTop = "";
@@ -229,14 +230,21 @@ public class AisParser {
 			tagAnswer += (anwser + "<input type=checkbox id=" + GetAnswerTagId(i, anwser) + " value=" + anwser + ">"); 
 		}
 		
+		String rightAnwser = "";
+		byte[] rightAnwserBytes = aisDoc.getQuestionAnswer(i);
+		if (rightAnwserBytes != null) {
+			for (byte a : rightAnwserBytes)
+				rightAnwser += (char)a;
+		}
+
+		String tagRightAnwser = "<div id=" + GetRightAnwserTagId(i) + " style=\"display:none;\">" + aisDoc.getQuestionGrade(i) + DataMan.COMMON_TOKEN + rightAnwser + "</div>";
 		String result = "<img id=" + GetResultTagId(i) + " style=\"visibility:hidden;vertical-align:text-bottom;\"/>";
-		
-		tagAnswer += result;
+		tagAnswer += (result + tagRightAnwser);
 
 		// 隐藏和显示解析
 		String noteTagId = GetNoteTagId(i);
 		String tagNote = "<label id=" + noteTagId + " style=\"display:none;\">解析：" + aisDoc.getQuestionNote(i) + "<label/>";
-		
+
 		final String DIV = "<div/>";
 		return tagQuestionBitmap + DIV + tagAnswer + DIV + tagNote;
 	}
@@ -266,6 +274,15 @@ public class AisParser {
 	 */
 	private static String GetResultTagId(int i) {
 		return "result" + i;
+	}
+	
+	/**
+	 * 获取正确答案Tag的id
+	 * @param i
+	 * @return
+	 */
+	private static String GetRightAnwserTagId(int i) {
+		return "rightAnwser" + i;
 	}
 
 	/**
