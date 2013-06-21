@@ -218,7 +218,7 @@ public class AisParser {
 		// 各题目之间的间隔
 		String paddingTop = "";
 		if (i != 0)
-			paddingTop = "style=\"padding-top:40px;\"";
+			paddingTop = "style=\"padding-top:20px;\"";
 
 		String tagQuestionBitmap = "<li " + paddingTop + "><img src=\"file://" + imageFilePathName + "\"" + 
 				" alt=\"" + imageAlt + "\"" +
@@ -246,7 +246,7 @@ public class AisParser {
 
 		// 隐藏和显示解析
 		String noteTagId = GetNoteTagId(i);
-		String tagNote = "<label id=" + noteTagId + " style=\"display:none;\">解析：" + aisDoc.getQuestionNote(i) + "<label/>";
+		String tagNote = "<br><div id=" + noteTagId + " style=\"display:none;\">解析：" + aisDoc.getQuestionNote(i) + "<div/>";
 
 		final String DIV = "<div/>";
 		return tagQuestionBitmap + DIV + tagAnswer + DIV + tagNote;
