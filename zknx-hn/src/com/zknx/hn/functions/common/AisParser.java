@@ -185,17 +185,24 @@ public class AisParser {
 			questionTags += GenQuestionTags(aisDoc, aisId, i);
 			total += aisDoc.getQuestionGrade(i);
 		}
-		
+
+		questionTags = "<ol style=\"font-size:18px;color:white;\">" + questionTags + "</ol>";
+
 		String jsInitMethod = "initTest(" + count+ ")";
-		String charset = "<head><meta http-equiv=\"Content-Type\" content=\"text/html\"; charset=gb2312/>";
-		String cssLink = "";//"<link href=\"file:///android_asset/ais.css\" rel=\"stylesheet\" type=\"text/css\">";
-		String jsScript = "<script type=\"text/javascript\" src=\"file:///android_asset/course.js\"></script></head>";
-		String currentResult = "<body onload=\""+ jsInitMethod + "\"><div id=" + GetCurResultTagId() + " align=\"right\" style=\"display:none;font-size:18px;color:green;\"></div>";
+		String cssLink = "<head><link href=\"file:///android_asset/course/course.css\" rel=stylesheet type=\"text/css\">";
+		String jsScript = "<script type=\"text/javascript\" src=\"file:///android_asset/course/course.js\"></script></head>";
+		String currentResult = "<div id=" + GetCurResultTagId() + " align=\"right\" style=\"display:none;font-size:18px;color:green;\"></div>";
 		String totalPoints = "<div align=\"right\" style=\"margin-top:4px;font-size:18px;color:white;\">总分：" + total + "分</div>";
 		String aisHiddenInfo = "<div id=crectIcon style=\"display:none;\">" + URL_FILE_CRECT_RESULT + "</div>" +
 				"<div id=increctIcon style=\"display:none;\"/>" + URL_FILE_INCRECT_RESULT + "</div>";
 
-		String htmlString = charset + cssLink + jsScript + currentResult + totalPoints + aisHiddenInfo + "<ol style=\"font-size:18px;color:white;\" >" + questionTags + "</ol></body>";
+		String xxx = "<table style=\"position:fixed;top:260px;width:320px;\"><tr><th><input class=\"buttonCss\" type=button value=\"重做\" /></th><th><input class=actionButton type=button value=\"交卷\" /></th></tr></table>";
+
+		String actionPair = xxx;//"<input type=button value=\"交卷\" class=actionButton  />";
+		String htmlString = cssLink + jsScript +
+				"<body onload=\""+ jsInitMethod + "\">" +
+				currentResult + totalPoints + aisHiddenInfo + questionTags + actionPair +
+				"<input class=buttonCss type=button value=\"重做\" /></body>";
 
 		webView.loadDataWithBaseURL(null, htmlString, "text/html", "UTF-8", null);
 	}
@@ -216,11 +223,7 @@ public class AisParser {
 			SaveImageToFile(aisDoc.getQuestionBitmapData(i), imageFilePathName);
 
 		// 各题目之间的间隔
-		String paddingTop = "";
-		if (i != 0)
-			paddingTop = "style=\"padding-top:20px;\"";
-
-		String tagQuestionBitmap = "<li " + paddingTop + "><img src=\"file://" + imageFilePathName + "\"" + 
+		String tagQuestionBitmap = "<li><img src=\"file://" + imageFilePathName + "\"" + 
 				" alt=\"" + imageAlt + "\"" +
 				" style=\"vertical-align:text-top;\"" +
 				"</li>";
@@ -246,7 +249,7 @@ public class AisParser {
 
 		// 隐藏和显示解析
 		String noteTagId = GetNoteTagId(i);
-		String tagNote = "<br><div id=" + noteTagId + " style=\"display:none;\">解析：" + aisDoc.getQuestionNote(i) + "<div/>";
+		String tagNote = "<br><div id=" + noteTagId + " style=\"display:none;\">解析：" + aisDoc.getQuestionNote(i) + "<div/><br>";
 
 		final String DIV = "<div/>";
 		return tagQuestionBitmap + DIV + tagAnswer + DIV + tagNote;
