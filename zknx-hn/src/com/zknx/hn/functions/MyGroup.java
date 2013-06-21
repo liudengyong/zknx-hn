@@ -67,6 +67,14 @@ public class MyGroup extends FunctionView {
 	// 保存当前好友信息
 	private FriendInfo mCurFriendInfo;
 	class FriendInfo {
+		public FriendInfo(ListItemMap info) {
+			id        = info.getString(DataMan.KEY_FRIEND_ID);
+			name      = info.getString(DataMan.KEY_NAME);
+			major     = info.getString(DataMan.KEY_FRIEND_MAJOR);
+			address   = info.getString(DataMan.KEY_FRIEND_ADDRESS);
+			phone     = info.getString(DataMan.KEY_FRIEND_TELEPHONE);
+			introduce = info.getString(DataMan.KEY_FRIEND_INTRODUCE);
+		}
 		private String id;
 		private String name;
 		private String major;
@@ -88,15 +96,13 @@ public class MyGroup extends FunctionView {
 	 */
 	private void initFriendList() {
 		LinearLayout layout = (LinearLayout)mInflater.inflate(R.layout.group_my_friend, null);
-		
-		// XXX 替换为通用frame，并增加添加好友按钮到custom_bottom （是否增加添加好友？）
-		
+
 		layout.findViewById(R.id.my_goup_friend_all).setOnClickListener(mOnClickClass);
 		layout.findViewById(R.id.my_goup_friend_rich_planter).setOnClickListener(mOnClickClass);
 		layout.findViewById(R.id.my_goup_friend_rich_culturists).setOnClickListener(mOnClickClass);
 		layout.findViewById(R.id.my_goup_friend_middleman).setOnClickListener(mOnClickClass);
 		layout.findViewById(R.id.my_goup_friend_cooperation).setOnClickListener(mOnClickClass);
-		
+
 		CommonListParams listParams = new CommonListParams(mInflater, mContentFrame[0], null, mClickFriend);
 
 		mFriendListView = CommonList.Init(listParams, "我的商友", layout);
@@ -126,16 +132,7 @@ public class MyGroup extends FunctionView {
 		ListItemMap info = mAdapterFriend.getItem(position);
 		
 		if (info != null) {
-			if (mCurFriendInfo == null)
-				mCurFriendInfo = new FriendInfo();
-
-			mCurFriendInfo.id = info.getString(DataMan.KEY_FRIEND_ID);
-			mCurFriendInfo.name = info.getString(DataMan.KEY_NAME);
-			mCurFriendInfo.major = info.getString(DataMan.KEY_FRIEND_MAJOR);
-			mCurFriendInfo.address = info.getString(DataMan.KEY_FRIEND_ADDRESS);
-			mCurFriendInfo.phone = info.getString(DataMan.KEY_FRIEND_TELEPHONE);
-			mCurFriendInfo.introduce = info.getString(DataMan.KEY_FRIEND_INTRODUCE);
-			
+			mCurFriendInfo = new FriendInfo(info);
 			Debug.Log("mCurFriendId:" + mCurFriendInfo.id);
 		}
 		
@@ -387,11 +384,10 @@ public class MyGroup extends FunctionView {
 				}
 			}
 		};
-		
+
 		mNewMessagePost.setOnClickListener(clickPost);
 		mNewMessageBack.setOnClickListener(clickPost);
 
-		// TODO 自我介绍
 		mNewMessageSelfIntroduce.setText(mCurFriendInfo.introduce);
 		mNewMessageReply.setText("回复：" + messageOwner);
 		mNewMessageDate.setText("日期：" + DataMan.GetCurrentTime(true));
