@@ -3,11 +3,11 @@ var gQuestionCount;
 var gCrectImageFile;
 var gIncrectImageFile;
 
-// 初始化 问题个数，正确结果的图标，错误结果的图标
-function initTest(questionCount, crectImageFile, increctImageFile) {
+// 初始化 问题个数
+function initTest(questionCount) {
     this.gQuestionCount = questionCount;
-    this.gCrectImageFile = crectImageFile;
-    this.gIncrectImageFile = increctImageFile;
+    this.gCrectImageFile = document.getElementById("crectIcon");
+    this.gIncrectImageFile = document.getElementById("increctIcon");
 }
 
 // 获取答案id
@@ -30,7 +30,7 @@ function resetTest() {
 
     // 清除答案，隐藏结果，隐藏解析
     var a, b, c, d, note, result;
-    for (var i = 0; i < 5; i++) {
+    for (var i = 0; i < gQuestionCount; i++) {
         a = document.getElementById(getAnwserId(i, "A"));
         b = document.getElementById(getAnwserId(i, "B"));
         c = document.getElementById(getAnwserId(i, "C"));
@@ -57,12 +57,9 @@ function resetTest() {
 // 提交答案
 function submitTest() {
 
-    var a, b, c, d, note, result, crectIcon, increctIcon;
+    var a, b, c, d, note, result;
 
-    crectIcon = document.getElementById("crectIcon");
-    increctIcon = document.getElementById("increctIcon");
-
-    for (var i = 0; i < 5; ++i) {
+    for (var i = 0; i < gQuestionCount; ++i) {
         a = document.getElementById(getAnwserId(i, "A"));
         b = document.getElementById(getAnwserId(i, "B"));
         c = document.getElementById(getAnwserId(i, "C"));
@@ -78,9 +75,9 @@ function submitTest() {
 
         result = document.getElementById(getResultId(i));
 
-        result.src = crectIcon.innerHTML;
+        result.src = gIncrectImageFile.innerHTML;
         result.style.visibility = "visible";
     }
     
-    alert("您本地测试的得分是：" + increctIcon.innerHTML);
+    alert("您本地测试的得分是：" + gIncrectImageFile.innerHTML);
 }
