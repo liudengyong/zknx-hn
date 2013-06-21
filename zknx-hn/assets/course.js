@@ -59,25 +59,34 @@ function resetTest() {
     }
 }
 
+// 字符串包含：包含返回true，不包含返回false
+function contains(str, a) {
+
+    for(var i = 0; i < str.length; i++)
+        if (str[i] == a)
+            return true;
+
+    return false;
+｝
+
 // 是否正确答案
 function rightAnwser(anwser, rightAnwser) {
 
-    var hit; // 用于检查是否有正确的答案，为真的话表示是正确答案之一
-    for (var i = 0; i < anwser.length; i++) {
-        // 检查争取答案中是否有该答案
-        hit = false;
-        for (var j = 0; j < rightAnwser.length; j++) {
-            if (anwser[i] == rightAnwser[j]) {
-                hit = true;
-                break;
+    // 首先比较长度
+    if (rightAnwser.length == anwser.length) {
+
+        // 变为大写
+        rightAnwser.toUpperCase();
+
+        for (var i = 0; i < rightAnwser.length; i++) {
+            // 答案中是否含有正确答案
+            if (!contains(anwser, rightAnwser[i])) {
+                return false;
             }
         }
 
-        if (!hit)
-            return false;
+        return true;
     }
-
-    return true;
 }
 
 // 检查结果：正确的话返回该题目分数，否则返回0分

@@ -225,7 +225,7 @@ public class AisParser {
 				"</li>";
 
 		char[] anwsers = {'A', 'B', 'C', 'D'};
-		String tagAnswer = "答题（" + aisDoc.getQuestionGrade(i) + "分）";
+		String tagAnswer = "答题（" + aisDoc.getQuestionGrade(i) + "分）：";
 		for (char anwser : anwsers) {
 			tagAnswer += (anwser + "<input type=checkbox id=" + GetAnswerTagId(i, anwser) + " value=" + anwser + ">"); 
 		}
@@ -234,7 +234,9 @@ public class AisParser {
 		byte[] rightAnwserBytes = aisDoc.getQuestionAnswer(i);
 		if (rightAnwserBytes != null) {
 			for (byte a : rightAnwserBytes)
-				rightAnwser += (char)a;
+				// 答案长度一定，如果不是全部正确则会余0
+				if (a != 0)
+					rightAnwser += (char)a;
 		}
 
 		String tagRightAnwser = "<div id=" + GetRightAnwserTagId(i) + " style=\"display:none;\">" + aisDoc.getQuestionGrade(i) + DataMan.COMMON_TOKEN + rightAnwser + "</div>";
