@@ -185,16 +185,17 @@ public class AisParser {
 			questionTags += GenQuestionTags(aisDoc, aisId, i);
 			total += aisDoc.getQuestionGrade(i);
 		}
-
+		
 		String jsInitMethod = "initTest(" + count+ ")";
 		String charset = "<head><meta http-equiv=\"Content-Type\" content=\"text/html\"; charset=gb2312/>";
 		String cssLink = "";//"<link href=\"file:///android_asset/ais.css\" rel=\"stylesheet\" type=\"text/css\">";
 		String jsScript = "<script type=\"text/javascript\" src=\"file:///android_asset/course.js\"></script></head>";
-		String totalPoints = "<body onload=\""+ jsInitMethod + "\"><div align=\"right\" style=\"margin-top:4px;font-size:18px;color:white;\">总分：" + total + "分</div>";
+		String currentResult = "<body onload=\""+ jsInitMethod + "\"><div id=" + GetCurResultTagId() + " align=\"right\" style=\"display:none;font-size:18px;color:green;\"></div>";
+		String totalPoints = "<div align=\"right\" style=\"margin-top:4px;font-size:18px;color:white;\">总分：" + total + "分</div>";
 		String aisHiddenInfo = "<div id=crectIcon style=\"display:none;\">" + URL_FILE_CRECT_RESULT + "</div>" +
 				"<div id=increctIcon style=\"display:none;\"/>" + URL_FILE_INCRECT_RESULT + "</div>";
 
-		String htmlString = charset + cssLink + jsScript + totalPoints + aisHiddenInfo + "<ol style=\"font-size:18px;color:white;\" >" + questionTags + "</ol></body>";
+		String htmlString = charset + cssLink + jsScript + currentResult + totalPoints + aisHiddenInfo + "<ol style=\"font-size:18px;color:white;\" >" + questionTags + "</ol></body>";
 
 		webView.loadDataWithBaseURL(null, htmlString, "text/html", "UTF-8", null);
 	}
@@ -225,7 +226,7 @@ public class AisParser {
 				"</li>";
 
 		char[] anwsers = {'A', 'B', 'C', 'D'};
-		String tagAnswer = "答题（" + aisDoc.getQuestionGrade(i) + "分）：";
+		String tagAnswer = "答题(" + aisDoc.getQuestionGrade(i) + "分)：";
 		for (char anwser : anwsers) {
 			tagAnswer += (anwser + "<input type=checkbox id=" + GetAnswerTagId(i, anwser) + " value=" + anwser + ">"); 
 		}
@@ -285,6 +286,15 @@ public class AisParser {
 	 */
 	private static String GetRightAnwserTagId(int i) {
 		return "rightAnwser" + i;
+	}
+	
+	/**
+	 * 获取得分Tag的id
+	 * @param i
+	 * @return
+	 */
+	private static String GetCurResultTagId() {
+		return "currentResult";
 	}
 
 	/**

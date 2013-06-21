@@ -30,11 +30,20 @@ function getNoteId(i) {
     return "note" + i;
 }
 
+// 获取本地得分id
+function getCurrentResultId() {
+    return "currentResult";
+}
+
 // 重做
 function resetTest() {
 
     // 清除答案，隐藏结果，隐藏解析
     var a, b, c, d, note, result;
+    
+    // 隐藏得分
+    document.getElementById(getCurrentResultId()).style.display = "none";
+    
     for (var i = 0; i < gQuestionCount; i++) {
         a = document.getElementById(getAnwserId(i, "A"));
         b = document.getElementById(getAnwserId(i, "B"));
@@ -62,12 +71,14 @@ function resetTest() {
 // 字符串包含：包含返回true，不包含返回false
 function contains(str, a) {
 
-    for(var i = 0; i < str.length; i++)
-        if (str[i] == a)
+    for (var i = 0; i < str.length; i++) {
+        if (str[i] == a) {
             return true;
+        }
+    }
 
     return false;
-｝
+}
 
 // 是否正确答案
 function rightAnwser(anwser, rightAnwser) {
@@ -137,11 +148,22 @@ function checkResult(i) {
 // 提交答案
 function submitTest() {
 
-    var grade = 0;
+    var grade = 0, curResult;
 
     for (var i = 0; i < gQuestionCount; ++i) {
         grade += checkResult(i);       
     }
+
+    curResult = document.getElementById(getCurrentResultId());
+    curResult.innerHTML = "得分：" + grade + "分";
+
+    // 得分为零显示红色
+    if (grade == 0)
+        curResult.style.color = "red";
+    else
+        curResult.style.color = "green";
+
+    curResult.style.display = "block";
 
     alert("您本次测试的得分是：" + grade + "分");
 }
