@@ -27,8 +27,8 @@ import com.zknx.hn.data.UserMan;
 import com.zknx.hn.functions.common.CommonList;
 import com.zknx.hn.functions.common.CommonListAdapter;
 import com.zknx.hn.functions.common.FunctionView;
-import com.zknx.hn.functions.common.CommonList.CommonListParams;
 import com.zknx.hn.functions.common.ListItemClickListener;
+import com.zknx.hn.functions.common.CommonList.CommonListParams;
 import com.zknx.hn.functions.rtmp.Test;
 
 public class MyGroup extends FunctionView {

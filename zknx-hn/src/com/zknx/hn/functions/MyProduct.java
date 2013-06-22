@@ -20,8 +20,8 @@ import com.zknx.hn.functions.common.ListItemClickListener;
 import com.zknx.hn.functions.common.MyProductListAdapter;
 import com.zknx.hn.functions.common.PriceChart;
 import com.zknx.hn.functions.common.ProductListAdapter;
-import com.zknx.hn.functions.common.CommonList.CommonListParams;
 import com.zknx.hn.functions.common.ProductPriceInfo;
+import com.zknx.hn.functions.common.CommonList.CommonListParams;
 
 public class MyProduct extends FunctionView {
 

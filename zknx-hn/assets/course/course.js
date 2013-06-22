@@ -84,7 +84,7 @@ function contains(str, a) {
 function rightAnwser(anwser, rightAnwser) {
 
     // 首先比较长度
-    if (rightAnwser.length == anwser.length) {
+    if (rightAnwser.length != 0 && rightAnwser.length == anwser.length) {
 
         // 变为大写
         rightAnwser.toUpperCase();

@@ -28,8 +28,8 @@ import com.zknx.hn.data.ListItemMap;
 import com.zknx.hn.functions.common.CommonList;
 import com.zknx.hn.functions.common.CommonListAdapter;
 import com.zknx.hn.functions.common.FunctionView;
-import com.zknx.hn.functions.common.CommonList.CommonListParams;
 import com.zknx.hn.functions.common.ListItemClickListener;
+import com.zknx.hn.functions.common.CommonList.CommonListParams;
 
 public class SupplyDemand extends FunctionView {
 	

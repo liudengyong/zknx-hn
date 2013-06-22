@@ -1,4 +1,4 @@
-package com.zknx.hn.functions.common;
+package com.zknx.hn.functions.ais;
 
 import java.io.FileInputStream;
 import java.io.IOException;

@@ -2,11 +2,11 @@ package com.zknx.hn.functions;
 
 import com.zknx.hn.data.DataMan;
 import com.zknx.hn.functions.common.CommonList;
-import com.zknx.hn.functions.common.CommonList.CommonListParams;
-import com.zknx.hn.functions.common.FunctionView;
 import com.zknx.hn.functions.common.CommonListAdapter;
+import com.zknx.hn.functions.common.FunctionView;
 import com.zknx.hn.functions.common.ListItemClickListener;
 import com.zknx.hn.functions.common.ProductListAdapter;
+import com.zknx.hn.functions.common.CommonList.CommonListParams;
 
 import android.view.LayoutInflater;
 import android.view.View;
