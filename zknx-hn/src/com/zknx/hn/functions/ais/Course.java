@@ -1,7 +1,11 @@
 package com.zknx.hn.functions.ais;
 
+import android.view.KeyEvent;
+import android.view.View;
+import android.view.View.OnKeyListener;
 import android.webkit.WebView;
 
+import com.zknx.hn.common.Debug;
 import com.zknx.hn.common.ImageUtils;
 import com.zknx.hn.data.DataMan;
 import com.zknx.hn.data.FileUtils;
@@ -49,6 +53,29 @@ public class Course {
 				"</body>";
 
 		webView.loadDataWithBaseURL(null, htmlString, "text/html", "UTF-8", null);
+		
+		// 设置webview可以获得焦点
+		webView.setFocusable(true);
+		webView.requestFocus();
+		
+		webView.setOnKeyListener(new OnKeyListener() {         
+	        public boolean onKey(View v, int keyCode, KeyEvent event) {
+	            if (keyCode == KeyEvent.KEYCODE_DPAD_LEFT &&
+	            	event.getAction() == KeyEvent.ACTION_DOWN) {
+	                //requestFocus() on parent view
+	            	Debug.Log("WebView OnKeyListener direct ：" + keyCode);
+	                return true;
+	            }
+	            
+	            if (keyCode == KeyEvent.KEYCODE_TAB) {
+	            	Debug.Log("webview TAB 键盘");
+	            }
+	            
+	            Debug.Log("WebView OnKeyListener ：" + keyCode);
+	            
+	            return false;
+	        }
+	    });   
 	}
 	
 	/**
