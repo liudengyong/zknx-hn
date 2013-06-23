@@ -1,4 +1,9 @@
 
+.questionOl {
+	font-size:20px;
+	color:white;
+}
+
 .actionTable {
 	position:fixed;
 	top:380px;
@@ -16,39 +21,22 @@
     /*background:#F0F0F0 repeat-x;*/
 }
 
-.checkboxOff {
-	background:"file:///android_asset/icon/checkbox_none.png";
-	background-repeat: no-repeat;
+.hiddenCheckbox {
+    display:none;
 }
 
-/* Off state for a ARC checkbox */
-.checkboxOff2 {
-	display: inline;
-	margin: 0px;
-	padding: 2px; /* NS 6 problem */
-	padding-left: 20px;
-	color: #666;
-	line-height: 16px;
-	font-family: Verdana, Arial, Helvetica, sans-serif;
-	font-size: .8em;
-	background-image: "file:///android_asset/icon/checkbox_none.png";
-	background-repeat: no-repeat;
-	background-position: 0% 50%;
-	border: 0px;
+.divCheckbox {
+	font-size:26px;
+	background-image:url(checkbox_none.png);
+	background-repeat:no-repeat;
+	display: inline; /* 不换行 */
 }
 
-/* On state for a ARC checkbox */
-#.checkboxOn {
-	display: inline;
-	margin: 0px;
-	padding: 2px; /* NS 6 problem */
-	padding-left: 20px;
-	color: #000;
-	line-height: 16px;
-	font-family: Verdana, Arial, Helvetica, sans-serif;
-	font-size: .8em;
-	background-image: url(checkbox_on.gif);
-	background-repeat: no-repeat;
-	background-position: 0% 50%;
-	border: 0px;
+.divCheckboxOn {
+	font-size:26px;
+	background-image:url(checkbox_check.png);
+	background-repeat:no-repeat;
+	/*background-position: 0% 50%;*/
+	display: inline; /* 不换行 */
 }
+

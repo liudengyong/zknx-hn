@@ -29,7 +29,7 @@ public class Course {
 			total += aisDoc.getQuestionGrade(i);
 		}
 
-		questionTags = "<ol style=\"font-size:18px;color:white;\">" + questionTags + "</ol>";
+		questionTags = "<ol class=questionOl>" + questionTags + "</ol>";
 
 		String jsInitMethod = "initTest(" + count+ ")";
 		String cssLink = "<head><link href=\"file:///android_asset/course/course.css\" rel=stylesheet type=\"text/css\">";
@@ -99,11 +99,14 @@ public class Course {
 				" style=\"vertical-align:text-top;\"" +
 				"</li>";
 
+		String anwserId = "";
+		String tagCheckbox = "";
 		char[] anwsers = {'A', 'B', 'C', 'D'};
 		String tagAnswer = "´ðÌâ(" + aisDoc.getQuestionGrade(i) + "·Ö)£º";
 		for (char anwser : anwsers) {
-			tagAnswer += (anwser + "<input class=checkboxOff type=checkbox id=" + GetAnswerTagId(i, anwser) + " value=" + anwser + ">"); 
-			//tagAnswer += (anwser + "<div style=\"background:file:///android_asset/icon/checkbox_none.png\" id=" + GetAnswerTagId(i, anwser) + ">");
+			anwserId = GetAnswerTagId(i, anwser);
+			tagCheckbox = ("<input class=hiddenCheckbox type=checkbox id=" + anwserId + ">"); 
+			tagAnswer += (anwser + tagCheckbox + "<div class=divCheckbox onClick=\"divCheckbox('" + anwserId + "', this);\">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>");
 		}
 		
 		String rightAnwser = "";

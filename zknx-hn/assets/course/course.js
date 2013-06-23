@@ -102,14 +102,14 @@ function rightAnwser(anwser, rightAnwser) {
 
 // 检查结果：正确的话返回该题目分数，否则返回0分
 function checkResult(i) {
-    
+
     var a, b, c, d, note, result, token, anwser;
-    
+
     a = document.getElementById(getAnwserId(i, "A"));
     b = document.getElementById(getAnwserId(i, "B"));
     c = document.getElementById(getAnwserId(i, "C"));
     d = document.getElementById(getAnwserId(i, "D"));
-    
+
     anwser = "";
     
     if (a.checked)
@@ -125,10 +125,10 @@ function checkResult(i) {
     b.disabled = true;
     c.disabled = true;
     d.disabled = true;
-    
+
     result = document.getElementById(getResultId(i));
     result.style.visibility = "visible";
-    
+
     note = document.getElementById(getNoteId(i));
     note.style.display = "block";
     
@@ -166,4 +166,21 @@ function submitTest() {
     curResult.style.display = "block";
 
     alert("您本次测试的得分是：" + grade + "分");
+}
+
+// 自定义chechbox
+function divCheckbox(checkboxId, divObj)
+{
+    var o = document.getElementById(checkboxId);
+    
+    if (o.checked)
+    {
+        divObj.className = "divCheckbox";
+        o.checked = false;
+    }
+    else
+    {
+        divObj.className = "divCheckboxOn";
+        o.checked = true;
+    }
 }
