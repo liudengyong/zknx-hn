@@ -243,7 +243,8 @@ public class MySupplyDemand extends FunctionView {
         mUnit = new EditText(mContext);
         mHost = new EditText(mContext);
         
-        tableLayout.addView(GetTableRow("供求", mIsSupply), params);
+        // 供求信息输入
+        tableLayout.addView(GetTableRow("", mIsSupply), params);
         tableLayout.addView(GetTableRow("产品分类", mProductClass), params);
         tableLayout.addView(GetTableRow("内容", mContent), params);
         tableLayout.addView(GetTableRow("有效期（天）", mValidDate), params);
