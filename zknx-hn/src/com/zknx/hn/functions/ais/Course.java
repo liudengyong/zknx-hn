@@ -19,7 +19,7 @@ public class Course {
 	 * 初始化课件试题
 	 * @param webView
 	 */
-	public static void GenHtml(String aisId, WebView webView, AisDoc aisDoc) {
+	public static void GenHtml(String aisId, final WebView webView, AisDoc aisDoc) {
 		
 		int total = 0;
 		int count = aisDoc.getQuestionCount();
@@ -51,6 +51,9 @@ public class Course {
 				"<body onload=\""+ jsInitMethod + "\">" +
 				currentResult + totalPoints + aisHiddenInfo + questionTags + actionPair +
 				"</body>";
+		
+		// 测试焦点
+		//htmlString = "<input style=\"height:50px;\" id=input1 type=text /><br><div style=\"color:white;font-size:30px;height:50px;width:100px;\" id=button1 onClick=\"alert(123)\"/>1234</div><br><input style=\"height:50px;\" id=input2 type=text />";
 
 		webView.loadDataWithBaseURL(null, htmlString, "text/html", "UTF-8", null);
 		
@@ -60,22 +63,41 @@ public class Course {
 		
 		webView.setOnKeyListener(new OnKeyListener() {         
 	        public boolean onKey(View v, int keyCode, KeyEvent event) {
-	            if (keyCode == KeyEvent.KEYCODE_DPAD_LEFT &&
-	            	event.getAction() == KeyEvent.ACTION_DOWN) {
-	                //requestFocus() on parent view
-	            	Debug.Log("WebView OnKeyListener direct ：" + keyCode);
-	                return true;
-	            }
-	            
-	            if (keyCode == KeyEvent.KEYCODE_TAB) {
-	            	Debug.Log("webview TAB 键盘");
-	            }
-	            
-	            Debug.Log("WebView OnKeyListener ：" + keyCode);
+	        	// 按键按下时处理
+	        	if (event.getAction() == KeyEvent.ACTION_DOWN) {
+	        		if (keyCode == KeyEvent.KEYCODE_DPAD_DOWN) {
+	    	                //requestFocus() on parent view
+	    	            	//Debug.Log("WebView OnKeyListener direct ：" + keyCode);
+	    	            	 //FOCUS_UP, FOCUS_DOWN, FOCUS_LEFT, and FOCUS_RIGHT
+	    	            }
+	    	            
+	    	            if (keyCode == KeyEvent.KEYCODE_TAB) {
+	    	            	Debug.Log("webview TAB 键盘");
+	    	            	
+	    	            	/*
+	    	            	Rect rect = new Rect();
+	    	                if (webView.requestFocus(WebView.FOCUS_RIGHT, rect) ||
+	    	                	webView.requestFocus(WebView.FOCUS_DOWN, rect)) {
+	    	                	Debug.Log("webview TAB 键盘 生效");
+	    	                	return true;
+	    	                }
+	    	                */
+	    	            }
+	    	            
+	    	            Debug.Log("WebView OnKeyListener ：" + keyCode);
+	        	}
 	            
 	            return false;
 	        }
-	    });   
+	    });
+
+		/* 反射调用内部方法
+		try {
+            Method m = WebView.class.getMethod("setFindIsUp", Boolean.TYPE);  
+            m.invoke(webView, true);
+        } catch (Throwable ignored) {
+        }
+        */
 	}
 	
 	/**
