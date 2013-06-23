@@ -53,10 +53,10 @@ public class Course {
 				"</body>";
 		
 		// 测试焦点
-		//htmlString = "<input style=\"height:50px;\" id=input1 type=text /><br><div style=\"color:white;font-size:30px;height:50px;width:100px;\" id=button1 onClick=\"alert(123)\"/>1234</div><br><input style=\"height:50px;\" id=input2 type=text />";
+		//htmlString = "<input tabindex=1 style=\"height:50px;\" id=input1 type=text /><br><div tabindex=2 onfocus=\"alert(1)\" style=\"color:white;font-size:30px;height:50px;width:100px;\" id=button1 onClick=\"alert(123)\"/>1234</div><br><input tabindex=3 style=\"height:50px;\" id=input2 type=text />";
 
 		webView.loadDataWithBaseURL(null, htmlString, "text/html", "UTF-8", null);
-		
+
 		// 设置webview可以获得焦点
 		webView.setFocusable(true);
 		webView.requestFocus();
@@ -70,7 +70,7 @@ public class Course {
 	    	            	//Debug.Log("WebView OnKeyListener direct ：" + keyCode);
 	    	            	 //FOCUS_UP, FOCUS_DOWN, FOCUS_LEFT, and FOCUS_RIGHT
 	    	            }
-	    	            
+
 	    	            if (keyCode == KeyEvent.KEYCODE_TAB) {
 	    	            	Debug.Log("webview TAB 键盘");
 	    	            	

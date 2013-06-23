@@ -1,4 +1,9 @@
 
+* {
+	-webkit-tap-highlight-color:red;
+	/*-webkit-tap-highlight-color: rgba(0, 0, 0, 0);*/
+}
+
 .questionOl {
 	font-size:20px;
 	color:white;
