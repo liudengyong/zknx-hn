@@ -30,12 +30,12 @@ public class MyProductListAdapter extends CommonListAdapter {
 		
 		// 只添加一次
 		if (convertView == null) {
-			int product_id = getItemMapInt(position, DataMan.KEY_PRODUCT_ID);
+			String product_id = getItemMapString(position, DataMan.KEY_PRODUCT_ID);
 			
 			View checkMyProduct = view.findViewById(R.id.my_product_list_item_cancel);
 			
 			// 按钮 保存产品id
-			checkMyProduct.setId(product_id);
+			checkMyProduct.setTag(product_id);
 			checkMyProduct.setOnClickListener(mClickRemove);
 			checkMyProduct.setBackgroundResource(R.drawable.button_remove);
 		}

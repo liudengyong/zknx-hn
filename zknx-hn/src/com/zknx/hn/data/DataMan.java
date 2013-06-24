@@ -433,9 +433,9 @@ public class DataMan extends DataInterface {
 	 * 添加自选产品
 	 * @return
 	 */
-	public static boolean MyProductListAdd(int product_id, String product_name) {
+	public static boolean MyProductListAdd(String product_id, String product_name) {
 
-		if (product_id == INVALID_ID)
+		if (product_id == null || product_id.length() == 0)
 			return false;
 
 		List<ListItemMap> list = GetMyProductList();
@@ -445,7 +445,7 @@ public class DataMan extends DataInterface {
 			return false;
 		
 		for (ListItemMap map : list) {
-			if (map.getInt(KEY_PRODUCT_ID) == product_id)
+			if (map.getString(KEY_PRODUCT_ID).equals(product_id))
 				return true; // 已经存在，不用重复添加
 		}
 		
@@ -459,13 +459,13 @@ public class DataMan extends DataInterface {
 	 * 取消自选产品
 	 * @return
 	 */
-	public static boolean MyProductListRemove(int product_id) {
+	public static boolean MyProductListRemove(String product_id) {
 
 		List<ListItemMap> list = GetMyProductList();
 		
 		for (ListItemMap item : list) {
-			int item_product_id = item.getInt(KEY_PRODUCT_ID);
-			if (item_product_id == product_id) {
+			String item_product_id = item.getString(KEY_PRODUCT_ID);
+			if (item_product_id.equals(product_id)) {
 				boolean removed = list.remove(item);
 				if (!removed) {
 					Debug.Log("错误：AddToMyProductList");
@@ -514,7 +514,7 @@ public class DataMan extends DataInterface {
 	 * 获取所有有该产品的市场列表
 	 * @return
 	 */
-	public static List<ListItemMap> GetMarketListByProduct(int product_id) {
+	public static List<ListItemMap> GetMarketListByProduct(String product_id) {
 
 		List<String> lines = null;
 		ArrayList<ListItemMap> list = new ArrayList<ListItemMap>();
@@ -554,11 +554,11 @@ public class DataMan extends DataInterface {
         	String[] token = GetToken(line);
         	if (token.length != 6)
         		continue;
-        	
-        	int product_id_parsed = ParseInt(token[2]);
-    		if (product_id_parsed != product_id)
+
+        	//int product_id_parsed = ParseInt(token[2]);
+    		if (!token[2].endsWith(product_id))
     			continue;
-    		
+
     		String marketId = token[0];
     		int market_id = ParseInt(marketId);
     		if (market_id == INVALID_ID)
@@ -595,12 +595,12 @@ public class DataMan extends DataInterface {
 	 * @return
 	 * 产品id或者市场id为空的话返回空
 	 */
-	public static ProductPriceInfo GetHistoryPrice(int product_id, int market_id) {
+	public static ProductPriceInfo GetHistoryPrice(String product_id, String market_id) {
 		
 		// 产品id或者市场id为空的话返回空
-		if (market_id == INVALID_ID || product_id == INVALID_ID)
+		if (market_id == null || product_id == null)
 			return null;
-		
+
 		// TODO 获取价格单位
 		// 价格单位（万元，元，角等）
 		String priceUnit = "元";
@@ -633,7 +633,7 @@ public class DataMan extends DataInterface {
 	 * @param today
 	 * @return
 	 */
-	private static Float GetPrice(long today, int product_id, int market_id) {
+	private static Float GetPrice(long today, String product_id, String market_id) {
 		long time = System.currentTimeMillis();
 		return 4.0F + (time % 4);
 	}

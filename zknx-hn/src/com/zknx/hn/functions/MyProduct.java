@@ -33,7 +33,7 @@ public class MyProduct extends FunctionView {
 	
 	private static final String LEVEL1_TITLE = "自选产品";
 	
-	private int mCurProductId = -1;
+	private String mCurProductId = null;
 	
 	private final static boolean IS_NEED_CHECKBOX = false;
 	
@@ -96,7 +96,7 @@ public class MyProduct extends FunctionView {
 	 */
 	private void initProductView(int position) {
 
-		mCurProductId = mAdapterMyProduct.getItemMapInt(position, DataMan.KEY_PRODUCT_ID);
+		mCurProductId = mAdapterMyProduct.getItemMapString(position, DataMan.KEY_PRODUCT_ID);
 		
 		// 添加市场列表
 		mMarketAdapter = new ProductListAdapter(mContext, DataMan.GetMarketListByProduct(mCurProductId), IS_NEED_CHECKBOX);
@@ -125,7 +125,7 @@ public class MyProduct extends FunctionView {
 	 */
 	private void initPriceChartView(int position) {
 		
-		int market_id = mMarketAdapter.getItemMapInt(position, DataMan.KEY_MARKET_ID);
+		String market_id = mMarketAdapter.getItemMapString(position, DataMan.KEY_MARKET_ID);
 
 		// 添加价格图表
 		PriceChart priceChart = null;
@@ -147,11 +147,12 @@ public class MyProduct extends FunctionView {
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
 
-					int product_id = view.getId();
-					DataMan.MyProductListRemove(product_id);
-
-					// XXX 待优化（是否需要重画所有试图？）
-					initMyProductList();
+					Object product_id = view.getTag();
+					if (product_id != null) {
+						DataMan.MyProductListRemove(product_id.toString());
+						// XXX 待优化（是否需要重画所有试图？）
+						initMyProductList();
+					}
 				}
 			});
 		}
