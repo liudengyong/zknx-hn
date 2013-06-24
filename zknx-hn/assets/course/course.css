@@ -7,6 +7,7 @@
 .questionOl {
 	font-size:20px;
 	color:white;
+	vertical-align:middle; /* 文字垂直居中 */
 }
 
 .actionTable {
@@ -31,14 +32,14 @@
 }
 
 .divCheckbox {
-	font-size:26px;
+	font-size:30px;
 	background-image:url(checkbox_none.png);
 	background-repeat:no-repeat;
 	display: inline; /* 不换行 */
 }
 
 .divCheckboxOn {
-	font-size:26px;
+	font-size:30px;
 	background-image:url(checkbox_check.png);
 	background-repeat:no-repeat;
 	/*background-position: 0% 50%;*/
