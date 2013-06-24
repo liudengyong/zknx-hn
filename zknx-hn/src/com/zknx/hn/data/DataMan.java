@@ -520,6 +520,9 @@ public class DataMan extends DataInterface {
 		ArrayList<ListItemMap> list = new ArrayList<ListItemMap>();
 		String productMarketFileName = "product_" + product_id + "_markets.txt";
 
+		if (product_id == null || product_id.length() == 0)
+			return list;
+
 		// ”≈ªØ
 		if (FileUtils.IsFileExist(DataFile(productMarketFileName))) {
 			lines = ReadLines(productMarketFileName);
