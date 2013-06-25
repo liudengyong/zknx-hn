@@ -872,7 +872,7 @@ public class DataMan extends DataInterface {
 	private static ListItemMap GetSupplyDemandMap(String[] token) {
 		String title = token[4];
 		
-		String supply_demand_id = title; // TODO interface 没有供求信息id
+		String supply_demand_id = title; // interface 没有供求信息id
 		ListItemMap map = new ListItemMap(title, KEY_SUPPLY_DEMAND_INFO_ID, supply_demand_id);
 		
 		// 1003021000,果树苗,0,,供应各种果树苗、绿化苗,,2011-2-23,2011-3-22,,面议,北京市,,王敏,13521120562,13521120562,陆辛庄华源发苗木市场
@@ -1039,7 +1039,6 @@ public class DataMan extends DataInterface {
 	
 	/**
 	 * 获取我的商圈朋友留言列表
-	 * TODO (讨论)朋友留言内容
 	 * fiend_id:INVALID_ID 即返回所有留言信息
 	 * 0 表示返回我的留言
 	 * @return
@@ -1412,7 +1411,7 @@ public class DataMan extends DataInterface {
 
 	/**
 	 * 发布供求信息
-	 * TODO 完善发布供求信息：完善参数，功能
+	 * TODO 待测试 完善发布供求信息：完善参数，功能
 	 * @param product_id
 	 * @return
 	 */
@@ -1456,12 +1455,13 @@ public class DataMan extends DataInterface {
 	}
 	
 	/**
-	 * 从用户名分享专业id
+	 * 从用户名分析专业id
 	 * @param userId
 	 * @return
 	 */
 	public static int GetMajor(String userId) {
-		return DataInterface.GetMajor(userId);
+		//return DataInterface.GetMajor(userId);
+		return -1;
 	}
 	
 	/**
