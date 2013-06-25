@@ -409,12 +409,12 @@ public class DataMan extends DataInterface {
 	 * @param product_id
 	 * @return
 	 */
-	private static boolean IsMyProduct(int product_id) {
+	private static boolean IsMyProduct(int productId) {
 
 		List<ListItemMap> list = GetMyProductList();
-		
+
 		for (ListItemMap map : list) {
-			if (map.getInt(KEY_PRODUCT_ID) == product_id)
+			if (map.getInt(KEY_PRODUCT_ID) == productId)
 				return true; // 是自选产品 
 		}
 
@@ -428,14 +428,14 @@ public class DataMan extends DataInterface {
 	public static List<ListItemMap> GetMyProductList() {
 		return ReadCommonIdName(FILE_NAME_MY_PRODUCTS, KEY_PRODUCT_ID);
 	}
-	
+
 	/**
 	 * 添加自选产品
 	 * @return
 	 */
-	public static boolean MyProductListAdd(String product_id, String product_name) {
+	public static boolean MyProductListAdd(int product_id, String product_name) {
 
-		if (product_id == null || product_id.length() == 0)
+		if (product_id == INVALID_ID)
 			return false;
 
 		List<ListItemMap> list = GetMyProductList();
@@ -443,12 +443,12 @@ public class DataMan extends DataInterface {
 		// 是否超过最大数量限制
 		if (list.size() >= Restraint.MAX_COUNT_MY_PRODUCT)
 			return false;
-		
+
 		for (ListItemMap map : list) {
-			if (map.getString(KEY_PRODUCT_ID).equals(product_id))
+			if (map.getInt(KEY_PRODUCT_ID) == product_id)
 				return true; // 已经存在，不用重复添加
 		}
-		
+
 		ListItemMap myNewProduct = new ListItemMap(product_name /* 产品名字 */, KEY_PRODUCT_ID, product_id + "");
 		list.add(myNewProduct);
 
@@ -459,13 +459,18 @@ public class DataMan extends DataInterface {
 	 * 取消自选产品
 	 * @return
 	 */
-	public static boolean MyProductListRemove(String product_id) {
+	public static boolean MyProductListRemove(int product_id) {
 
 		List<ListItemMap> list = GetMyProductList();
 		
+		if (product_id == INVALID_ID) {
+			Debug.Log("严重内部错误：MyProductListRemove");
+			return false;
+		}
+
 		for (ListItemMap item : list) {
-			String item_product_id = item.getString(KEY_PRODUCT_ID);
-			if (item_product_id.equals(product_id)) {
+			int item_product_id = item.getInt(KEY_PRODUCT_ID);
+			if (item_product_id == product_id) {
 				boolean removed = list.remove(item);
 				if (!removed) {
 					Debug.Log("错误：AddToMyProductList");
@@ -492,12 +497,15 @@ public class DataMan extends DataInterface {
 		    for (ListItemMap item : list) {   
 		
 		    	int product_id_to_be_save = item.getInt(KEY_PRODUCT_ID);
-		        String product_name_to_be_save = (String)item.get(KEY_NAME);
-		        String line = product_id_to_be_save + COMMON_TOKEN + product_name_to_be_save + "\r\n";
-		
-		        out.write(line.getBytes());
+
+		    	if (product_id_to_be_save != INVALID_ID) {
+			        String product_name_to_be_save = (String)item.get(KEY_NAME);
+			        String line = product_id_to_be_save + COMMON_TOKEN + product_name_to_be_save + "\r\n";
+			
+			        out.write(line.getBytes());
+		    	}
 		    }
-		
+
 		    out.close();
 		
 			// 添加成功

@@ -149,7 +149,7 @@ public class ProductListAdapter extends CommonListAdapter {
 					ListItemMap map = getItem(position);
 					
 					boolean ok = false;
-					String product_id = map.getString(DataMan.KEY_PRODUCT_ID);
+					int product_id = map.getInt(DataMan.KEY_PRODUCT_ID);
 
 					if (checked)
 						ok = DataMan.MyProductListAdd(product_id, map.getString(KEY_PRODUCT_NAME));

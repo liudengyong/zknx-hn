@@ -147,9 +147,9 @@ public class MyProduct extends FunctionView {
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
 
-					Object product_id = view.getTag();
-					if (product_id != null) {
-						DataMan.MyProductListRemove(product_id.toString());
+					int product_id = view.getId();
+					if (product_id != DataMan.INVALID_ID) {
+						DataMan.MyProductListRemove(product_id);
 						// XXX 待优化（是否需要重画所有试图？）
 						initMyProductList();
 					}
