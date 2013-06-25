@@ -109,7 +109,6 @@ public class DataInterface {
 	 * @return
 	 */
 	protected static boolean ProductClassMatch(String product_class_id, String product_id) {
-		// TODO interface 产品id定义，算法判断前几位包含
 
 		/*
 		int max_product_id = (product_class_id + 1) * 1000;
@@ -127,7 +126,7 @@ public class DataInterface {
 	 * @return
 	 */
 	protected static boolean IsSupply(int supply_demand_id) {
-		// TODO interface 根据首位编码判断（首位是0则是供应，首位是1则是需求）
+		// interface 根据首位编码判断（首位是0则是供应，首位是1则是需求）
 		// 大于或者小于编码位数（编码位数需固定）
 		//return (supply_demand_id > 100000);
 		
@@ -167,11 +166,13 @@ public class DataInterface {
 	}
 	
 	/**
-	 * TODO 从用户名分享专业id
+	 * TODO 从用户名分析专业id
 	 * @param userId
 	 * @return
 	 */
+	/*
 	protected static int GetMajor(String userId) {
 		return -1;
 	}
+	*/
 }
