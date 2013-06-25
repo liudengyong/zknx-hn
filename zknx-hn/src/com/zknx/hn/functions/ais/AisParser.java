@@ -14,6 +14,7 @@ import com.zknx.hn.functions.ais.AisDoc.ItemType;
 
 import android.annotation.SuppressLint;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.widget.LinearLayout;
@@ -62,23 +63,14 @@ public class AisParser {
 	 * @return
 	 */
 	@SuppressLint("SetJavaScriptEnabled")
-	public AisLayout GetAisLayout(String ais_id, LayoutInflater inflater, Object jsInterface) {
+	public AisLayout GetAisLayout(String ais_id, LayoutInflater inflater, Object jsInterface /* 暂未使用 */) {
 		
 		LinearLayout aisLayout = (LinearLayout) inflater.inflate(R.layout.ais_view, null);
 
 		// Ais内容滚动视图
 		LinearLayout contentLayout = (LinearLayout) aisLayout.findViewById(R.id.ais_content_view);
-		
-		// Ais内容滚动视图
-		WebView webView = (WebView) aisLayout.findViewById(R.id.ais_webview);
-		
-		// 添加JS接口
-		webView.getSettings().setJavaScriptEnabled(true); // 启用JS脚本
-		webView.getSettings().setCacheMode(WebSettings.LOAD_NO_CACHE); // 禁用cache
-		webView.addJavascriptInterface(jsInterface, "ais");
-		webView.setWebChromeClient(new WebkitClient());
 
-		String title = parseAis(ais_id, contentLayout, webView);
+		String title = parseAis(ais_id, contentLayout/*, jsInterface*/);
 
 		if (title == null) {
 			Debug.Log("严重错误：AIS parse错误");
@@ -128,21 +120,33 @@ public class AisParser {
 	 * @param root
 	 * @return
 	 */
-	private String parseAis(String ais_id, LinearLayout root, WebView webView) {
+	private String parseAis(String ais_id, LinearLayout contentLayout) {
 		// 获取解析后的ais文档
 		AisDoc aisDoc = new AisDoc(ais_id);
 		String title = aisDoc.getTitle();
-		boolean isCourse = aisDoc.isCourse();
 		
 		mAudioItem = null;
 		mVideoItem = null;
 		
 		if (title == null)
 			return null;
-		
-		if (isCourse) {
-			Course.GenHtml(ais_id, webView, aisDoc);
+
+		// Ais内容滚动视图
+		WebView webView = (WebView) contentLayout.findViewById(R.id.ais_webview);
+
+		// 是否课件
+		if (aisDoc.isCourse()) {
+			webView.setVisibility(View.GONE);
+			//CourseWebView.GenHtml(ais_id, webView, aisDoc);
+			CourseView.InitView(contentLayout, aisDoc);
 		} else {
+			
+			// 添加JS接口
+			webView.getSettings().setJavaScriptEnabled(true); // 启用JS脚本
+			webView.getSettings().setCacheMode(WebSettings.LOAD_NO_CACHE); // 禁用cache
+			//webView.addJavascriptInterface(jsInterface, "ais");
+			webView.setWebChromeClient(new WebkitClient());
+
 			String htmlString = genAisWebview(ais_id, webView, aisDoc);
 			
 			// 加载webview
@@ -150,9 +154,9 @@ public class AisParser {
 				//webView.loadData(htmlString, "text/html", "GBK");
 				webView.loadDataWithBaseURL(null, htmlString, "text/html", "UTF-8", null);
 			}
+			
+			webView.setBackgroundColor(0); // 设置透明
 		}
-
-		webView.setBackgroundColor(0); // 设置透明
 
 		return title;
 	}

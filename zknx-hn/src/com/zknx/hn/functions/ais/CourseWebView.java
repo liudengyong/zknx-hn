@@ -10,11 +10,11 @@ import com.zknx.hn.common.ImageUtils;
 import com.zknx.hn.data.DataMan;
 import com.zknx.hn.data.FileUtils;
 
-public class Course {
+public class CourseWebView extends CourseView {
 	
 	private final static String URL_FILE_CRECT_RESULT = "file:///android_asset/icon/crect.png";
 	private final static String URL_FILE_INCRECT_RESULT = "file:///android_asset/icon/increct.png";
-	
+
 	/**
 	 * 初始化课件试题
 	 * @param webView
@@ -59,7 +59,15 @@ public class Course {
 
 		// 设置webview可以获得焦点
 		webView.setFocusable(true);
-		webView.requestFocus();
+		//webView.requestFocus();
+		
+		webView.setFocusableInTouchMode(true);
+		// 默认不会选择第一个焦点
+		webView.getSettings().setNeedInitialFocus(false);
+		// 不支持缩放
+		webView.getSettings().setSupportZoom(false);
+		
+		//webView.setScrollBarStyle(0);
 		
 		webView.setOnKeyListener(new OnKeyListener() {         
 	        public boolean onKey(View v, int keyCode, KeyEvent event) {
@@ -123,9 +131,9 @@ public class Course {
 
 		String anwserId = "";
 		String tagCheckbox = "";
-		char[] anwsers = {'A', 'B', 'C', 'D'};
+		
 		String tagAnswer = "答题(" + aisDoc.getQuestionGrade(i) + "分)：";
-		for (char anwser : anwsers) {
+		for (char anwser : ANWSERS) {
 			anwserId = GetAnswerTagId(i, anwser);
 			tagCheckbox = ("<input class=hiddenCheckbox type=checkbox id=" + anwserId + ">"); 
 			tagAnswer += (anwser + tagCheckbox + "<div class=divCheckbox onClick=\"divCheckbox('" + anwserId + "', this);\">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>");
@@ -196,5 +204,4 @@ public class Course {
 	private static String GetCurResultTagId() {
 		return "currentResult";
 	}
-
 }
