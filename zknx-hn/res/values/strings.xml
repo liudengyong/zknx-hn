@@ -73,6 +73,7 @@
     <string name="resset">重做</string>
     <string name="confirm_submit_course">确认交卷吗？</string>
     <string name="confirm_reset_course">确认要重做吗？</string>
+    <string name="key_anwser">anwser</string>
 
     <!-- Ais视图 -->
     <string name="audio">音频</string>
