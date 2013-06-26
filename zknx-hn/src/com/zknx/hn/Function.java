@@ -4,11 +4,11 @@ import java.util.List;
 
 import com.zknx.hn.R;
 import com.zknx.hn.common.Debug;
-import com.zknx.hn.common.Dialog;
-import com.zknx.hn.common.Dialog.ConfirmListener;
 import com.zknx.hn.common.UIConst;
 import com.zknx.hn.common.UIConst.L_LAYOUT_TYPE;
+import com.zknx.hn.common.widget.Dialog;
 import com.zknx.hn.common.widget.WaitDialog;
+import com.zknx.hn.common.widget.Dialog.ConfirmListener;
 import com.zknx.hn.common.widget.WaitDialog.WaitListener;
 import com.zknx.hn.data.DataMan;
 import com.zknx.hn.data.UserMan;

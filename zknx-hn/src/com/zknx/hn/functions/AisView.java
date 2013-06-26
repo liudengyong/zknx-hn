@@ -15,8 +15,8 @@ import android.widget.LinearLayout;
 
 import com.zknx.hn.R;
 import com.zknx.hn.common.Debug;
-import com.zknx.hn.common.Dialog;
 import com.zknx.hn.common.UIConst;
+import com.zknx.hn.common.widget.Dialog;
 import com.zknx.hn.data.DataMan;
 import com.zknx.hn.data.FileUtils;
 import com.zknx.hn.data.ListItemMap;

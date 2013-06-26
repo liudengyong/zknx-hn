@@ -20,11 +20,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.zknx.hn.R;
-import com.zknx.hn.common.Dialog;
-import com.zknx.hn.common.Dialog.ConfirmListener;
+import com.zknx.hn.common.widget.Dialog;
 import com.zknx.hn.common.widget.ListBox;
 import com.zknx.hn.common.widget.Radio;
 import com.zknx.hn.common.widget.WaitDialog;
+import com.zknx.hn.common.widget.Dialog.ConfirmListener;
 import com.zknx.hn.common.widget.WaitDialog.WaitListener;
 import com.zknx.hn.data.DataMan;
 import com.zknx.hn.data.ListItemMap;

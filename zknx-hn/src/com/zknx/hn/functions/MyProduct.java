@@ -9,10 +9,10 @@ import android.widget.LinearLayout;
 import android.widget.AdapterView.OnItemClickListener;
 
 import com.zknx.hn.R;
-import com.zknx.hn.common.Dialog;
-import com.zknx.hn.common.Dialog.ConfirmListener;
 import com.zknx.hn.common.UIConst;
 import com.zknx.hn.common.UIConst.L_LAYOUT_TYPE;
+import com.zknx.hn.common.widget.Dialog;
+import com.zknx.hn.common.widget.Dialog.ConfirmListener;
 import com.zknx.hn.data.DataMan;
 import com.zknx.hn.functions.common.CommonList;
 import com.zknx.hn.functions.common.FunctionView;
