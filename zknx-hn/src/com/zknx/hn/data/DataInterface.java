@@ -95,7 +95,6 @@ public class DataInterface {
 	 * @return
 	 */
 	protected static boolean AddressMatch(int address_id, int address_id_parsed) {
-		// TODO interface 地址编号分析，是否属于当前区域
 		int max = (address_id + 1) * 1000;;
 		int min = address_id * 1000;
 		

@@ -139,7 +139,6 @@ public class Expert extends AisView {
 			}
 		});
 
-		// TODO Ã·Œ ∞¥≈•
 		askLayout.findViewById(R.id.expert_ask_ask).setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View view) {

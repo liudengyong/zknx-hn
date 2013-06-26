@@ -95,9 +95,8 @@ public class UserMan {
 		mUserInfo.address = address;
 		mUserInfo.phone= phone;
 		
-		/* TODO A 完善用户信息
-		
-		mUserInfo.protectionZoneId = protectionZoneId;
+		/*
+		 * 完善用户信息
 		*/
 	}
 

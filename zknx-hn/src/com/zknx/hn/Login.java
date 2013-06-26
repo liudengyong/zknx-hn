@@ -85,7 +85,7 @@ public class Login extends Activity {
         // 添加并初始化注册视图
         mViewFlipper.addView(getRegisterView());
 
-		// TODO A 调试登录
+		// 调试登录
         /*
 		if (App.mDebug) {
 			mJsInterface.user = "12345678";
