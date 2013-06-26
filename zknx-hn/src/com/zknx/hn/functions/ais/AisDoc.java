@@ -104,8 +104,8 @@ typedef struct tagAisHeader
 	 * 通过ais_id构造AisDoc
 	 * @param ais_id
 	 */
-	AisDoc(String ais_id) {
-		parseAisDoc(ais_id);
+	AisDoc(String aisFileName) {
+		parseAisDoc(aisFileName);
 	}
 
 	/**
@@ -114,6 +114,14 @@ typedef struct tagAisHeader
 	 */
 	public String getTitle() {
 		return (mHeader != null) ? mHeader.title : "";
+	}
+	
+	/**
+	 * 获取ais id
+	 * @return
+	 */
+	public String getAisId() {
+		return (mHeader != null) ? mHeader.fileId : "";
 	}
 
 	/**
@@ -174,13 +182,13 @@ typedef struct tagAisHeader
 	 * @param ais_id
 	 * @return
 	 */
-	private boolean parseAisDoc(String ais_id) {
-		if (ais_id == null) {
-			Debug.Log("严重错误：parseAisDoc，ais_id为空");
+	private boolean parseAisDoc(String aisFileName) {
+		if (aisFileName == null || aisFileName.length() == 0) {
+			Debug.Log("严重错误：parseAisDoc，ais_file为空");
 			return false;
 		}
 
-		String filePathName = DataMan.GetAisFilePathName(ais_id);
+		String filePathName = DataMan.DataFile(aisFileName);
 		
 		if (!FileUtils.IsFileExist(filePathName)) {
 			Debug.Log("Ais文件没找到：" + filePathName);

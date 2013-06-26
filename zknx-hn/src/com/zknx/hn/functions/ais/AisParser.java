@@ -62,14 +62,14 @@ public class AisParser {
 	 * @param context
 	 * @return
 	 */
-	public AisLayout GetAisLayout(String ais_id, LayoutInflater inflater, Object jsInterface) {
+	public AisLayout GetAisLayout(String aisFileName, LayoutInflater inflater, Object jsInterface) {
 		
 		LinearLayout aisLayout = (LinearLayout) inflater.inflate(R.layout.ais_view, null);
 
 		// Ais内容滚动视图
 		LinearLayout contentLayout = (LinearLayout) aisLayout.findViewById(R.id.ais_content_view);
 
-		String title = parseAis(ais_id, contentLayout, jsInterface);
+		String title = parseAis(aisFileName, contentLayout, jsInterface);
 
 		if (title == null) {
 			Debug.Log("严重错误：AIS parse错误");
@@ -120,9 +120,9 @@ public class AisParser {
 	 * @return
 	 */
 	@SuppressLint("SetJavaScriptEnabled")
-	private String parseAis(String ais_id, LinearLayout contentLayout, Object jsInterface) {
+	private String parseAis(String aisFileName, LinearLayout contentLayout, Object jsInterface) {
 		// 获取解析后的ais文档
-		AisDoc aisDoc = new AisDoc(ais_id);
+		AisDoc aisDoc = new AisDoc(aisFileName);
 		String title = aisDoc.getTitle();
 		
 		mAudioItem = null;
@@ -147,7 +147,7 @@ public class AisParser {
 			webView.addJavascriptInterface(jsInterface, "ais");
 			webView.setWebChromeClient(new WebkitClient());
 
-			String htmlString = genAisWebview(ais_id, webView, aisDoc);
+			String htmlString = genAisWebview(aisDoc.getAisId(), webView, aisDoc);
 			
 			// 加载webview
 			if (htmlString != null) {

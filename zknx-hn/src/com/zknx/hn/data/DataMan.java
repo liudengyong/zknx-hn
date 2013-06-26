@@ -35,7 +35,8 @@ public class DataMan extends DataInterface {
 	public static final String KEY_PRODUCT_CLASS_ID = "product_class_id"; //  产品分类
 	public static final String KEY_SUPPLY_DEMAND_INFO_ID = "supply_demand_info_id"; // 供求信息id
 	public static final String KEY_FRIEND_ID = "friend_id";
-	public static final String KEY_AIS_ID = "ais_id";
+	//public static final String KEY_AIS_ID = "ais_id"; // ais_id 暂时无用
+	public static final String KEY_AIS_FILE_NAME = "ais_name";
 	public static final String KEY_AIS_CLASS_ID = "ais_class_id";
 	// messageId 同时也是发布留言的商友id
 	public static final String KEY_MY_GROUP_MESSAGE_ID = "my_group_message";
@@ -1242,9 +1243,10 @@ public class DataMan extends DataInterface {
 				String calssId = token[1];
 				if (class_id == INVALID_ID || class_id == ParseInt(calssId)) {
 					// 符合条件
-					String id = token[0];
+					//String id = token[0];
 					String name = token[2];
-					list.add(new ListItemMap(name, KEY_AIS_ID, id));
+					String fileName = name + ".ais";
+					list.add(new ListItemMap(name, KEY_AIS_FILE_NAME, fileName));
 				}
 			}
 		}
@@ -1398,26 +1400,6 @@ public class DataMan extends DataInterface {
 		}
 
 		return 0;
-	}
-
-	/**
-	 * 获取ais文件路径名
-	 * @param ais_id
-	 * @return
-	 */
-	public static String GetAisFilePathName(String ais_id) {
-		List<String> lines = DataMan.ReadLines(DataMan.FILE_NAME_AIS_LIST);
-
-		String token[];
-		for (String line : lines) {
-			token = line.split(DataMan.COMMON_TOKEN);
-			
-			if (token != null && token.length >= 4 && token[0].equals(ais_id)) {
-				return DataMan.DataFile(token[2] + AIS_SURFIX);
-			}
-		}
-
-		return "空";
 	}
 
 	/**

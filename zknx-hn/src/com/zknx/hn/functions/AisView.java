@@ -45,7 +45,7 @@ public class AisView extends FunctionView {
 	
 	// 点击图片返回时用到
 	private LinearLayout mAisViewRoot;
-	private String mCurAisId;
+	private String mCurAisFileName;
 	
 	private static final String DEFAULT_TITLE = "内容";
 	private String mAisTitle = DEFAULT_TITLE;
@@ -162,23 +162,23 @@ public class AisView extends FunctionView {
 	}
 	
 	void attachAisView(int position) {
-		String ais_id = mAdapterAisList.getItemMapString(position, DataMan.KEY_AIS_ID);
-		attachAisView(ais_id, mAisContentFrame);
+		String aisFileName = mAdapterAisList.getItemMapString(position, DataMan.KEY_AIS_FILE_NAME);
+		attachAisView(aisFileName, mAisContentFrame);
 	}
 
-	void attachAisView(String ais_id, LinearLayout root) {
+	void attachAisView(String aisFileName, LinearLayout root) {
 		String title = DEFAULT_TITLE;
 		LinearLayout layout = null;
-		Debug.Log("ais_id = " + ais_id);
+		Debug.Log("ais_file = " + aisFileName);
 		
-		AisParser.AisLayout aisLayout = mAisParser.GetAisLayout(ais_id, mInflater, getJsInterface());
+		AisParser.AisLayout aisLayout = mAisParser.GetAisLayout(aisFileName, mInflater, getJsInterface());
 		
 		if (aisLayout != null) {
 			title = aisLayout.getTitle();
 			layout = aisLayout.getLayout();
 			// 保存当前信息
 			mAisViewRoot = root;
-			mCurAisId = ais_id;
+			mCurAisFileName = aisFileName;
 			mAisTitle = title;
 			
 			// 如果有音频则播放音频
@@ -199,7 +199,7 @@ public class AisView extends FunctionView {
 			@Override
 			public void onClick(View v) {
 				// 返回Ais视图
-				attachAisView(mCurAisId, mAisViewRoot);
+				attachAisView(mCurAisFileName, mAisViewRoot);
 			}
 		});
 
