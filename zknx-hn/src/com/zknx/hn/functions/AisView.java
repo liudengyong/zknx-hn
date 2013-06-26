@@ -73,6 +73,8 @@ public class AisView extends FunctionView {
 		
 		if (function_id == UIConst.FUNCTION_ID_BEST_COUSE) {
 			initCouseSubmitButtons();
+		} else {
+			mCourseSubmitLayout = null;
 		}
 		
 		// 初始化分类（三栏）或者初始化Ais列表（两栏）
@@ -349,11 +351,10 @@ public class AisView extends FunctionView {
 	 * 初始化交卷视图
 	 */
 	private void initCouseSubmitButtons() {
-		//if (mCourseSubmitLayout == null) {
-			// 初始化交卷和重做按钮
 		mCourseSubmitLayout = initButtonPair(R.string.resset, R.string.submit, new OnClickListener() {
 			@Override
 			public void onClick(View view) {
+				
 				switch (view.getId()) {
 				case ID_SUBMIT:
 					//invokeJsMethod(R.string.confirm_submit_course, "submitTest()");
@@ -364,18 +365,5 @@ public class AisView extends FunctionView {
 				}
 			}
 		});
-		/*} else {
-			// 首先脱离父类
-			ViewParent parent = mCourseSubmitLayout.getParent();
-			
-			if (parent != null) {
-				if (parent instanceof LinearLayout) {
-					((LinearLayout)parent).removeAllViews();
-				} else if (parent instanceof RelativeLayout) {
-					((RelativeLayout)parent).removeAllViews();
-				}
-			}
-		}
-		*/
 	}
 }
