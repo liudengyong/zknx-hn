@@ -195,10 +195,8 @@ public class CourseView {
 					// 是答案，选中了，或者不是答案，没有选
 					if (contains && checkbox.isChecked() ||
 						!contains && !checkbox.isChecked()) {
-						continue;
 					} else {
 						checkedResult = false;
-						break;
 					}
 				}
 				

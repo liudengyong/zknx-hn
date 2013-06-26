@@ -56,4 +56,13 @@ public class Checkbox extends LinearLayout {
 			mCheckbox.setButtonDrawable(checkboxBg);
 		}
 	}
+
+	/**
+	 * ÊÇ·ñ½ûÓÃ
+	 * @param b
+	 */
+	@Override
+	public void setEnabled(boolean enabled) {
+		mCheckbox.setEnabled(enabled);
+	}
 }
