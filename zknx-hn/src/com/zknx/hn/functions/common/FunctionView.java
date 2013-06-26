@@ -9,6 +9,7 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.ViewParent;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -79,8 +80,14 @@ public class FunctionView {
 			contentLayout.setVisibility(View.GONE);
 		
 		// 底部定制视图
-		if (bottomCustom != null)
+		if (bottomCustom != null) {
+			ViewParent parent = bottomCustom.getParent();
+			if (parent != null && parent instanceof LinearLayout) {
+				((LinearLayout)parent).removeAllViews();
+			}
+
 			bottomLayout.addView(bottomCustom, UIConst.GetLayoutParams(L_LAYOUT_TYPE.H_WRAP));
+		}
 		else
 			bottomLayout.setVisibility(View.GONE);
 

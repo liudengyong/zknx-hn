@@ -251,7 +251,7 @@ public class Login extends Activity {
 				@Override
 				public void startWait() {
 					
-					mWaitRet = UserMan.Register();
+					//mWaitRet = UserMan.Register();
 					
 					mHandler.sendEmptyMessage(MESSAGE_REGISTER);
 				}

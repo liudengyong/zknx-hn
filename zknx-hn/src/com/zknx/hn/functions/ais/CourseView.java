@@ -170,9 +170,11 @@ public class CourseView {
 				view.setVisibility(View.GONE);
 				
 				for (char anwser : ANWSERS) {
-					View checkbox = courseLayout.findViewById(GetAnwserId(i, anwser));
-					if (checkbox != null)
+					Checkbox checkbox = (Checkbox) courseLayout.findViewById(GetAnwserId(i, anwser));
+					if (checkbox != null) {
+						checkbox.setChecked(false);
 						checkbox.setEnabled(true);
+					}
 				}
 			}
 			else {

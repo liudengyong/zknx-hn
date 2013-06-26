@@ -17,7 +17,6 @@ public class AudioCenter extends AbstractMicrophone {
 	
 	private final static String subTAG = "AudioCenter";
 	
-	// TODO Í¬²½£¿volatile£¿
 	private volatile boolean isPublish, isPlaying;
 	private Vector<byte[]> bufferData = new Vector<byte[]>();
 

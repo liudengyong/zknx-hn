@@ -87,7 +87,7 @@ public class Function extends Activity {
 	};
 
 	/**
-     * TODO (讨论)后台数据服务
+     * 后台数据服务
      * @param id
      */
     private static DataService mDataService;

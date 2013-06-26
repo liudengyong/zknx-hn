@@ -65,4 +65,12 @@ public class Checkbox extends LinearLayout {
 	public void setEnabled(boolean enabled) {
 		mCheckbox.setEnabled(enabled);
 	}
+
+	/**
+	 * бЁжа
+	 * @param b
+	 */
+	public void setChecked(boolean checked) {
+		mCheckbox.setChecked(checked);
+	}
 }

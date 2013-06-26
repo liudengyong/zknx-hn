@@ -140,14 +140,6 @@ public class UserMan {
 	}
 
 	/**
-	 * 注册新用户
-	 * TODO interface 注册用户
-	 */
-	public static String Register() {
-		return null;
-	}
-	
-	/**
 	 * 保存用户信息
 	 */
 	private static String SaveUserInfo(String url, String fileName) throws Exception {
