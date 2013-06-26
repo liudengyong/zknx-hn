@@ -2,8 +2,8 @@ package com.zknx.hn;
 
 import com.zknx.hn.common.Debug;
 import com.zknx.hn.common.Dialog;
-import com.zknx.hn.common.WaitDialog;
-import com.zknx.hn.common.WaitDialog.WaitListener;
+import com.zknx.hn.common.widget.WaitDialog;
+import com.zknx.hn.common.widget.WaitDialog.WaitListener;
 import com.zknx.hn.data.UserMan;
 
 import android.annotation.SuppressLint;

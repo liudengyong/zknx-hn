@@ -1,4 +1,4 @@
-package com.zknx.hn.common;
+package com.zknx.hn.common.widget;
 
 import android.content.Context;
 import android.graphics.Color;

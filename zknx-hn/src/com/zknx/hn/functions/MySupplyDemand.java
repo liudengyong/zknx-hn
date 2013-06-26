@@ -21,11 +21,11 @@ import android.widget.Toast;
 
 import com.zknx.hn.R;
 import com.zknx.hn.common.Dialog;
-import com.zknx.hn.common.ListBox;
-import com.zknx.hn.common.Radio;
-import com.zknx.hn.common.WaitDialog;
 import com.zknx.hn.common.Dialog.ConfirmListener;
-import com.zknx.hn.common.WaitDialog.WaitListener;
+import com.zknx.hn.common.widget.ListBox;
+import com.zknx.hn.common.widget.Radio;
+import com.zknx.hn.common.widget.WaitDialog;
+import com.zknx.hn.common.widget.WaitDialog.WaitListener;
 import com.zknx.hn.data.DataMan;
 import com.zknx.hn.data.ListItemMap;
 import com.zknx.hn.data.UserMan;

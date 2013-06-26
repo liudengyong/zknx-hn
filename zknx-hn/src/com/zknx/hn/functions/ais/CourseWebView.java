@@ -6,7 +6,7 @@ import android.view.View.OnKeyListener;
 import android.webkit.WebView;
 
 import com.zknx.hn.common.Debug;
-import com.zknx.hn.common.ImageUtils;
+import com.zknx.hn.common.widget.ImageUtils;
 import com.zknx.hn.data.DataMan;
 import com.zknx.hn.data.FileUtils;
 

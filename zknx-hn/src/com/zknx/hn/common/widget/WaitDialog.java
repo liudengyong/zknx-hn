@@ -1,4 +1,6 @@
-package com.zknx.hn.common;
+package com.zknx.hn.common.widget;
+
+import com.zknx.hn.common.Debug;
 
 import android.app.ProgressDialog;
 import android.content.Context;

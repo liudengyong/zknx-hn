@@ -5,8 +5,8 @@ import java.util.List;
 
 import com.zknx.hn.R;
 import com.zknx.hn.common.Debug;
-import com.zknx.hn.common.ImageUtils;
 import com.zknx.hn.common.WebkitClient;
+import com.zknx.hn.common.widget.ImageUtils;
 import com.zknx.hn.data.DataMan;
 import com.zknx.hn.data.FileUtils;
 import com.zknx.hn.functions.ais.AisDoc.AisItem;

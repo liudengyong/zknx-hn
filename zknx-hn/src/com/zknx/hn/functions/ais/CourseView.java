@@ -8,10 +8,10 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 import com.zknx.hn.R;
-import com.zknx.hn.common.Checkbox;
-import com.zknx.hn.common.Label;
 import com.zknx.hn.common.UIConst;
 import com.zknx.hn.common.UIConst.L_LAYOUT_TYPE;
+import com.zknx.hn.common.widget.Checkbox;
+import com.zknx.hn.common.widget.Label;
 
 public class CourseView {
 

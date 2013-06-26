@@ -1,10 +1,11 @@
-package com.zknx.hn.common;
+package com.zknx.hn.common.widget;
 
 import java.io.FileOutputStream;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 
+import com.zknx.hn.common.Debug;
 import com.zknx.hn.data.FileUtils;
 
 public class ImageUtils {

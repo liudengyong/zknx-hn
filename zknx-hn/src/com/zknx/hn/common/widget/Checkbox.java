@@ -1,4 +1,4 @@
-package com.zknx.hn.common;
+package com.zknx.hn.common.widget;
 
 import com.zknx.hn.data.DataMan;
 
