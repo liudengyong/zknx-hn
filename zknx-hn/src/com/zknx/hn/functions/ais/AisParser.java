@@ -62,15 +62,14 @@ public class AisParser {
 	 * @param context
 	 * @return
 	 */
-	@SuppressLint("SetJavaScriptEnabled")
-	public AisLayout GetAisLayout(String ais_id, LayoutInflater inflater, Object jsInterface /* 暂未使用 */) {
+	public AisLayout GetAisLayout(String ais_id, LayoutInflater inflater, Object jsInterface) {
 		
 		LinearLayout aisLayout = (LinearLayout) inflater.inflate(R.layout.ais_view, null);
 
 		// Ais内容滚动视图
 		LinearLayout contentLayout = (LinearLayout) aisLayout.findViewById(R.id.ais_content_view);
 
-		String title = parseAis(ais_id, contentLayout/*, jsInterface*/);
+		String title = parseAis(ais_id, contentLayout, jsInterface);
 
 		if (title == null) {
 			Debug.Log("严重错误：AIS parse错误");
@@ -120,7 +119,8 @@ public class AisParser {
 	 * @param root
 	 * @return
 	 */
-	private String parseAis(String ais_id, LinearLayout contentLayout) {
+	@SuppressLint("SetJavaScriptEnabled")
+	private String parseAis(String ais_id, LinearLayout contentLayout, Object jsInterface) {
 		// 获取解析后的ais文档
 		AisDoc aisDoc = new AisDoc(ais_id);
 		String title = aisDoc.getTitle();
@@ -144,7 +144,7 @@ public class AisParser {
 			// 添加JS接口
 			webView.getSettings().setJavaScriptEnabled(true); // 启用JS脚本
 			webView.getSettings().setCacheMode(WebSettings.LOAD_NO_CACHE); // 禁用cache
-			//webView.addJavascriptInterface(jsInterface, "ais");
+			webView.addJavascriptInterface(jsInterface, "ais");
 			webView.setWebChromeClient(new WebkitClient());
 
 			String htmlString = genAisWebview(ais_id, webView, aisDoc);
