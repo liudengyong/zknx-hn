@@ -54,6 +54,12 @@ public class AisView extends FunctionView {
 	private MediaPlayer mPlayer;
 	// 解析器
 	AisParser mAisParser;
+	
+	// 课件：交卷布局
+	private LinearLayout mCourseSubmitLayout;
+	
+	private final static int ID_RESET = R.id.common_btn_pair_left;
+	private final static int ID_SUBMIT = R.id.common_btn_pair_right;
 
 	public AisView(LayoutInflater inflater, LinearLayout frameRoot, int function_id, int frameResId) {
 		super(inflater, frameRoot, frameResId);
@@ -64,6 +70,10 @@ public class AisView extends FunctionView {
 		mFrameResId = frameResId;
 		
 		mTitle = getTitle(function_id);
+		
+		if (function_id == UIConst.FUNCTION_ID_BEST_COUSE) {
+			initCouseSubmitButtons();
+		}
 		
 		// 初始化分类（三栏）或者初始化Ais列表（两栏）
 		if (mFrameResId == R.layout.func_frame_split) {
@@ -106,7 +116,7 @@ public class AisView extends FunctionView {
 	 * 默认无底部视图，子类可以覆盖，从而实现自定义底部View
 	 */
 	LinearLayout getCutomBottom() {
-		return null;
+		return mCourseSubmitLayout;
 	}
 	
 	/**
@@ -333,5 +343,39 @@ public class AisView extends FunctionView {
 		Intent it = new Intent(Intent.ACTION_VIEW);  
         it.setDataAndType(Uri.parse(tmpFile), "video/mp4");  
         mInflater.getContext().startActivity(it);
+	}
+	
+	/**
+	 * 初始化交卷视图
+	 */
+	private void initCouseSubmitButtons() {
+		//if (mCourseSubmitLayout == null) {
+			// 初始化交卷和重做按钮
+		mCourseSubmitLayout = initButtonPair(R.string.resset, R.string.submit, new OnClickListener() {
+			@Override
+			public void onClick(View view) {
+				switch (view.getId()) {
+				case ID_SUBMIT:
+					//invokeJsMethod(R.string.confirm_submit_course, "submitTest()");
+					break;
+				case ID_RESET:
+					//invokeJsMethod(R.string.confirm_reset_course, "resetTest()");
+					break;
+				}
+			}
+		});
+		/*} else {
+			// 首先脱离父类
+			ViewParent parent = mCourseSubmitLayout.getParent();
+			
+			if (parent != null) {
+				if (parent instanceof LinearLayout) {
+					((LinearLayout)parent).removeAllViews();
+				} else if (parent instanceof RelativeLayout) {
+					((RelativeLayout)parent).removeAllViews();
+				}
+			}
+		}
+		*/
 	}
 }
