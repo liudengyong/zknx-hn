@@ -21,6 +21,7 @@ import com.zknx.hn.data.DataMan;
 import com.zknx.hn.data.FileUtils;
 import com.zknx.hn.data.ListItemMap;
 import com.zknx.hn.functions.ais.AisParser;
+import com.zknx.hn.functions.ais.CourseView;
 import com.zknx.hn.functions.common.CommonList;
 import com.zknx.hn.functions.common.CommonListAdapter;
 import com.zknx.hn.functions.common.FunctionView;
@@ -357,10 +358,10 @@ public class AisView extends FunctionView {
 				
 				switch (view.getId()) {
 				case ID_SUBMIT:
-					//invokeJsMethod(R.string.confirm_submit_course, "submitTest()");
+					CourseView.SubmitOrReset(view, false);
 					break;
 				case ID_RESET:
-					//invokeJsMethod(R.string.confirm_reset_course, "resetTest()");
+					CourseView.SubmitOrReset(view, true);
 					break;
 				}
 			}

@@ -125,7 +125,7 @@ public class AisParser {
 		if (aisDoc.isCourse()) {
 			webView.setVisibility(View.GONE);
 			//CourseWebView.GenHtml(ais_id, webView, aisDoc);
-			CourseView.InitView(contentLayout, aisDoc);
+			CourseView.InitView(mInflater, contentLayout, aisDoc);
 		} else {
 			AisWebView.Init(aisDoc, webView, jsInterface);
 		}

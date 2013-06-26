@@ -139,15 +139,7 @@ public class CourseWebView extends CourseView {
 			tagAnswer += (anwser + tagCheckbox + "<div class=divCheckbox onClick=\"divCheckbox('" + anwserId + "', this);\">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>");
 		}
 		
-		String rightAnwser = "";
-		byte[] rightAnwserBytes = aisDoc.getQuestionAnswer(i);
-		if (rightAnwserBytes != null) {
-			for (byte a : rightAnwserBytes)
-				// 答案长度一定，如果不是全部正确则会余0
-				if (a != 0)
-					rightAnwser += (char)a;
-		}
-
+		String rightAnwser = aisDoc.getQuestionAnswer(i);
 		String tagRightAnwser = "<div id=" + GetRightAnwserTagId(i) + " style=\"display:none;\">" + aisDoc.getQuestionGrade(i) + DataMan.COMMON_TOKEN + rightAnwser + "</div>";
 		String result = "<img id=" + GetResultTagId(i) + " style=\"visibility:hidden;vertical-align:text-bottom;\"/>";
 		tagAnswer += (result + tagRightAnwser);

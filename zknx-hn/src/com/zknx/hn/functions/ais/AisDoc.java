@@ -364,11 +364,20 @@ typedef struct tagAisHeader
 	 * 获取题目答案
 	 * @return
 	 */
-	public byte[] getQuestionAnswer(int i) {
+	public String getQuestionAnswer(int i) {
 		if (mQuestionList == null || mQuestionList.size() < i)
-			return null;
+			return "";
 		
-		return mQuestionList.get(i).answer;
+		String rightAnwser = "";
+		byte[] rightAnwserBytes = mQuestionList.get(i).answer;
+		if (rightAnwserBytes != null) {
+			for (byte a : rightAnwserBytes)
+				// 答案长度一定，如果不是全部正确则会余0
+				if (a != 0)
+					rightAnwser += (char)a;
+		}
+		
+		return rightAnwser;
 	}
 	
 	/**
