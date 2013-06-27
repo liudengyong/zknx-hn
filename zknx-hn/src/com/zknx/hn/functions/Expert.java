@@ -64,6 +64,9 @@ public class Expert extends AisView {
 	@Override
 	protected void initAisList(int position) {
 		initExpertQuestionList(position);
+		
+		// 默认第三栏视图
+		initContent("问题解答", null, mContentFrame[2]);
 	}
 	
 	/**
@@ -72,14 +75,14 @@ public class Expert extends AisView {
 	private void initExpertQuestionList(int position) {
 		ListItemMap item = mAdapterClassList.getItem(position);
 		
-		List<ListItemMap> expertList = null;
-		
 		String expertId = "";
 		String expertName = "";
 		if (item != null) {
 			expertId = item.getString(DataMan.KEY_EXPERT_ID);
-			expertList = DataMan.GetExpertAnwserList(expertId);
+			expertName = item.getString(DataMan.KEY_NAME);
 		}
+		
+		List<ListItemMap> expertList = DataMan.GetExpertAnwserList(expertId);
 		
 		LinearLayout inforLayout  = getExpertInfo(item);
 		LinearLayout askBtnLayout = getExpertAskButton(expertId, expertName);
@@ -134,13 +137,25 @@ public class Expert extends AisView {
 	 * @return
 	 */
 	private LinearLayout getExpertAskButton(final String expertId, final String expertName) {
+		
+		OnClickListener clickAskButton = null;
 
-		LinearLayout askLayout = initButtonPair(R.string.ask_expert, R.string.ask_expert_interphone, new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				initAskView(expertId, expertName);
-			}
-		});
+		// 专家id和名字不为空，否则禁用按钮
+		if (expertId != null &&
+			!expertId.isEmpty() &&
+			expertName != null &&
+			!expertName.isEmpty()) {
+
+			clickAskButton = new OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					initAskView(expertId, expertName);
+				}
+			};
+
+		}
+
+		LinearLayout askLayout = initButtonPair(R.string.ask_expert, R.string.ask_expert_interphone, clickAskButton);
 		
 		// 实现语音对讲
 		askLayout.findViewById(R.id.common_btn_pair_right).setEnabled(false);
@@ -165,6 +180,11 @@ public class Expert extends AisView {
 	 * @param expertId
 	 */
 	private void initAskView(final String expertId, String expertName) {
+
+		if (expertId == null || expertId.isEmpty() || expertName == null || expertName.isEmpty()) {
+			return;
+		}
+
 		RelativeLayout askLayout = (RelativeLayout) mInflater.inflate(R.layout.expert_ask, null);
 
 		mAskSubject = (EditText) askLayout.findViewById(R.id.expert_ask_subject);

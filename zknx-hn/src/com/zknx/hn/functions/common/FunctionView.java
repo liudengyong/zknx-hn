@@ -125,6 +125,7 @@ public class FunctionView {
 	/**
 	 * 生成并初始化按钮对
 	 * @param clickListener
+	 * 如果clickListener为空,则禁用按钮
 	 * @param left
 	 * @param right
 	 * @return
@@ -134,11 +135,17 @@ public class FunctionView {
 		LinearLayout layout = (LinearLayout)mInflater.inflate(R.layout.common_btn_pair, null);
 		Button btn = (Button) layout.findViewById(R.id.common_btn_pair_left);
 		btn.setText(left);
-		btn.setOnClickListener(listener);
+		if (listener != null)
+			btn.setOnClickListener(listener);
+		else
+			btn.setEnabled(false);
 		
 		btn = (Button) layout.findViewById(R.id.common_btn_pair_right);
 		btn.setText(right);
-		btn.setOnClickListener(listener);
+		if (listener != null)
+			btn.setOnClickListener(listener);
+		else
+			btn.setEnabled(false);
 
 		return layout;
 	}
