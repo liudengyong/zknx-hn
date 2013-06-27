@@ -29,6 +29,8 @@ public class DataInterface {
 	protected static final String FILE_NAME_MY_FRIEND = "my_friend.txt";
 	// 所有商友留言文件名
 	protected static final String FILE_NAME_MY_GROUP_MESSAGE = "my_group_message.txt";
+	// 专家问答
+	protected static final String FILE_NAME_EXPERTS = "experts.txt";
 	// ais列表文件名
 	protected static final String FILE_NAME_AIS_LIST = "ais_file_list.txt";
 	// ais分类列表文件名

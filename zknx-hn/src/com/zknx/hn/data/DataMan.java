@@ -58,6 +58,9 @@ public class DataMan extends DataInterface {
 	public static final String KEY_FRIEND_MESSAGE_DATE = "message_date";
 	// 留言内容
 	public static final String KEY_FRIEND_MESSAGE_CONTENT = "message_content";
+	
+	// 专家问答
+	public static final String KEY_EXPERT_ID = "expert_id";
 
 	// 临时文件名
 	public static final String FILE_NAME_TMP = "tmp.txt";
@@ -1473,5 +1476,13 @@ public class DataMan extends DataInterface {
 		Debug.Log("提问专家错误：返回：" + ret);
 
 		return false;
+	}
+
+	/**
+	 * 获取专家列表
+	 * @return
+	 */
+	public static List<ListItemMap> GetExpertList() {
+		return ReadCommonIdName(FILE_NAME_EXPERTS, KEY_EXPERT_ID);
 	}
 }

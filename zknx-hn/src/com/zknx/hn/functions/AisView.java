@@ -87,6 +87,7 @@ public class AisView extends FunctionView {
 			mAisListFrame = mContentFrame[1];
 			mAisContentFrame = mContentFrame[2];
 			initClass(function_id);
+			initClassList();
 		} else {
 			Debug.Log("严重错误：AISView mFrameResId");
 		}
@@ -95,10 +96,14 @@ public class AisView extends FunctionView {
 	/**
 	 * 初始化Ais分类
 	 */
-	void initClass(int function_id) {
-		
+	protected void initClass(int function_id) {
 		mAdapterClassList = new CommonListAdapter(mContext, DataMan.GetAisClassList(function_id));
-		
+	}
+	
+	/**
+	 * 初始化分类列表
+	 */
+	protected void initClassList() {
 		CommonListParams listParams = new CommonListParams(mInflater, mContentFrame[0], mAdapterClassList, mOnClickClass);
 		
 		CommonList.Init(listParams, mTitle);
@@ -126,7 +131,7 @@ public class AisView extends FunctionView {
 	 * 初始化Ais列表
 	 * @param position
 	 */
-	void initAisList(int position) {
+	protected void initAisList(int position) {
 		ListItemMap mapItem = mAdapterClassList.getItem(position);
 
 		String title = "AIS分类";

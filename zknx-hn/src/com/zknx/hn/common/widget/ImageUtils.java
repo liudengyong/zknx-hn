@@ -1,5 +1,7 @@
 package com.zknx.hn.common.widget;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 
 import android.graphics.Bitmap;
@@ -33,5 +35,25 @@ public class ImageUtils {
 		}
 		
 		return false;
+	}
+	
+	/**
+	* 加载本地图片
+	* http://bbs.3gstdy.com
+	* @param url
+	* @return
+	*/
+	public static Bitmap GetLoacalBitmap(String fileName) {
+	     try {
+	          FileInputStream fis = new FileInputStream(fileName);
+	          return BitmapFactory.decodeStream(fis);
+	     } catch (FileNotFoundException e) {
+	          e.printStackTrace();
+	          Debug.Log("加载本地图片失败，没找到文件：" + e.getMessage());
+	     } catch (Exception e) {
+	    	 Debug.Log("加载本地图片失败：" + e.getMessage());
+	     }
+	     
+	     return null;
 	}
 }

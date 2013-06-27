@@ -4,13 +4,16 @@ import com.zknx.hn.R;
 import com.zknx.hn.common.Debug;
 import com.zknx.hn.common.UIConst;
 import com.zknx.hn.common.widget.Dialog;
+import com.zknx.hn.common.widget.ImageUtils;
 import com.zknx.hn.common.widget.WaitDialog;
 import com.zknx.hn.common.widget.Dialog.ConfirmListener;
 import com.zknx.hn.common.widget.WaitDialog.WaitListener;
 import com.zknx.hn.data.DataMan;
 import com.zknx.hn.data.UserMan;
+import com.zknx.hn.functions.common.CommonListAdapter;
 
 import android.content.DialogInterface;
+import android.graphics.Bitmap;
 import android.os.Handler;
 import android.os.Message;
 import android.view.LayoutInflater;
@@ -36,13 +39,21 @@ public class Expert extends AisView {
 
 		Instance = this;
 	}
+	
+	/**
+	 * 初始化专家列表
+	 */
+	@Override
+	protected void initClass(int function_id) {
+		mAdapterClassList = new CommonListAdapter(mContext, DataMan.GetExpertList());
+	}
 
 	/**
 	 * 初始化Ais子分类
 	 * @param position
 	 */
 	@Override
-	void initAisList(int position) {
+	protected void initAisList(int position) {
 		LinearLayout inforLayout  = getExpertInfo(position);
 		LinearLayout askBtnLayout = getExpertAskButton(position);
 
@@ -55,20 +66,19 @@ public class Expert extends AisView {
 	 * @return
 	 */
 	private LinearLayout getExpertInfo(int position) {
+		String expertId = mAdapterClassList.getItemMapString(position, DataMan.KEY_EXPERT_ID);
+		
 		LinearLayout inforLayout = (LinearLayout) mInflater.inflate(R.layout.expert_info, null);
 		
-		// TODO 专家照片
 		ImageView newImageView = (ImageView) inforLayout.findViewById(R.id.expert_info_photo);
 
-		long time = System.currentTimeMillis();
-		int res = R.drawable.expert;
-		if (time % 3 == 1)
-			res = R.drawable.expert2;
-		else if (time % 3 == 2)
-			res = R.drawable.expert3;
+		String imageFilePath = DataMan.DataFile("expert/" + expertId + ".jpg");
+
+		Bitmap bm = ImageUtils.GetLoacalBitmap(imageFilePath);
 		
 		try {
-			newImageView.setImageDrawable(mContext.getResources().getDrawable(res));
+			//newImageView.setImageDrawable(mContext.getResources().getDrawable(res));
+			newImageView.setImageBitmap(bm);
 		} catch (Throwable e) {
 			Debug.Log("严重错误：内存不足，getExpertInfo");
 		}
