@@ -1,5 +1,7 @@
 package com.zknx.hn.functions;
 
+import java.util.List;
+
 import com.zknx.hn.R;
 import com.zknx.hn.common.Debug;
 import com.zknx.hn.common.UIConst;
@@ -55,10 +57,19 @@ public class Expert extends AisView {
 	 */
 	@Override
 	protected void initAisList(int position) {
-		LinearLayout inforLayout  = getExpertInfo(position);
+		ListItemMap item = mAdapterClassList.getItem(position);
+		
+		List<ListItemMap> expertList = null;
+		
+		if (item != null) {
+			String expertId = item.getString(DataMan.KEY_EXPERT_ID);
+			expertList = DataMan.GetExpertAnwserList(expertId);
+		}
+		
+		LinearLayout inforLayout  = getExpertInfo(item);
 		LinearLayout askBtnLayout = getExpertAskButton(position);
 
-		super.initAisList("专家信息", DataMan.INVALID_ID, inforLayout, askBtnLayout);
+		super.initAisList("专家信息", expertList, inforLayout, askBtnLayout);
 	}
 
 	/**
@@ -66,8 +77,8 @@ public class Expert extends AisView {
 	 * @param position
 	 * @return
 	 */
-	private LinearLayout getExpertInfo(int position) {
-		ListItemMap item = mAdapterClassList.getItem(position);
+	private LinearLayout getExpertInfo(ListItemMap item) {
+		
 		LinearLayout inforLayout = (LinearLayout) mInflater.inflate(R.layout.expert_info, null);
 		
 		if (item != null) {

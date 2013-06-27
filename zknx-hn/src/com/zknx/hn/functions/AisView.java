@@ -1,6 +1,7 @@
 package com.zknx.hn.functions;
 
 import java.io.IOException;
+import java.util.List;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -82,7 +83,7 @@ public class AisView extends FunctionView {
 		if (mFrameResId == R.layout.func_frame_split) {
 			mAisListFrame = mContentFrame[0];
 			mAisContentFrame = mContentFrame[1];
-			initAisList(mTitle, DataMan.INVALID_ID, null, null);
+			initAisList(mTitle, DataMan.INVALID_ID);
 		} else if (mFrameResId == R.layout.func_frame_triple) {
 			mAisListFrame = mContentFrame[1];
 			mAisContentFrame = mContentFrame[2];
@@ -103,7 +104,7 @@ public class AisView extends FunctionView {
 	/**
 	 * 初始化分类列表
 	 */
-	protected void initClassList() {
+	private void initClassList() {
 		CommonListParams listParams = new CommonListParams(mInflater, mContentFrame[0], mAdapterClassList, mOnClickClass);
 		
 		CommonList.Init(listParams, mTitle);
@@ -142,16 +143,26 @@ public class AisView extends FunctionView {
 			class_id = mapItem.getInt(DataMan.KEY_AIS_CLASS_ID);
 		}
 		
-		initAisList(title, class_id, null, null);
+		initAisList(title, class_id);
+	}
+	
+	/**
+	 * 初始化ais列表
+	 * @param title
+	 * @param class_id
+	 */
+	private void initAisList(String title, int class_id) {
+		List<ListItemMap> listMap = DataMan.GetAisList(class_id);
+		initAisList(title, listMap, null, null);
 	}
 	
 	/**
 	 * 初始化Ais子分类
 	 * @param position
 	 */
-	protected void initAisList(String title, int class_id, LinearLayout header, LinearLayout footer) {
+	protected void initAisList(String title, List<ListItemMap> listMap, LinearLayout header, LinearLayout footer) {
 		
-		mAdapterAisList = new CommonListAdapter(mContext, DataMan.GetAisList(class_id));
+		mAdapterAisList = new CommonListAdapter(mContext, listMap);
 		
 		CommonListParams listParams = new CommonListParams(mInflater, mAisListFrame, mAdapterAisList, new ListItemClickListener() {
 			@Override

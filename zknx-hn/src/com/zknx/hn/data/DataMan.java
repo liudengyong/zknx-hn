@@ -1512,4 +1512,10 @@ public class DataMan extends DataInterface {
 		
 		return list;
 	}
+	
+	public static List<ListItemMap> GetExpertAnwserList(String expertId) {
+		List<ListItemMap> list = new ArrayList<ListItemMap>();
+		// TODO GetExpertAnwserList
+		return list;
+	}
 }
