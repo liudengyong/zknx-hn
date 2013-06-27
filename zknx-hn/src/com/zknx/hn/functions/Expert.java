@@ -68,32 +68,34 @@ public class Expert extends AisView {
 	 */
 	private LinearLayout getExpertInfo(int position) {
 		ListItemMap item = mAdapterClassList.getItem(position);
-		
-		String expertId = item.getString(DataMan.KEY_EXPERT_ID);
-		
 		LinearLayout inforLayout = (LinearLayout) mInflater.inflate(R.layout.expert_info, null);
 		
-		ImageView newImageView = (ImageView) inforLayout.findViewById(R.id.expert_info_photo);
-
-		String imageFilePath = DataMan.DataFile("expert/" + expertId + ".jpg");
-
-		Bitmap bm = ImageUtils.GetLoacalBitmap(imageFilePath);
+		if (item != null) {
 		
-		try {
-			//newImageView.setImageDrawable(mContext.getResources().getDrawable(res));
-			newImageView.setImageBitmap(bm);
-		} catch (Throwable e) {
-			Debug.Log("严重错误：内存不足，getExpertInfo");
+			String expertId = item.getString(DataMan.KEY_EXPERT_ID);
+			String name = item.getString(DataMan.KEY_NAME);
+			String major = item.getString(DataMan.KEY_EXPERT_MAJOR);
+			String introduce = item.getString(DataMan.KEY_EXPERT_INTRODUCE);
+
+			((TextView) inforLayout.findViewById(R.id.expert_info_name)).setText(name);
+			((TextView) inforLayout.findViewById(R.id.expert_info_major)).setText(major);
+			((TextView) inforLayout.findViewById(R.id.expert_info_introduce)).setText(introduce);
+			
+			String imageFilePath = DataMan.DataFile("expert/" + expertId + ".jpg");
+			Bitmap bm = ImageUtils.GetLoacalBitmap(imageFilePath);
+			
+			// 如果没有专家图片，隐藏
+			if (bm != null) {
+				try {
+					//newImageView.setImageDrawable(mContext.getResources().getDrawable(res));
+					((ImageView) inforLayout.findViewById(R.id.expert_info_photo)).setImageBitmap(bm);
+				} catch (Throwable e) {
+					Debug.Log("严重错误：内存不足，getExpertInfo");
+				}
+			} else {
+				inforLayout.findViewById(R.id.expert_info_photo).setVisibility(View.GONE);
+			}
 		}
-
-		String name = item.getString(DataMan.KEY_NAME);
-		((TextView) inforLayout.findViewById(R.id.expert_info_name)).setText(name);
-		
-		String major = item.getString(DataMan.KEY_EXPERT_MAJOR);
-		((TextView) inforLayout.findViewById(R.id.expert_info_major)).setText(major);
-		
-		String introduce = item.getString(DataMan.KEY_EXPERT_INTRODUCE);
-		((TextView) inforLayout.findViewById(R.id.expert_info_introduce)).setText(introduce);
 		
 		return inforLayout;
 	}

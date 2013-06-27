@@ -6,7 +6,6 @@ public class DataInterface {
 	//public static final String URL_SERVER = "http://www.yczjxt.com.cn/appfora/";
 	public static final String URL_SERVER = "http://218.106.254.101:8077/";
 	public static final String URL_GET_USER_INFO = URL_SERVER + "getuserinfo.asp";
-	// TODO 语言对讲服务器地址
 	public final static String RTMP_SERVER = "rtmp://192.168.0.101/zknx-hn";
 	
 	// 省级地址列表文件名
