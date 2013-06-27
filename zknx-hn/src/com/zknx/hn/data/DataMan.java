@@ -63,6 +63,8 @@ public class DataMan extends DataInterface {
 	public static final String KEY_EXPERT_ID = "expert_id";
 	public static final String KEY_EXPERT_MAJOR = "expert_major";
 	public static final String KEY_EXPERT_INTRODUCE = "expert_introduce";
+	public static final String KEY_EXPERT_QUESTION_SUBJECT = "expert_question_subject";
+	public static final String KEY_EXPERT_QUESTION_CONTENT = "expert_question_content";
 
 	// 临时文件名
 	public static final String FILE_NAME_TMP = "tmp.txt";
@@ -1472,8 +1474,10 @@ public class DataMan extends DataInterface {
 
 		String ret = Downloader.PostUrl(URL_ASK_EXPERT, params);
 
-		if (ret.equals("true"))
+		if (ret.equals("true")) {
+			SaveTodayLocalQuestion(expertId, subject, question);
 			return true;
+		}
 		
 		Debug.Log("提问专家错误：返回：" + ret);
 
@@ -1513,9 +1517,69 @@ public class DataMan extends DataInterface {
 		return list;
 	}
 	
+	/**
+	 * 保存本地成功的提问，方便快速显示在问题列表中
+	 * @param expertId
+	 * @param subject
+	 * @param question
+	 */
+	private static String LOCAL_QUESTION = "local_questions.txt";
+	private static void SaveTodayLocalQuestion(String expertId, String subject,	String question) {
+		// 在列表的第一个
+		String questionLines = expertId + COMMON_TOKEN + subject + COMMON_TOKEN + question + "\n";
+        List<String> lines = ReadLines(LOCAL_QUESTION);
+        boolean duplicated = false;
+        
+        for (String line : lines) {
+        	// id,名字
+        	String[] token = GetToken(line);
+        	if (token.length == 3) {
+
+        		String savedExpertId = token[0];
+        		String savedSubject  = token[1];
+        		String savedQuestion = token[2];
+
+        		// 只需要省份
+        		if (savedExpertId.equals(expertId) && savedSubject.equals(subject)) {
+        			duplicated = true;
+        			break;
+        		} else {
+        			questionLines += savedExpertId + COMMON_TOKEN + savedSubject + COMMON_TOKEN + savedQuestion + "\n";
+        		}
+        	}
+        }
+        
+        // append
+        if (!duplicated) {
+        	FileUtils.WriteText(DataFile(""), LOCAL_QUESTION, questionLines);
+        }
+	}
+	
 	public static List<ListItemMap> GetExpertAnwserList(String expertId) {
 		List<ListItemMap> list = new ArrayList<ListItemMap>();
+		
+		// 读取本地问题列表
+		List<String> lines = ReadLines(LOCAL_QUESTION);
+		
+		for (String line : lines) {
+        	// id,名字
+        	String[] token = GetToken(line);
+        	if (token.length == 3) {
+
+        		String savedExpertId = token[0];
+        		String savedSubject  = token[1];
+        		String savedQuestion = token[2];
+        		
+        		if (savedExpertId.endsWith(expertId)) {
+        			ListItemMap map = new ListItemMap(savedSubject, KEY_EXPERT_QUESTION_SUBJECT, savedSubject);
+        			map.put(KEY_EXPERT_QUESTION_CONTENT, savedQuestion);
+        			list.add(map);
+        		}
+        	}
+		}
+		
 		// TODO GetExpertAnwserList
+		
 		return list;
 	}
 }

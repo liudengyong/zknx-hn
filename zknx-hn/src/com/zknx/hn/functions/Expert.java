@@ -36,6 +36,12 @@ public class Expert extends AisView {
 	// 提问的主题和问题
 	private EditText mAskSubject;
 	private EditText mAskQuestion;
+	
+	private static final int MESSAGE_ARG_OK     = 0;
+	private static final int MESSAGE_ARG_FAILED = 1;
+	
+	// 当前专家id
+	private int mCurExpertPosition;
 
 	public Expert(LayoutInflater inflater, LinearLayout frameRoot) {
 		super(inflater, frameRoot, UIConst.FUNCTION_ID_EXPERT_GUIDE, R.layout.func_frame_triple);
@@ -57,19 +63,30 @@ public class Expert extends AisView {
 	 */
 	@Override
 	protected void initAisList(int position) {
+		initExpertQuestionList(position);
+	}
+	
+	/**
+	 * 初始化专家问题列表
+	 */
+	private void initExpertQuestionList(int position) {
 		ListItemMap item = mAdapterClassList.getItem(position);
 		
 		List<ListItemMap> expertList = null;
 		
+		String expertId = "";
+		String expertName = "";
 		if (item != null) {
-			String expertId = item.getString(DataMan.KEY_EXPERT_ID);
+			expertId = item.getString(DataMan.KEY_EXPERT_ID);
 			expertList = DataMan.GetExpertAnwserList(expertId);
 		}
 		
 		LinearLayout inforLayout  = getExpertInfo(item);
-		LinearLayout askBtnLayout = getExpertAskButton(position);
+		LinearLayout askBtnLayout = getExpertAskButton(expertId, expertName);
 
 		super.initAisList("专家信息", expertList, inforLayout, askBtnLayout);
+		
+		mCurExpertPosition = position;
 	}
 
 	/**
@@ -101,7 +118,7 @@ public class Expert extends AisView {
 					//newImageView.setImageDrawable(mContext.getResources().getDrawable(res));
 					((ImageView) inforLayout.findViewById(R.id.expert_info_photo)).setImageBitmap(bm);
 				} catch (Throwable e) {
-					Debug.Log("严重错误：内存不足，getExpertInfo");
+					Debug.Log("严重错误：内存不足，getExpertInfo setImageBitmap");
 				}
 			} else {
 				inforLayout.findViewById(R.id.expert_info_photo).setVisibility(View.GONE);
@@ -116,10 +133,7 @@ public class Expert extends AisView {
 	 * @param position
 	 * @return
 	 */
-	private LinearLayout getExpertAskButton(int position) {
-
-		final String expertId = "";
-		final String expertName = "刘专家";
+	private LinearLayout getExpertAskButton(final String expertId, final String expertName) {
 
 		LinearLayout askLayout = initButtonPair(R.string.ask_expert, R.string.ask_expert_interphone, new OnClickListener() {
 			@Override
@@ -182,18 +196,16 @@ public class Expert extends AisView {
 						mWaitDialog = WaitDialog.Show(mContext, "提问", "正在提问", new WaitListener() {
 							@Override
 							public void startWait() {
-								// TODO interface 提问专家
-
-								int ret = 0;
-								
-								if (DataMan.AskExpert(UserMan.GetUserId(), expertId, subject, question))
-									ret = 1;
 
 								Message msg = new Message();
 								msg.what = MESSAGE_ASK_QUESTION;
-								msg.arg1 = ret;
+								
+								if (DataMan.AskExpert(UserMan.GetUserId(), expertId, subject, question))
+									msg.arg1 = MESSAGE_ARG_OK;
+								else
+									msg.arg1 = MESSAGE_ARG_FAILED;
+								
 								mHandler.sendMessage(msg);
-								//mHandler.sendEmptyMessage(MESSAGE_ASK_QUESTION);
 							}
 						});
 					}
@@ -216,8 +228,11 @@ public class Expert extends AisView {
 		mWaitDialog.dismiss();
 		
 		if (msg.what == MESSAGE_ASK_QUESTION) {
-			if (msg.arg1 == 1)
+			if (msg.arg1 == MESSAGE_ARG_OK) {
 				Toast.makeText(mContext, "提问成功，请等待专家解答", Toast.LENGTH_LONG).show();
+				// 重新初始化问题列表，加载本地
+				initExpertQuestionList(mCurExpertPosition);
+			}
 			else
 				Toast.makeText(mContext, "提问失败，请检查网络", Toast.LENGTH_LONG).show();
 		}
