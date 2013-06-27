@@ -58,9 +58,11 @@ public class DataMan extends DataInterface {
 	public static final String KEY_FRIEND_MESSAGE_DATE = "message_date";
 	// 留言内容
 	public static final String KEY_FRIEND_MESSAGE_CONTENT = "message_content";
-	
+
 	// 专家问答
 	public static final String KEY_EXPERT_ID = "expert_id";
+	public static final String KEY_EXPERT_MAJOR = "expert_major";
+	public static final String KEY_EXPERT_INTRODUCE = "expert_introduce";
 
 	// 临时文件名
 	public static final String FILE_NAME_TMP = "tmp.txt";
@@ -1483,6 +1485,31 @@ public class DataMan extends DataInterface {
 	 * @return
 	 */
 	public static List<ListItemMap> GetExpertList() {
-		return ReadCommonIdName(FILE_NAME_EXPERTS, KEY_EXPERT_ID);
+		List<String> lines = ReadLines(FILE_NAME_EXPERTS);
+		//return ReadCommonIdName(, KEY_EXPERT_ID);
+		
+		List<ListItemMap> list = new ArrayList<ListItemMap>();
+		
+		String[] token;
+		for (String line : lines) {
+			token = line.split(COMMON_TOKEN);
+			
+			if (token == null || token.length != 4)
+				continue;
+			
+			String id = token[0];
+			String name = token[1];
+			String major = token[2];
+			String introduce = token[3];
+			
+			ListItemMap map = new ListItemMap(name, KEY_EXPERT_ID, id);
+			
+			map.put(KEY_EXPERT_MAJOR, major);
+			map.put(KEY_EXPERT_INTRODUCE, introduce);
+			
+			list.add(map);
+		}
+		
+		return list;
 	}
 }

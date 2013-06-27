@@ -126,7 +126,7 @@ public class MyGroup extends FunctionView {
 	/**
 	 * 初始化商友信息
 	 */
-	Test test = new Test(); // TODO 语音测试
+	Test test = new Test();
 	void initGroupFriendInfo(int position) {
 		
 		ListItemMap info = mAdapterFriend.getItem(position);
@@ -150,7 +150,6 @@ public class MyGroup extends FunctionView {
 						initNewMessageView(mCurFriendInfo.name, mCurFriendInfo.id, R.id.my_group_message_my_message);
 					break;
 				case R.id.common_btn_pair_right:
-					// TODO 实现语音对讲
 					String friendId = "jun";
 					String userId = "yong";
 					test.start(DataMan.RTMP_SERVER, userId, friendId);
@@ -162,7 +161,6 @@ public class MyGroup extends FunctionView {
 
 		layoutContent.addView(initButtonPair(R.string.new_message, R.string.friend_interphone, listener), UIConst.GetLayoutParams(L_LAYOUT_TYPE.H_WRAP));
 		
-		// TODO 实现语音对讲
 		layoutContent.findViewById(R.id.common_btn_pair_right).setEnabled(false);
 
 		// 初始化好友界面

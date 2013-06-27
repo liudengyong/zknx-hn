@@ -9,6 +9,7 @@ import com.zknx.hn.common.widget.WaitDialog;
 import com.zknx.hn.common.widget.Dialog.ConfirmListener;
 import com.zknx.hn.common.widget.WaitDialog.WaitListener;
 import com.zknx.hn.data.DataMan;
+import com.zknx.hn.data.ListItemMap;
 import com.zknx.hn.data.UserMan;
 import com.zknx.hn.functions.common.CommonListAdapter;
 
@@ -66,7 +67,9 @@ public class Expert extends AisView {
 	 * @return
 	 */
 	private LinearLayout getExpertInfo(int position) {
-		String expertId = mAdapterClassList.getItemMapString(position, DataMan.KEY_EXPERT_ID);
+		ListItemMap item = mAdapterClassList.getItem(position);
+		
+		String expertId = item.getString(DataMan.KEY_EXPERT_ID);
 		
 		LinearLayout inforLayout = (LinearLayout) mInflater.inflate(R.layout.expert_info, null);
 		
@@ -82,15 +85,14 @@ public class Expert extends AisView {
 		} catch (Throwable e) {
 			Debug.Log("严重错误：内存不足，getExpertInfo");
 		}
-		
-		// TODO 专家名字，专业，介绍
-		String name = "李天明";
+
+		String name = item.getString(DataMan.KEY_NAME);
 		((TextView) inforLayout.findViewById(R.id.expert_info_name)).setText(name);
 		
-		String major = "种植专家";
+		String major = item.getString(DataMan.KEY_EXPERT_MAJOR);
 		((TextView) inforLayout.findViewById(R.id.expert_info_major)).setText(major);
 		
-		String introduce = "李天明是北京最著名的养殖专家";
+		String introduce = item.getString(DataMan.KEY_EXPERT_INTRODUCE);
 		((TextView) inforLayout.findViewById(R.id.expert_info_introduce)).setText(introduce);
 		
 		return inforLayout;
@@ -113,7 +115,7 @@ public class Expert extends AisView {
 			}
 		});
 		
-		// TODO 实现语音对讲
+		// 实现语音对讲
 		askLayout.findViewById(R.id.common_btn_pair_right).setEnabled(false);
 		
 		return askLayout;

@@ -165,15 +165,4 @@ public class DataInterface {
 		// 检查前几位？
 		return true;
 	}
-	
-	/**
-	 * TODO 从用户名分析专业id
-	 * @param userId
-	 * @return
-	 */
-	/*
-	protected static int GetMajor(String userId) {
-		return -1;
-	}
-	*/
 }
