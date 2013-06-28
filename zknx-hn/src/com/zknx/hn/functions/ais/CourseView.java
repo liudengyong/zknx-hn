@@ -150,6 +150,10 @@ public class CourseView {
 	public static void SubmitOrReset(View button, boolean reset) {
 		LinearLayout courseLayout = GetCourseLayout(button);
 		
+		// 没有课件时点击无效
+		if (courseLayout == null)
+			return;
+		
 		int count = 0;
 		Object tag = courseLayout.getTag();
 		if (tag == null || (count = DataMan.ParseInt(tag.toString())) <= 0) {
