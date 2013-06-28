@@ -135,7 +135,7 @@ public class AisView extends FunctionView {
 	protected void initAisList(int position) {
 		ListItemMap mapItem = mAdapterClassList.getItem(position);
 
-		String title = "AIS分类";
+		String title = "分类";
 		int class_id = DataMan.INVALID_ID;
 
 		if (mapItem != null) {

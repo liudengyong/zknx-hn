@@ -113,7 +113,7 @@ typedef struct tagAisHeader
 	 * @return
 	 */
 	public String getTitle() {
-		return (mHeader != null) ? mHeader.title : "";
+		return (mHeader != null) ? mHeader.title : "БъЬт";
 	}
 	
 	/**

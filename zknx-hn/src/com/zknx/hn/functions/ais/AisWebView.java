@@ -12,6 +12,7 @@ import com.zknx.hn.functions.ais.AisDoc.AisItem;
 import com.zknx.hn.functions.ais.AisDoc.ItemType;
 
 import android.annotation.SuppressLint;
+import android.view.View;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 
@@ -38,9 +39,10 @@ public class AisWebView {
 		if (htmlString != null) {
 			//webView.loadData(htmlString, "text/html", "GBK");
 			webView.loadDataWithBaseURL(null, htmlString, "text/html", "UTF-8", null);
+			webView.setVisibility(View.VISIBLE);
+		} else {
+			webView.setVisibility(View.GONE);
 		}
-		
-		webView.setBackgroundColor(0); // …Ë÷√Õ∏√˜
 	}
 	
 

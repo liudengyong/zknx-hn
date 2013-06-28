@@ -115,11 +115,9 @@ public class AisParser {
 		mAudioItem = aisDoc.getAudioItem();
 		mVideoItem = aisDoc.getVideoItem();
 		
-		if (title == null)
-			return null;
-
 		// Ais内容滚动视图
 		WebView webView = (WebView) contentLayout.findViewById(R.id.ais_webview);
+		webView.setBackgroundColor(0); // 设置透明
 
 		// 是否课件
 		if (aisDoc.isCourse()) {
