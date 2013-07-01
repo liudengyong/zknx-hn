@@ -116,7 +116,7 @@ public class CourseWebView extends CourseView {
 	private static String GenQuestionTags(AisDoc aisDoc, String aisId, int i) {
 		// 标题  + 图片 + CheckBox
 		
-		String imageFilePathName = DataMan.DataFile(aisId + "_question" + i + ".bmp");
+		String imageFilePathName = DataMan.DataFile(aisId + "_question" + i + ".bmp", true);
 		String imageAlt = "图片找不到：" + imageFilePathName;
 		
 		// 保存图片

@@ -133,7 +133,7 @@ public class AisWebView {
 	 */
 	private static String genImgTag(String aisId, AisItem item, int imageIndex) {
 		
-		String imageFilePathName = DataMan.DataFile(aisId + "_image" + imageIndex + ".bmp");
+		String imageFilePathName = DataMan.DataFile(aisId + "_image" + imageIndex + ".bmp", true);
 		String imageAlt = "Õº∆¨’“≤ªµΩ£∫" + imageFilePathName;
 		
 		// ±£¥ÊÕº∆¨

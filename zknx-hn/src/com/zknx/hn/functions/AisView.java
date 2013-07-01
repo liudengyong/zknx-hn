@@ -325,7 +325,7 @@ public class AisView extends FunctionView {
 
 		Exception exp = null;
 		try {
-			String tmpFileName = DataMan.DataFile("tmp.mp3");
+			String tmpFileName = DataMan.DataFile("tmp.mp3", true);
 			FileUtils.WriteFile(tmpFileName, data);
 			mPlayer.reset();
 			mPlayer.setDataSource(tmpFileName);
@@ -357,7 +357,7 @@ public class AisView extends FunctionView {
 			return;
 		}
 		
-		String tmpFile = DataMan.DataFile("tmp.mp4");
+		String tmpFile = DataMan.DataFile("tmp.mp4", true);
 		FileUtils.WriteFile(tmpFile, data);
 		Intent it = new Intent(Intent.ACTION_VIEW);  
         it.setDataAndType(Uri.parse(tmpFile), "video/mp4");  

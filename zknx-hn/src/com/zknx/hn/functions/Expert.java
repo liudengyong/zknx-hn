@@ -112,7 +112,7 @@ public class Expert extends AisView {
 			((TextView) inforLayout.findViewById(R.id.expert_info_major)).setText(major);
 			((TextView) inforLayout.findViewById(R.id.expert_info_introduce)).setText(introduce);
 			
-			String imageFilePath = DataMan.DataFile("expert/" + expertId + ".jpg");
+			String imageFilePath = DataMan.DataFile("expert/" + expertId + ".jpg", true);
 			Bitmap bm = ImageUtils.GetLoacalBitmap(imageFilePath);
 			
 			// 如果没有专家图片，隐藏

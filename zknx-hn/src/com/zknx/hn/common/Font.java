@@ -14,7 +14,7 @@ public class Font {
 		if (mFontHupo == null) {
 			try {
 				//mFontHupo = Typeface.createFromAsset (context.getAssets() , "STHUPO.TTF");
-				mFontHupo = Typeface.createFromFile(DataMan.DataFile("fonts/STHUPO.TTF"));
+				mFontHupo = Typeface.createFromFile(DataMan.DataFile("fonts/STHUPO.TTF", true));
 			} catch (Exception exp) {
 				return Typeface.defaultFromStyle(Typeface.BOLD);
 			}

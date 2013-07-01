@@ -22,7 +22,6 @@ import android.os.Environment;
 import com.zknx.hn.common.Debug;
 import com.zknx.hn.common.Restraint;
 import com.zknx.hn.functions.common.ProductPriceInfo;
-import com.zknx.hn.zip.Ziper;
 
 public class DataMan extends DataInterface {
 
@@ -85,9 +84,19 @@ public class DataMan extends DataInterface {
 	 * @param fileName
 	 * @return
 	 */
+	public static List<String> ReadLines(String fileName, boolean root) {
+		// 默认编码
+		return ReadLines(fileName, "UTF-8", root);
+	}
+	
+	/**
+	 * 兼容设计
+	 * @param fileName
+	 * @return
+	 */
 	public static List<String> ReadLines(String fileName) {
 		// 默认编码
-		return ReadLines(fileName, "UTF-8");
+		return ReadLines(fileName, "UTF-8", false);
 	}
 	
 	/**
@@ -95,12 +104,12 @@ public class DataMan extends DataInterface {
 	 * @param fileName
 	 * @return
 	 */
-	public static List<String> ReadLines(String fileName, String encoding) {
+	public static List<String> ReadLines(String fileName, String encoding, boolean root) {
 		
 		ArrayList<String> list = new ArrayList<String>();
 		
 		try {
-			String filePathName = DataFile(fileName);
+			String filePathName = DataFile(fileName, root);
 			
 			Debug.Log("读取：" + filePathName);
 			
@@ -212,7 +221,7 @@ public class DataMan extends DataInterface {
 	private static List<ListItemMap> ReadCommonIdName(String fileName, String key) {
 
         ArrayList<ListItemMap> list = new ArrayList<ListItemMap>();
-        List<String> lines = ReadLines(fileName);
+        List<String> lines = ReadLines(fileName, false); // 都生成在root文件夹
         
         for (String line : lines)  
         {
@@ -243,7 +252,7 @@ public class DataMan extends DataInterface {
 	    ArrayList<ListItemMap> list = new ArrayList<ListItemMap>();
 	    
 	    // 优化效率 省级地址
-	    if (FileUtils.IsFileExist(DataFile(FILE_NAME_ADDRESS_PROVINCE)))
+	    if (FileUtils.IsFileExist(DataFile(FILE_NAME_ADDRESS_PROVINCE, true)))
 	    	return ReadCommonIdName(FILE_NAME_ADDRESS_PROVINCE, KEY_ADDRESS_ID);
 
 	    String provinceLines = "";
@@ -269,7 +278,7 @@ public class DataMan extends DataInterface {
         	}
         }
         
-        FileUtils.WriteText(DataFile(""), FILE_NAME_ADDRESS_PROVINCE, provinceLines);
+        FileUtils.WriteText(DataFile("", true), FILE_NAME_ADDRESS_PROVINCE, provinceLines);
 
         return list;
 	}
@@ -284,7 +293,7 @@ public class DataMan extends DataInterface {
         ArrayList<ListItemMap> list = new ArrayList<ListItemMap>();
         
         // 优化效率
-        if (FileUtils.IsFileExist(DataFile(marketCacheFileName)))
+        if (FileUtils.IsFileExist(DataFile(marketCacheFileName, true)))
         	return ReadCommonIdName(marketCacheFileName, KEY_MARKET_ID);
         
         String marketLines = "";
@@ -309,7 +318,7 @@ public class DataMan extends DataInterface {
         	}
         }
         
-        FileUtils.WriteText(DataFile(""), marketCacheFileName, marketLines);
+        FileUtils.WriteText(DataFile("", true), marketCacheFileName, marketLines);
 
         return list;
 	}
@@ -328,8 +337,8 @@ public class DataMan extends DataInterface {
         String marketProductsFileName = "market_" + market_id + "_products.txt";
         
         // 优化
-        if (FileUtils.IsFileExist(DataFile(marketProductsFileName))) {
-        	lines = ReadLines(marketProductsFileName);
+        if (FileUtils.IsFileExist(DataFile(marketProductsFileName, true))) {
+        	lines = ReadLines(marketProductsFileName, true);
         	for (String line : lines)
             {
             	String[] token = GetToken(line);
@@ -398,7 +407,7 @@ public class DataMan extends DataInterface {
         	}
         }
 
-        FileUtils.WriteText(DataFile(""), marketProductsFileName, marketProductLines);
+        FileUtils.WriteText(DataFile("", true), marketProductsFileName, marketProductLines);
 
         return list;
 	}
@@ -500,7 +509,7 @@ public class DataMan extends DataInterface {
 
 		try {
 			// 如果自选产品列表文件存在，则覆盖
-			FileOutputStream out = new FileOutputStream(new File(DataFile(FILE_NAME_MY_PRODUCTS)));   
+			FileOutputStream out = new FileOutputStream(new File(DataFile(FILE_NAME_MY_PRODUCTS, true)));   
 		
 		    for (ListItemMap item : list) {   
 		
@@ -540,8 +549,8 @@ public class DataMan extends DataInterface {
 			return list;
 
 		// 优化
-		if (FileUtils.IsFileExist(DataFile(productMarketFileName))) {
-			lines = ReadLines(productMarketFileName);
+		if (FileUtils.IsFileExist(DataFile(productMarketFileName, true))) {
+			lines = ReadLines(productMarketFileName, true);
 			
 			for (String line : lines)
 	        {
@@ -598,7 +607,7 @@ public class DataMan extends DataInterface {
         			averagePrice + COMMON_TOKEN + hostPrice + COMMON_TOKEN + unit + "\n";
         }
         
-        FileUtils.WriteText(DataFile(""), productMarketFileName, productMarketLines);
+        FileUtils.WriteText(DataFile("", true), productMarketFileName, productMarketLines);
 
         return list;
 	}
@@ -666,7 +675,7 @@ public class DataMan extends DataInterface {
 		
 		// 优化效率 省级地址
 		String productClassCacheFileName = "productClass.txt";
-	    if (FileUtils.IsFileExist(DataFile(productClassCacheFileName)))
+	    if (FileUtils.IsFileExist(DataFile(productClassCacheFileName, true)))
 	    	return ReadCommonIdName(productClassCacheFileName, KEY_PRODUCT_CLASS_ID);
 		
 	    String productClassLines = "";
@@ -694,7 +703,7 @@ public class DataMan extends DataInterface {
         	}
         }
 
-        FileUtils.WriteText(DataFile(""), productClassCacheFileName, productClassLines);
+        FileUtils.WriteText(DataFile("", true), productClassCacheFileName, productClassLines);
 
         return list;
 	}
@@ -742,7 +751,7 @@ public class DataMan extends DataInterface {
 		List<ListItemMap> list = new ArrayList<ListItemMap>();
 		
 		if (GetSupplyDemandLinesCache == null)
-			GetSupplyDemandLinesCache = ReadLines(FILE_NAME_SUPPLY_DEMAND_INFO, "GB2312");
+			GetSupplyDemandLinesCache = ReadLines(FILE_NAME_SUPPLY_DEMAND_INFO, "GB2312", false);
 
         for (String line : GetSupplyDemandLinesCache)
         {
@@ -1266,8 +1275,9 @@ public class DataMan extends DataInterface {
 	 * @param fileName
 	 * @return
 	 */
-	public static String DataFile(String fileName) {
-		String appPath = AppDataPath();
+	public static String DataFile(String fileName, boolean root) {
+		String appPath = AppDataPath(root);
+		
 		File file = new File(appPath);
 		
 		// 如果不是目录先删除
@@ -1283,12 +1293,24 @@ public class DataMan extends DataInterface {
 	}
 	
 	/**
+	 * 兼容之前代码
+	 * @param fileName
+	 * @return
+	 */
+	public static String DataFile(String fileName) {
+		return DataFile(fileName, false);
+	}
+	
+	/**
 	 * 返回加上路径的数据文件名
 	 * @param fileName
 	 * @return
 	 */
-	private static String AppDataPath() {
-		return Environment.getExternalStorageDirectory() + "/zknx.hn";
+	private static String AppDataPath(boolean root) {
+		if (root)
+			return Environment.getExternalStorageDirectory() + "/zknx.hn";
+		else
+			return Environment.getExternalStorageDirectory() + "/zknx.hn/" + GetCurrentTime(false);
 	}
 	
 	/**
@@ -1298,15 +1320,15 @@ public class DataMan extends DataInterface {
 	public static boolean ShouldUpdateData() {
 
 		String today = GetCurrentTime(false);
-		String dataFileName = DataFile(today + ".zip");
+		//String dataFileName = DataFile(today + ".zip");
 
-		List<String> line = ReadLines(TIME_STAMP_FILE_NAME);
+		List<String> line = ReadLines(TIME_STAMP_FILE_NAME, true);
 
 		// 没有时间戳，或者时间戳不匹配
 		boolean timStampNotMatch = (line.size() == 0) || (!line.get(0).equals(today));
 
 		// 时间戳不匹配，且当天数据文件存在
-		return timStampNotMatch && FileUtils.IsFileExist(dataFileName);
+		return timStampNotMatch;// && FileUtils.IsFileExist(dataFileName);
 	}
 	
 	/**
@@ -1315,7 +1337,7 @@ public class DataMan extends DataInterface {
 	 * @return
 	 */
 	private static boolean WriteTimeStamp(String today) {
-		return FileUtils.WriteFile(DataFile(TIME_STAMP_FILE_NAME), today.getBytes());
+		return FileUtils.WriteFile(DataFile(TIME_STAMP_FILE_NAME, true), today.getBytes());
 	}
 
 	/**
@@ -1344,7 +1366,7 @@ public class DataMan extends DataInterface {
 	 * 获取当前用户新的留言
 	 */
 	private static void GetNewMessages() {
-		Downloader.DownFile(URL_GET_MESSAGE + "?userid=" + UserMan.GetUserId(), DataFile(""), FILE_NAME_NEW_MESSAGE);
+		Downloader.DownFile(URL_GET_MESSAGE + "?userid=" + UserMan.GetUserId(), DataFile("", true), FILE_NAME_NEW_MESSAGE /* TODO 获取新留言 */);
 	}
 	
 	/**
@@ -1355,6 +1377,9 @@ public class DataMan extends DataInterface {
 
 		// 获取当天日期
 		String today = GetCurrentTime(false);
+		return WriteTimeStamp(today);
+		
+		/*
 		String dataFileName = DataFile(today + ".zip");
 
 		// 解压数据更新
@@ -1365,6 +1390,7 @@ public class DataMan extends DataInterface {
 		}
 
 		return false;
+		*/
 	}
 
 	private static final String TIME_FORMAT = "yyyy-MM-dd hh:mm:ss";
@@ -1489,7 +1515,7 @@ public class DataMan extends DataInterface {
 	 * @return
 	 */
 	public static List<ListItemMap> GetExpertList() {
-		List<String> lines = ReadLines(FILE_NAME_EXPERTS);
+		List<String> lines = ReadLines(FILE_NAME_EXPERTS, true);
 		//return ReadCommonIdName(, KEY_EXPERT_ID);
 		
 		List<ListItemMap> list = new ArrayList<ListItemMap>();
