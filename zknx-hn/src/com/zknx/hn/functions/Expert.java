@@ -105,14 +105,14 @@ public class Expert extends AisView {
 		
 			String expertId = item.getString(DataMan.KEY_EXPERT_ID);
 			String name = item.getString(DataMan.KEY_NAME);
-			String major = item.getString(DataMan.KEY_EXPERT_MAJOR);
+			String major = DataMan.GetExpertMajor(item.getInt(DataMan.KEY_EXPERT_MAJOR));
 			String introduce = item.getString(DataMan.KEY_EXPERT_INTRODUCE);
 
 			((TextView) inforLayout.findViewById(R.id.expert_info_name)).setText(name);
 			((TextView) inforLayout.findViewById(R.id.expert_info_major)).setText(major);
 			((TextView) inforLayout.findViewById(R.id.expert_info_introduce)).setText(introduce);
 			
-			String imageFilePath = DataMan.DataFile("expert/" + expertId + ".jpg", true);
+			String imageFilePath = DataMan.DataFile("expert/" + expertId + "/" + expertId + ".jpg", true);
 			Bitmap bm = ImageUtils.GetLoacalBitmap(imageFilePath);
 			
 			// 如果没有专家图片，隐藏

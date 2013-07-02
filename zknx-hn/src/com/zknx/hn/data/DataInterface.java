@@ -164,4 +164,17 @@ public class DataInterface {
 		// 检查前几位？
 		return true;
 	}
+	
+	public static String GetExpertMajor(int majorId) {
+		switch (majorId) {
+		case 1:
+			return "种植专家";
+		case 2:
+			return "养殖专家";
+		case 3:
+			return "惠农专家";
+		}
+		
+		return "未知专业";
+	}
 }

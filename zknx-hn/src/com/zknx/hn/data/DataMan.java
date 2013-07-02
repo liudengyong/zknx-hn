@@ -86,7 +86,7 @@ public class DataMan extends DataInterface {
 	 */
 	public static List<String> ReadLines(String fileName, boolean root) {
 		// 默认编码
-		return ReadLines(fileName, "UTF-8", root);
+		return ReadLinesWithEncoding(fileName, "GB2312", root);
 	}
 	
 	/**
@@ -95,8 +95,8 @@ public class DataMan extends DataInterface {
 	 * @return
 	 */
 	public static List<String> ReadLines(String fileName) {
-		// 默认编码
-		return ReadLines(fileName, "UTF-8", false);
+		// 默认编码 "UTF-8" "GB2312"
+		return ReadLinesWithEncoding(fileName, "GB2312", false);
 	}
 	
 	/**
@@ -104,7 +104,7 @@ public class DataMan extends DataInterface {
 	 * @param fileName
 	 * @return
 	 */
-	public static List<String> ReadLines(String fileName, String encoding, boolean root) {
+	private static List<String> ReadLinesWithEncoding(String fileName, String encoding, boolean root) {
 		
 		ArrayList<String> list = new ArrayList<String>();
 		
@@ -218,10 +218,10 @@ public class DataMan extends DataInterface {
 	 * 格式：id,名字
 	 * @return
 	 */
-	private static List<ListItemMap> ReadCommonIdName(String fileName, String key) {
+	private static List<ListItemMap> ReadCommonIdName(String fileName, String key, boolean root) {
 
         ArrayList<ListItemMap> list = new ArrayList<ListItemMap>();
-        List<String> lines = ReadLines(fileName, false); // 都生成在root文件夹
+        List<String> lines = ReadLines(fileName, root); // 都生成在root文件夹
         
         for (String line : lines)  
         {
@@ -242,6 +242,10 @@ public class DataMan extends DataInterface {
 
         return list;
 	}
+	
+	private static List<ListItemMap> ReadCommonIdName(String fileName, String key) {
+		return ReadCommonIdName(fileName, key, false);
+	}
 
 	/**
 	 * 获取地址列表
@@ -253,7 +257,7 @@ public class DataMan extends DataInterface {
 	    
 	    // 优化效率 省级地址
 	    if (FileUtils.IsFileExist(DataFile(FILE_NAME_ADDRESS_PROVINCE, true)))
-	    	return ReadCommonIdName(FILE_NAME_ADDRESS_PROVINCE, KEY_ADDRESS_ID);
+	    	return ReadCommonIdName(FILE_NAME_ADDRESS_PROVINCE, KEY_ADDRESS_ID, true);
 
 	    String provinceLines = "";
         List<String> lines = ReadLines(FILE_NAME_ADDRESS);
@@ -293,7 +297,7 @@ public class DataMan extends DataInterface {
         ArrayList<ListItemMap> list = new ArrayList<ListItemMap>();
         
         // 优化效率
-        if (FileUtils.IsFileExist(DataFile(marketCacheFileName, true)))
+        if (FileUtils.IsFileExist(DataFile(marketCacheFileName)))
         	return ReadCommonIdName(marketCacheFileName, KEY_MARKET_ID);
         
         String marketLines = "";
@@ -318,7 +322,7 @@ public class DataMan extends DataInterface {
         	}
         }
         
-        FileUtils.WriteText(DataFile("", true), marketCacheFileName, marketLines);
+        FileUtils.WriteText(DataFile(""), marketCacheFileName, marketLines);
 
         return list;
 	}
@@ -443,7 +447,7 @@ public class DataMan extends DataInterface {
 	 * @return
 	 */
 	public static List<ListItemMap> GetMyProductList() {
-		return ReadCommonIdName(FILE_NAME_MY_PRODUCTS, KEY_PRODUCT_ID);
+		return ReadCommonIdName(FILE_NAME_MY_PRODUCTS, KEY_PRODUCT_ID, true);
 	}
 
 	/**
@@ -751,7 +755,7 @@ public class DataMan extends DataInterface {
 		List<ListItemMap> list = new ArrayList<ListItemMap>();
 		
 		if (GetSupplyDemandLinesCache == null)
-			GetSupplyDemandLinesCache = ReadLines(FILE_NAME_SUPPLY_DEMAND_INFO, "GB2312", false);
+			GetSupplyDemandLinesCache = ReadLines(FILE_NAME_SUPPLY_DEMAND_INFO, false);
 
         for (String line : GetSupplyDemandLinesCache)
         {
@@ -1515,7 +1519,7 @@ public class DataMan extends DataInterface {
 	 * @return
 	 */
 	public static List<ListItemMap> GetExpertList() {
-		List<String> lines = ReadLines(FILE_NAME_EXPERTS, true);
+		List<String> lines = ReadLines(FILE_NAME_EXPERTS);
 		//return ReadCommonIdName(, KEY_EXPERT_ID);
 		
 		List<ListItemMap> list = new ArrayList<ListItemMap>();
