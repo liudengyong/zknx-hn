@@ -1000,50 +1000,47 @@ public class DataMan extends DataInterface {
 	public static List<ListItemMap> GetMyGroupFriendList(int majorIid, boolean myFriend) {
 		
         ArrayList<ListItemMap> list = new ArrayList<ListItemMap>();  
-        List<String> lines = ReadLines(FILE_NAME_MY_FRIEND);
+        List<String> lines = ReadLines(FILE_NAME_USERS);
         
         for (String line : lines)  
         {
         	// user,名字,专业,联系地址,联系电话
         	//0,zhangsan,张三,专业1,北京通州,13812341234,自我介绍
         	String[] token = GetToken(line);
-        	if (token.length == 6) {
+        	if (token.length == 5) {
 
-        		int id = ParseInt(token[0]);
-
-        		if (id != INVALID_ID) {
+        		String id = token[0];
         			
-        			// XXX 待优化：从cache中取出，然后匹配
-        			int major_id = ParseInt(token[3]);
-        			String major = "未知专业";
-        			
-        			if (major_id < MAJOR.length)
-        				major = MAJOR[major_id];
-        			else
-        				Debug.Log("严重错误：未知专业，" + major_id);
+    			// XXX 待优化：从cache中取出，然后匹配
+    			int major_id = ParseInt(token[1]);
+    			String major = "未知专业";
+    			
+    			if (major_id < MAJOR.length)
+    				major = MAJOR[major_id];
+    			else
+    				Debug.Log("严重错误：未知专业，" + major_id);
 
-        			// 取所有商友或者商友匹配，不然继续
-        			if (majorIid != INVALID_ID && majorIid != major_id)
-        				continue;
+    			// 取所有商友或者商友匹配，不然继续
+    			if (majorIid != INVALID_ID && majorIid != major_id)
+    				continue;
 
-	        		String name = token[2];
-	        		String address = token[4];
-	        		String telephone = token[5];
-	        		String introduce = "TODO介绍";//token[6];
-	        		
-	        		if (myFriend) {
-	        			// TODO 判断是否我的好友
-	        		}
-	
-	        		ListItemMap map = new ListItemMap(name/* 名字 */, KEY_FRIEND_ID, token[0]/* id */);
-	        		
-	        		map.put(KEY_FRIEND_MAJOR, major);
-	        		map.put(KEY_FRIEND_ADDRESS, address);
-	        		map.put(KEY_FRIEND_TELEPHONE, telephone);
-	        		map.put(KEY_FRIEND_INTRODUCE, introduce);
-	        		
-	        		list.add(map);
+        		String name = id;//token[2];
+        		String telephone = token[2];
+        		String address   = token[3];
+        		String introduce = token[4];
+        		
+        		if (myFriend) {
+        			// TODO 判断是否我的好友
         		}
+
+        		ListItemMap map = new ListItemMap(name/* 名字 */, KEY_FRIEND_ID, id/* 用户id */);
+        		
+        		map.put(KEY_FRIEND_MAJOR, major);
+        		map.put(KEY_FRIEND_ADDRESS, address);
+        		map.put(KEY_FRIEND_TELEPHONE, telephone);
+        		map.put(KEY_FRIEND_INTRODUCE, introduce);
+        		
+        		list.add(map);
         	}
         }
 

@@ -25,7 +25,9 @@ public class DataInterface {
 	// 供求信息文件名
 	protected static final String FILE_NAME_SUPPLY_DEMAND_INFO = "tradeInfo.txt";
 	// 我的商友文件名
-	protected static final String FILE_NAME_MY_FRIEND = "my_friend.txt";
+	//protected static final String FILE_NAME_MY_FRIEND = "my_friend.txt";
+	// 用户列表
+	protected static final String FILE_NAME_USERS = "users.txt";
 	// 所有商友留言文件名
 	protected static final String FILE_NAME_MY_GROUP_MESSAGE = "my_group_message.txt";
 	// 专家问答
