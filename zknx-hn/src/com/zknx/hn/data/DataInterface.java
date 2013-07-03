@@ -34,8 +34,6 @@ public class DataInterface {
 	protected static final String FILE_NAME_EXPERTS = "experts.txt";
 	// ais列表文件名
 	protected static final String FILE_NAME_AIS_LIST = "ais_file_list.txt";
-	// ais分类列表文件名
-	protected static final String FILE_NAME_AIS_CLASS = "ais_class.txt";
 	// 获取ais文件接口
 	protected static final String AIS_SURFIX = ".ais"; // ais 文件后缀名
 	protected static final String AIS_FOLDER = "ais//"; // ais 文件存放文件夹（数据文件夹下）
@@ -143,18 +141,6 @@ public class DataInterface {
 		return (product_id / 1000);
 	}
 
-	/**
-	 * 检查ais分类是否属于当前功能
-	 * TODO interface 待实现 检查ais分类是否属于当前功能
-	 * @param function_id
-	 * @param ais_class_id
-	 * @return
-	 */
-	protected static boolean AisClassMatch(int function_id, int ais_class_id) {
-		// 检查前几位？
-		return true;
-	}
-	
 	/**
 	 * 检查ais子分类是否属于当前分类
 	 * TODO interface 待实现 检查ais子分类是否属于当前分类

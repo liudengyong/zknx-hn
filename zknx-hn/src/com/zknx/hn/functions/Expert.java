@@ -53,7 +53,7 @@ public class Expert extends AisView {
 	 * 初始化专家列表
 	 */
 	@Override
-	protected void initClass(int function_id) {
+	protected void initChildListData() {
 		mAdapterClassList = new CommonListAdapter(mContext, DataMan.GetExpertList());
 	}
 

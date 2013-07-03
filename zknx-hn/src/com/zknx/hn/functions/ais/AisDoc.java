@@ -55,17 +55,43 @@ typedef struct tagAisHeader
 	*/
 	
 	/*
-	00：农业技术
-	01：专家指导
-	02：专家施肥
-	03：时政要闻
-	04：精选课件
-	05：先锋党员
-	06：典型经验
-	07：致富模范
-	08：快乐农家
-	09：法律法规
-	10：惠农政策
+BYTE bColumn  
+
+1	自选产品
+2	市场行情
+3	供求信息
+4	我的商圈
+5	农业技术
+6	专家指导
+7	我的供求
+8	科学施肥
+9	时政新闻
+10	精选课件
+11	先锋党员
+12	典型模范
+13	致富经验
+14	快乐农家
+15	法律法规
+16	惠农政策
+
+char child_column
+
+CString column_child1[]={""};
+CString column_child2[]={""};
+CString column_child3[]={""};
+CString column_child4[]={""};
+CString column_child5[]={"粮食","蔬菜","禽畜","水产","药材","经济作物","水果","其他"};
+CString column_child6[]={"种植", "养殖", "惠农"};
+CString column_child7[]={""};
+CString column_child8[]={""};
+CString column_child9[]={"时政新闻", "农经要闻", "理论学习"};
+CString column_child10[]={""};
+CString column_child11[]={""};
+CString column_child12[]={""};
+CString column_child13[]={"粮食","蔬菜","禽畜","水产","药材","经济作物","水果","其他"};
+CString column_child14[]={"历史记忆","精选笑话","厨艺学习","生活窍门"};
+CString column_child15[]={"基本法律","三农法律"};
+CString column_child16[]={"生产类","生活类","医疗类","教育类"};
 	 */
 	
 	private static int COLUMN_COURSE = 12; // TODO 确认
@@ -104,7 +130,7 @@ typedef struct tagAisHeader
 	 * 通过ais_id构造AisDoc
 	 * @param ais_id
 	 */
-	AisDoc(String aisFileName) {
+	public AisDoc(String aisFileName) {
 		parseAisDoc(aisFileName);
 	}
 
@@ -122,6 +148,14 @@ typedef struct tagAisHeader
 	 */
 	public String getAisId() {
 		return (mHeader != null) ? mHeader.fileId : "";
+	}
+	
+	/**
+	 * 获取ais child id
+	 * @return
+	 */
+	public String getAisChildColumn() {
+		return (mHeader != null) ? mHeader.childColumn : "";
 	}
 
 	/**

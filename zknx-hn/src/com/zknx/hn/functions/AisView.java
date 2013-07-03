@@ -60,6 +60,8 @@ public class AisView extends FunctionView {
 	// 课件：交卷布局
 	private LinearLayout mCourseSubmitLayout;
 	
+	private int mFunctionId = DataMan.INVALID_ID;
+	
 	private final static int ID_RESET = R.id.common_btn_pair_left;
 	private final static int ID_SUBMIT = R.id.common_btn_pair_right;
 
@@ -71,7 +73,9 @@ public class AisView extends FunctionView {
 		
 		mFrameResId = frameResId;
 		
-		mTitle = getTitle(function_id);
+		mFunctionId = function_id;
+		
+		mTitle = getTitle(mFunctionId);
 		
 		if (function_id == UIConst.FUNCTION_ID_BEST_COUSE) {
 			initCouseSubmitButtons();
@@ -83,12 +87,12 @@ public class AisView extends FunctionView {
 		if (mFrameResId == R.layout.func_frame_split) {
 			mAisListFrame = mContentFrame[0];
 			mAisContentFrame = mContentFrame[1];
-			initAisList(mTitle, DataMan.INVALID_ID);
+			initAisList(mTitle, "");
 		} else if (mFrameResId == R.layout.func_frame_triple) {
 			mAisListFrame = mContentFrame[1];
 			mAisContentFrame = mContentFrame[2];
-			initClass(function_id);
-			initClassList();
+			initChildListData();
+			initChildListView();
 		} else {
 			Debug.Log("严重错误：AISView mFrameResId");
 		}
@@ -97,14 +101,14 @@ public class AisView extends FunctionView {
 	/**
 	 * 初始化Ais分类
 	 */
-	protected void initClass(int function_id) {
-		mAdapterClassList = new CommonListAdapter(mContext, DataMan.GetAisClassList(function_id));
+	protected void initChildListData() {
+		mAdapterClassList = new CommonListAdapter(mContext, DataMan.GetAisColumnChildList(mFunctionId));
 	}
 	
 	/**
 	 * 初始化分类列表
 	 */
-	private void initClassList() {
+	private void initChildListView() {
 		CommonListParams listParams = new CommonListParams(mInflater, mContentFrame[0], mAdapterClassList, mOnClickClass);
 		
 		CommonList.Init(listParams, mTitle);
@@ -136,14 +140,14 @@ public class AisView extends FunctionView {
 		ListItemMap mapItem = mAdapterClassList.getItem(position);
 
 		String title = "分类";
-		int class_id = DataMan.INVALID_ID;
+		String child = null;
 
 		if (mapItem != null) {
 			title = mapItem.get(DataMan.KEY_NAME).toString();
-			class_id = mapItem.getInt(DataMan.KEY_AIS_CLASS_ID);
+			child = mapItem.getString(DataMan.KEY_AIS_COLUMN);
 		}
 		
-		initAisList(title, class_id);
+		initAisList(title, child);
 	}
 	
 	/**
@@ -151,8 +155,8 @@ public class AisView extends FunctionView {
 	 * @param title
 	 * @param class_id
 	 */
-	private void initAisList(String title, int class_id) {
-		List<ListItemMap> listMap = DataMan.GetAisList(class_id);
+	private void initAisList(String title, String child) {
+		List<ListItemMap> listMap = DataMan.GetAisList(mFunctionId, child);
 		initAisList(title, listMap, null, null);
 	}
 	

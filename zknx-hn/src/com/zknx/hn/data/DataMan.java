@@ -12,7 +12,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -21,6 +20,8 @@ import android.os.Environment;
 
 import com.zknx.hn.common.Debug;
 import com.zknx.hn.common.Restraint;
+import com.zknx.hn.common.UIConst;
+import com.zknx.hn.functions.ais.AisDoc;
 import com.zknx.hn.functions.common.ProductPriceInfo;
 
 public class DataMan extends DataInterface {
@@ -36,7 +37,11 @@ public class DataMan extends DataInterface {
 	public static final String KEY_FRIEND_ID = "friend_id";
 	//public static final String KEY_AIS_ID = "ais_id"; // ais_id 暂时无用
 	public static final String KEY_AIS_FILE_NAME = "ais_name";
-	public static final String KEY_AIS_CLASS_ID = "ais_class_id";
+	// ais分类
+	public static final String KEY_AIS_COLUMN = "ais_column";
+	// ais子分类
+	public static final String KEY_AIS_COLUMN_CHILD = "ais_column_child";
+
 	// messageId 同时也是发布留言的商友id
 	public static final String KEY_MY_GROUP_MESSAGE_ID = "my_group_message";
 
@@ -1155,62 +1160,82 @@ public class DataMan extends DataInterface {
 	}
 	
 	/**
+	 * 功能id转换
+	 * @param functionId
+	 * @param column
+	 * @return
+	 */
+	private static boolean IsAisColumnMatch(int functionId, int column) {
+		switch (column) {
+		case 5: // 农业技术
+			return (functionId == UIConst.FUNCTION_ID_ARGRI_TECH);
+		case 6: // 专家指导
+			return (functionId == UIConst.FUNCTION_ID_EXPERT_GUIDE);
+		case 8: // 科学施肥
+			return (functionId == UIConst.FUNCTION_ID_EXPERT_FERTILIZE);
+		case 9: // 时政要闻
+			return (functionId == UIConst.FUNCTION_ID_CUR_POLITICS);
+		case 10: // 精选课件
+			return (functionId == UIConst.FUNCTION_ID_BEST_COUSE);
+		case 11: // 先锋党员
+			return (functionId == UIConst.FUNCTION_ID_VANGUARD_PARTY);
+		case 12: // 典型模范
+			return (functionId == UIConst.FUNCTION_ID_CLASS_EXPERIENCE);
+		case 13: // 致富经验
+			return (functionId == UIConst.FUNCTION_ID_MODEL);
+		case 14: // 快乐农家
+			return (functionId == UIConst.FUNCTION_ID_HAPPAY);
+		case 15: // 法律法规
+			return (functionId == UIConst.FUNCTION_ID_LAW);
+		case 16: // 惠农政策
+			return (functionId == UIConst.FUNCTION_ID_POLICY);
+		default:
+			return false;
+		}
+	}
+	
+	/**
 	 * 获取AIS第一级分类列表
 	 * 如果function_id为0则返回一级分类，否则返回function_id对应的子级分类
 	 * @return
 	 */
-	public static List<ListItemMap> GetAisClassList(int function_id) {
+	public static List<ListItemMap> GetAisColumnChildList(int functionId) {
 
-		if (!FileUtils.IsFileExist(DataMan.DataFile(FILE_NAME_AIS_CLASS))) {
-			GenerateAisClassCache();
-		}
-
-		List<ListItemMap> list = ReadCommonIdName(FILE_NAME_AIS_CLASS, KEY_AIS_CLASS_ID);
-
-		// 遍历列表并删除不满足条件的项
-		Iterator<ListItemMap> it = list.iterator();
-
-        while (it.hasNext()) {
-        	ListItemMap item = it.next();
-
-        	if (!AisClassMatch(function_id, item.getInt(KEY_AIS_CLASS_ID)))
-				it.remove();
-        }
-
-        return list;
-	}
-	
-	/**
-	 * 生成Ais分类文件（优化效率）
-	 */
-	private static void GenerateAisClassCache() {
+		List<ListItemMap> list = new ArrayList<ListItemMap>();
 		List<String> lines = ReadLines(FILE_NAME_AIS_LIST);
-		
 		Map<String, String> map = new HashMap<String, String>();
 		
-		List<ListItemMap> productClassList = GetProductClassList();
-		
-		String id, name, content = "";
+		String[] token;
 		for (String line : lines) {
-			String[] token = line.split(TOKEN_SEP);
+			token = line.split(TOKEN_SEP);
 			
-			id = token[1];
-			name = FindCommodityName(productClassList, KEY_PRODUCT_CLASS_ID, id);
-			
-			// 如果没有名字就以id为名字
-			if (name == null)
-				name = id;
-
-			if (map.get(id) == null) {
-				map.put(id, "name:"+token[1]); // TODO 产品分类名字
+			if (token != null && token.length == 4) {
+				// 20130607112901281,10,试卷一,2013-6-7
+				int column = ParseInt(token[1]);
+				if (!IsAisColumnMatch(functionId, column))
+					continue;
 				
-				content += id + TOKEN_SEP + name + "\n";
+				String name = token[2];
+				String fileName = name + ".ais";
+				
+				AisDoc aisDoc = new AisDoc(fileName);
+				String child = aisDoc.getAisChildColumn();
+				
+				// 不重复添加
+				if (!child.isEmpty() && map.get(child) == null)
+					map.put(child, child);
 			}
 		}
 		
-		FileUtils.WriteText(DataFile(""), FILE_NAME_AIS_CLASS, content);
+		// 添加子分类
+		for (String childName : map.keySet()) {
+			ListItemMap item = new ListItemMap(childName, KEY_AIS_COLUMN_CHILD, childName);
+			list.add(item);
+		}
+		
+		return list;
 	}
-	
+
 	/**
 	 * 查找商品名字
 	 * @param id
@@ -1248,25 +1273,38 @@ public class DataMan extends DataInterface {
 	 * INVALID返回所有
 	 * @return
 	 */
-	public static List<ListItemMap> GetAisList(int class_id) {
+	public static List<ListItemMap> GetAisList(int functionId, String childColumn) {
 
 		List<ListItemMap> list = new ArrayList<ListItemMap>();
 		List<String> lines = ReadLines(FILE_NAME_AIS_LIST);
 		
+		if (childColumn == null)
+			return list;
+		
 		String[] token;
 		for (String line : lines) {
 			token = line.split(TOKEN_SEP);
-			if (token != null && token.length >= 2) {
-				String calssId = token[1];
-				if (class_id == INVALID_ID || class_id == ParseInt(calssId)) {
-					// 符合条件
-					//String id = token[0];
-					String name = token[2];
-					String fileName = name + ".ais";
+			
+			if (token != null && token.length == 4) {
+				// 20130607112901281,10,试卷一,2013-6-7
+				int column = ParseInt(token[1]);
+				if (!IsAisColumnMatch(functionId, column))
+					continue;
+				
+				String name = token[2];
+				String fileName = name + ".ais";
+				
+				AisDoc aisDoc = new AisDoc(fileName);
+				
+				// 符合条件
+				if (childColumn.isEmpty() ||
+					aisDoc.getAisChildColumn().equals(childColumn)) {
 					list.add(new ListItemMap(name, KEY_AIS_FILE_NAME, fileName));
 				}
 			}
 		}
+		
+		//String fileName = GetAisColumnFileName(functionId);
 
         return list;
 	}
