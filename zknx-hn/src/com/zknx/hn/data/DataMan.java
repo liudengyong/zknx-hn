@@ -640,11 +640,9 @@ public class DataMan extends DataInterface {
 
 		// TODO 获取价格单位
 		// 价格单位（万元，元，角等）
-		String priceUnit = "元";
+		String priceUnit = "";
 		// 日期单位（年，月，周等）
 		String dateUnit = "月.日";
-		
-		ProductPriceInfo info = new ProductPriceInfo(priceUnit, dateUnit);
 		
 		String fileName = "history_price/" + market_id + ".txt";
 		List<String> lines = ReadLines(fileName);
@@ -661,29 +659,53 @@ public class DataMan extends DataInterface {
 			if (!productId.equals(product_id))
 				continue;
 			
-			AddPriceInro(line);
+			return CreatePriceInfo(line, priceUnit, dateUnit);
 		}
 		
 
-		// 日期格式（月.日）
-		SimpleDateFormat simpleDate = new SimpleDateFormat("M.d", Locale.CHINA); //如果写成年月日的形式的话，要写小d，如："yyyy/MM/dd"
-
-		// 向前减去30天
-		long today = System.currentTimeMillis();
-		for (int i = 0; i < HISTORY_PRICE_DAYS; ++i) {
-
-			// 获取当天价格
-			Float price = GetPrice(today, product_id, market_id);
-			// 添加当天的价格
-			if (price != 0F)
-				info.add(simpleDate.format(new Date(today)), price);
-
-			today -= MILLIS_ONE_DAY;
-		}
-		
-		return info;
+		return null;
 	}
 	
+	/**
+	 * 生成价格信息
+	 * @param line
+	 * @param priceUnit
+	 * @param dateUnit
+	 * @return
+	 */
+	private static ProductPriceInfo CreatePriceInfo(String line, String priceUnit, String dateUnit) {
+		ProductPriceInfo info = new ProductPriceInfo(priceUnit, dateUnit);
+
+		String[] prices = line.split(COMMON_TOKEN);
+		
+		if (prices.length < 2) {
+			Debug.Log("价格信息错误：" + line);
+			return null;
+		}
+		
+		for (int i = 1; i < prices.length; ++i) {
+
+			// 获取当天价格
+			String[] token = prices[i].split(":");
+			if (token.length != 2)
+				continue;
+			
+			String date  = token[0];
+			Float price = 0F;
+			try {
+				Float.parseFloat(token[1]);
+			} catch (Exception e) {
+				e.printStackTrace();
+				Debug.Log("价格信息解析错误：" + e.getMessage());
+			}
+			// 添加当天的价格
+			if (price != 0F)
+				info.add(date, price);
+		}
+				
+		return info;
+	}
+
 	/**
 	 * TODO 获取某天的价格
 	 * @param today
