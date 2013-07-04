@@ -645,6 +645,25 @@ public class DataMan extends DataInterface {
 		String dateUnit = "月.日";
 		
 		ProductPriceInfo info = new ProductPriceInfo(priceUnit, dateUnit);
+		
+		String fileName = "history_price/" + market_id + ".txt";
+		List<String> lines = ReadLines(fileName);
+		
+		String[] token;
+		for (String line : lines) {
+			token = line.split(COMMON_TOKEN);
+			
+			if (token.length < 1)
+				continue;
+			
+			String productId = token[0];
+			
+			if (!productId.equals(product_id))
+				continue;
+			
+			AddPriceInro(line);
+		}
+		
 
 		// 日期格式（月.日）
 		SimpleDateFormat simpleDate = new SimpleDateFormat("M.d", Locale.CHINA); //如果写成年月日的形式的话，要写小d，如："yyyy/MM/dd"
@@ -1277,7 +1296,7 @@ public class DataMan extends DataInterface {
 
 		List<ListItemMap> list = new ArrayList<ListItemMap>();
 		List<String> lines = ReadLines(FILE_NAME_AIS_LIST);
-		
+
 		if (childColumn == null)
 			return list;
 		

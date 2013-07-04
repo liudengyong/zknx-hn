@@ -159,7 +159,7 @@ public class AisView extends FunctionView {
 		List<ListItemMap> listMap = DataMan.GetAisList(mFunctionId, child);
 		initAisList(title, listMap, null, null);
 	}
-	
+
 	/**
 	 * 初始化Ais子分类
 	 * @param position

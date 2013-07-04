@@ -106,7 +106,6 @@ CString column_child16[]={"生产类","生活类","医疗类","教育类"};
 		String fileId; //文件唯一ID
 		byte column;   //栏目ID
 		String childColumn; // 子栏目名
-		String childColumnId; // 子栏目id
 		byte seazon; // 季节
 		String address;  //所属地区ID,不区分地区时为0
 		String major;    //所属专业ID,每个BIT对应一个专业,不区分专业时为0
@@ -545,8 +544,9 @@ CString column_child16[]={"生产类","生活类","医疗类","教育类"};
 		header.seazon = buffer[offset];
 		offset += size;
 		
-		// 子栏目id
-		header.childColumnId = new String(buffer, offset, size = 4);
+		// 子栏目id 暂时没有用
+		//header.childColumnId = new String(buffer, offset, size = 4);
+		size = 4;
 		offset += size;
 
 		// 地区id
