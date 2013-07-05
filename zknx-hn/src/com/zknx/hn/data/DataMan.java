@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.text.ParseException;
@@ -286,7 +285,7 @@ public class DataMan extends DataInterface {
         	}
         }
         
-        FileUtils.WriteText(DataFile("", true), FILE_NAME_ADDRESS_PROVINCE, provinceLines);
+        FileUtils.WriteGB2312Text(true, FILE_NAME_ADDRESS_PROVINCE, provinceLines);
 
         return list;
 	}
@@ -326,7 +325,7 @@ public class DataMan extends DataInterface {
         	}
         }
         
-        FileUtils.WriteText(DataFile(""), marketCacheFileName, marketLines);
+        FileUtils.WriteGB2312Text(false, marketCacheFileName, marketLines);
 
         return list;
 	}
@@ -415,7 +414,7 @@ public class DataMan extends DataInterface {
         	}
         }
 
-        FileUtils.WriteText(DataFile("", true), marketProductsFileName, marketProductLines);
+        FileUtils.WriteGB2312Text(true, marketProductsFileName, marketProductLines);
 
         return list;
 	}
@@ -514,33 +513,21 @@ public class DataMan extends DataInterface {
 	 * @return
 	 */
 	private static boolean SaveMyProducts(List<ListItemMap> list) {
+		// 如果自选产品列表文件存在，则覆盖
+		String lines = "";
+	    for (ListItemMap item : list) {   
+	
+	    	int product_id_to_be_save = item.getInt(KEY_PRODUCT_ID);
 
-		try {
-			// 如果自选产品列表文件存在，则覆盖
-			FileOutputStream out = new FileOutputStream(new File(DataFile(FILE_NAME_MY_PRODUCTS, true)));   
+	    	if (product_id_to_be_save != INVALID_ID) {
+		        String product_name_to_be_save = (String)item.get(KEY_NAME);
+		        String line = product_id_to_be_save + COMMON_TOKEN + product_name_to_be_save + "\r\n";
 		
-		    for (ListItemMap item : list) {   
-		
-		    	int product_id_to_be_save = item.getInt(KEY_PRODUCT_ID);
-
-		    	if (product_id_to_be_save != INVALID_ID) {
-			        String product_name_to_be_save = (String)item.get(KEY_NAME);
-			        String line = product_id_to_be_save + COMMON_TOKEN + product_name_to_be_save + "\r\n";
-			
-			        out.write(line.getBytes());
-		    	}
-		    }
-
-		    out.close();
-		
-			// 添加成功
-			return true;
-		}
-		catch (IOException exp) {
-			Debug.Log("错误：SaveMyProducts，" + exp.getMessage());
-		}
-		
-		return false;
+		        lines += line + "\n";
+	    	}
+	    }
+	    
+	    return (null == FileUtils.WriteGB2312Text(true, FILE_NAME_MY_PRODUCTS, lines));
 	}
 
 	/**
@@ -615,7 +602,7 @@ public class DataMan extends DataInterface {
         			averagePrice + COMMON_TOKEN + hostPrice + COMMON_TOKEN + unit + "\n";
         }
         
-        FileUtils.WriteText(DataFile("", true), productMarketFileName, productMarketLines);
+        FileUtils.WriteGB2312Text(true, productMarketFileName, productMarketLines);
 
         return list;
 	}
@@ -738,7 +725,7 @@ public class DataMan extends DataInterface {
         	}
         }
 
-        FileUtils.WriteText(DataFile("", true), productClassCacheFileName, productClassLines);
+        FileUtils.WriteGB2312Text(true, productClassCacheFileName, productClassLines);
 
         return list;
 	}
@@ -865,7 +852,7 @@ public class DataMan extends DataInterface {
 
 		List<ListItemMap> list = GetSupplyDemandList(listener);
 		
-		FileUtils.WriteText(DataFile(""), supplyDemandClassCache, supplyDemandClassLines);
+		FileUtils.WriteGB2312Text(false, supplyDemandClassCache, supplyDemandClassLines);
 		
 		return list;
 	}
@@ -1642,7 +1629,7 @@ public class DataMan extends DataInterface {
         
         // append
         if (!duplicated) {
-        	FileUtils.WriteText(DataFile(""), LOCAL_QUESTION, questionLines);
+        	FileUtils.WriteGB2312Text(false, LOCAL_QUESTION, questionLines);
         }
 	}
 	

@@ -8,6 +8,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 
 import com.zknx.hn.common.Debug;
 
@@ -168,21 +169,54 @@ public class FileUtils {
         
         return err;
     }
+
+    /**
+     * 默认编码（UTF8）写文件
+     * @param path
+     * @param fileName
+     * @param text
+     * @return
+     */
+    public static String WriteText(String path, String fileName, String text) {
+    	return WriteText(path, fileName, text, null);
+    }
     
-    public static String WriteText(String path, String fileName, String text)
+    /**
+     * 默认编码（UTF8）写文件
+     * @param path
+     * @param fileName
+     * @param text
+     * @return
+     */
+    public static String WriteGB2312Text(boolean rootPath, String fileName, String text) {
+    	String path = DataMan.DataFile("", rootPath);
+    	return WriteText(path, fileName, text, "GB2312");
+    }
+    
+    /**
+     * 写文件到SD卡中
+     * @param path
+     * @param fileName
+     * @param text
+     * @return
+     */
+    private static String WriteText(String path, String fileName, String text, String encoding)
     {
     	String err = null;
         OutputStream outputStream = null;
+        OutputStreamWriter writer = null;
         
         try {
         	
             File file = createSDFile(path, fileName);
             
             outputStream = new FileOutputStream(file);
-            
-            outputStream.write(text.getBytes());
-  
-            outputStream.flush();
+            if (encoding != null)
+            	writer = new OutputStreamWriter(outputStream, "GB2312");
+            else
+            	writer = new OutputStreamWriter(outputStream);
+            writer.write(text);
+            writer.flush();
         }    
         catch (Exception e) {   
             e.printStackTrace();
@@ -192,7 +226,9 @@ public class FileUtils {
         finally{   
             try {
             	if (outputStream != null)
-            		outputStream.close();   
+            		outputStream.close();
+            	if (writer != null)
+            		writer.close();
             } catch (IOException e) {   
                 e.printStackTrace();   
             }   
