@@ -4,7 +4,6 @@ import java.io.UnsupportedEncodingException;
 import java.util.List;
 
 import com.zknx.hn.common.Debug;
-import com.zknx.hn.common.WebkitClient;
 import com.zknx.hn.common.widget.ImageUtils;
 import com.zknx.hn.data.DataMan;
 import com.zknx.hn.data.FileUtils;
@@ -17,9 +16,6 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 
 public class AisWebView {
-	
-	private final static int IMAGE_WIDTH = 240;
-	private final static int IMAGE_HEIGHT = 360;
 
 	/**
 	 * 初始化视图
@@ -27,11 +23,9 @@ public class AisWebView {
 	 */
 	@SuppressLint("SetJavaScriptEnabled")
 	public static void Init(AisDoc aisDoc, WebView webView, Object jsInterface) {
-		// 添加JS接口
-		webView.getSettings().setJavaScriptEnabled(true); // 启用JS脚本
 		webView.getSettings().setCacheMode(WebSettings.LOAD_NO_CACHE); // 禁用cache
-		webView.addJavascriptInterface(jsInterface, "ais");
-		webView.setWebChromeClient(new WebkitClient());
+		webView.setScrollBarStyle(View.SCROLLBARS_INSIDE_OVERLAY);
+		webView.setBackgroundColor(0);
 
 		String htmlString = genAisWebview(aisDoc.getAisId(), webView, aisDoc);
 		
@@ -88,11 +82,10 @@ public class AisWebView {
 		String mediaTags = genMediaIconTags(aisDoc);
 
 		String htmlStirng = mediaTags +
-				"<div class=\"profile-datablock\">"+ 
-					"<div class=\"profile-content\" style=\"margin-top:8px;font-size:20px;color:black;\">" +
+				"<div style=\"margin-top:8px;font-size:20px;color:white;\">" +
 					imageTags +
 					text.replaceAll("\r", "<div>") +
-				"</div></div>";
+				"</div>";
 
 		return htmlStirng;
 	}
@@ -129,12 +122,12 @@ public class AisWebView {
 	 * @return
 	 */
 	private static String genImgTag(String aisId, AisItem item, int imageIndex) {
-		
+
 		aisId = aisId.trim(); // 删除可能存在的空格
-		
+
 		String imageFilePathName = DataMan.DataFile(aisId + "_image" + imageIndex + ".bmp", true);
 		String imageAlt = "图片找不到：" + imageFilePathName;
-		
+
 		// 保存图片
 		if (!FileUtils.IsFileExist(imageFilePathName))
 			ImageUtils.SaveBitmap(item.data, imageFilePathName);
@@ -142,8 +135,6 @@ public class AisWebView {
 		return "<img src=\"file://" + imageFilePathName + "\"" + 
 		        " onclick=\"ais.showImage('" + imageFilePathName + "')\"" +
 				" alt=\"" + imageAlt + "\"" +
-				" width=\"" + IMAGE_WIDTH + "\"" + 
-				" height=\"" + IMAGE_HEIGHT + "\"" +
 				" style=\"float:left;margin-right:8px;margin-top:8px;\"/>";
 	}
 }
