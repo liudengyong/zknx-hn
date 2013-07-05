@@ -94,7 +94,7 @@ CString column_child15[]={"基本法律","三农法律"};
 CString column_child16[]={"生产类","生活类","医疗类","教育类"};
 	 */
 	
-	private static int COLUMN_COURSE = 12; // TODO 确认
+	private static int COLUMN_COURSE = 10; // 课件column
 
 	/**
 	 * Ais文件头
@@ -300,7 +300,10 @@ CString column_child16[]={"生产类","生活类","医疗类","教育类"};
 				case DataMan.AIS_TOKEN_COURSE_ANSWER:
 				case DataMan.AIS_TOKEN_COURSE_GRADE:
 				case DataMan.AIS_TOKEN_COURSE_NOTE:
-					addQuestion(v, data);
+					if (isCourse())
+						addQuestion(v, data);
+					else
+						Debug.Log("Ais结构错误：非试卷不应有答案结构，" + mHeader.column);
 					break;
 				case DataMan.AIS_TOKEN_IMAGE:
 					if (isCourse())
@@ -470,7 +473,6 @@ CString column_child16[]={"生产类","生活类","医疗类","教育类"};
 		switch (v) {
 		// 添加分数
 		case DataMan.AIS_TOKEN_COURSE_GRADE:
-			// TODO 分数只有两位数？
 			lastQuestion.grade = DataMan.ParseInt(new String(data, 0, 2));
 			break;
 		case DataMan.AIS_TOKEN_COURSE_ANSWER:

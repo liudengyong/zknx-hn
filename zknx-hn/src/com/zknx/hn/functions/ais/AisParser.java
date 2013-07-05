@@ -117,7 +117,6 @@ public class AisParser {
 		
 		// Ais内容滚动视图
 		WebView webView = (WebView) contentLayout.findViewById(R.id.ais_webview);
-		webView.setBackgroundColor(0); // 设置透明
 
 		// 是否课件
 		if (aisDoc.isCourse()) {
@@ -127,6 +126,9 @@ public class AisParser {
 		} else {
 			AisWebView.Init(aisDoc, webView, jsInterface);
 		}
+		
+		webView.setBackgroundColor(0); // 设置透明
+		webView.getBackground().setAlpha(0);
 
 		return title;
 	}

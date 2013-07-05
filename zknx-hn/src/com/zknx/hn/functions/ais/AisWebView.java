@@ -133,6 +133,8 @@ public class AisWebView {
 	 */
 	private static String genImgTag(String aisId, AisItem item, int imageIndex) {
 		
+		aisId = aisId.trim(); // 删除可能存在的空格
+		
 		String imageFilePathName = DataMan.DataFile(aisId + "_image" + imageIndex + ".bmp", true);
 		String imageAlt = "图片找不到：" + imageFilePathName;
 		

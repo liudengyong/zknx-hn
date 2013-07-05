@@ -144,7 +144,7 @@ public class AisView extends FunctionView {
 
 		if (mapItem != null) {
 			title = mapItem.get(DataMan.KEY_NAME).toString();
-			child = mapItem.getString(DataMan.KEY_AIS_COLUMN);
+			child = mapItem.getString(DataMan.KEY_AIS_COLUMN_CHILD);
 		}
 		
 		initAisList(title, child);
