@@ -214,7 +214,8 @@ public class PriceChart extends View {
 	 * @param points
 	 */
 	private void drawGridUnit(Canvas canvas, Points points) {
-		float xStart = getRealX();
+		final int offset4mid = 20;
+		float xStart = getRealX() - offset4mid;
         float yStart = getRealY();
         int height = getRealHeight();
         
@@ -226,10 +227,10 @@ public class PriceChart extends View {
         float fixedDateY = yStart + height + fontHeight;
         for (int i = 0; i < points.points.length; ++i) {
         	// 画日期
-        	if (i == 0)
-        		canvas.drawText(mPriceInfo.getDateUnit(), xStart, fixedDateY, mPaintAxisUnit);
-        	else
-        		canvas.drawText(mPriceInfo.getDate(i), xStart, fixedDateY, mPaintAxisUnit);
+        	if (i == points.points.length - 1)
+        		xStart -= 50; // 最后一个日期向左偏移
+        	
+        	canvas.drawText(mPriceInfo.getDate(i), xStart, fixedDateY, mPaintAxisUnit);
 
             xStart += points.dateStep;
         }
@@ -253,12 +254,7 @@ public class PriceChart extends View {
         	
         	// 画价格单位以及网格价格值
         	float price = mMaxPrice - (priceValueStep * i);
-        	
-        	// 第一个画单位
-        	if (i == 0)
-        		canvas.drawText(mPriceInfo.getPriceUnit(), fixedPriceX, yStart, mPaintAxisUnit);
-        	else
-        		canvas.drawText(price + "", fixedPriceX, yStart, mPaintAxisUnit);
+        	canvas.drawText(price + "", fixedPriceX, yStart, mPaintAxisUnit);
 
             yStart += pricePositionStep;
         }

@@ -10,7 +10,6 @@ import java.io.InputStreamReader;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -622,7 +621,7 @@ public class DataMan extends DataInterface {
 	}
 	
 	// 一天的毫秒数： 1天=24*60*60*1000=86400000毫秒
-	private static final long MILLIS_ONE_DAY = 86400000;
+	//private static final long MILLIS_ONE_DAY = 86400000;
 	
 	/**
 	 * 获取最近30天价格信息 HISTORY_PRICE_DAYS
@@ -638,12 +637,7 @@ public class DataMan extends DataInterface {
 		if (market_id == null || product_id == null)
 			return null;
 
-		// TODO 获取价格单位
-		// 价格单位（万元，元，角等）
-		String priceUnit = "";
-		// 日期单位（年，月，周等）
-		String dateUnit = "月.日";
-		
+		// 获取某市场历史价格
 		String fileName = "history_price/" + market_id + ".txt";
 		List<String> lines = ReadLines(fileName);
 		
@@ -656,12 +650,12 @@ public class DataMan extends DataInterface {
 			
 			String productId = token[0];
 			
-			if (!productId.equals(product_id))
+			if (product_id.length() < 9 ||
+				!productId.contains(product_id))
 				continue;
 			
-			return CreatePriceInfo(line, priceUnit, dateUnit);
+			return CreatePriceInfo(line);
 		}
-		
 
 		return null;
 	}
@@ -673,8 +667,8 @@ public class DataMan extends DataInterface {
 	 * @param dateUnit
 	 * @return
 	 */
-	private static ProductPriceInfo CreatePriceInfo(String line, String priceUnit, String dateUnit) {
-		ProductPriceInfo info = new ProductPriceInfo(priceUnit, dateUnit);
+	private static ProductPriceInfo CreatePriceInfo(String line) {
+		ProductPriceInfo info = new ProductPriceInfo();
 
 		String[] prices = line.split(COMMON_TOKEN);
 		
@@ -683,7 +677,8 @@ public class DataMan extends DataInterface {
 			return null;
 		}
 		
-		for (int i = 1; i < prices.length; ++i) {
+		// 从列表取数据时正向
+		for (int i = prices.length - 1; i > 0; --i) {
 
 			// 获取当天价格
 			String[] token = prices[i].split(":");
@@ -693,7 +688,7 @@ public class DataMan extends DataInterface {
 			String date  = token[0];
 			Float price = 0F;
 			try {
-				Float.parseFloat(token[1]);
+				price = Float.parseFloat(token[1]);
 			} catch (Exception e) {
 				e.printStackTrace();
 				Debug.Log("价格信息解析错误：" + e.getMessage());
@@ -704,16 +699,6 @@ public class DataMan extends DataInterface {
 		}
 				
 		return info;
-	}
-
-	/**
-	 * TODO 获取某天的价格
-	 * @param today
-	 * @return
-	 */
-	private static Float GetPrice(long today, String product_id, String market_id) {
-		long time = System.currentTimeMillis();
-		return 4.0F + (time % 4);
 	}
 
 	/**

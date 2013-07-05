@@ -17,11 +17,8 @@ public class ProductPriceInfo {
 		Float mPrice;
 	}
 
-	public ProductPriceInfo(String priceUnit, String dateUnit) {
+	public ProductPriceInfo() {
 		mPriceList = new ArrayList<PricePair>();;
-		
-		mPriceUnit = priceUnit;
-		mDateUnit  = dateUnit;
 	}
 
 	/**
@@ -74,6 +71,9 @@ public class ProductPriceInfo {
 	 * @return
 	 */
 	public Float getMinPrice() {
+		if (mPriceList.size() == 0)
+			return 0F;
+
 		// 新建一个list做比较用
 		List<Float> tmp = new ArrayList<Float>();
 		for (PricePair price : mPriceList)
@@ -87,6 +87,9 @@ public class ProductPriceInfo {
 	 * @return
 	 */
 	public Float getMaxPrice() {
+		if (mPriceList.size() == 0)
+			return 0F;
+
 		// 新建一个list做比较用
 		List<Float> tmp = new ArrayList<Float>();
 		for (PricePair price : mPriceList)
@@ -101,25 +104,6 @@ public class ProductPriceInfo {
 	public int size() {
 		return mPriceList.size();
 	}
-
-	/**
-	 * 获取价格单位
-	 * @return
-	 */
-	public String getPriceUnit() {
-		return mPriceUnit;
-	}
-	
-	/**
-	 * 获取日期单位
-	 * @return
-	 */
-	public String getDateUnit() {
-		return mDateUnit;
-	}
-
-	private String mPriceUnit; // 价格单位，元/万元等
-	private String mDateUnit; // 日期单位，年/月/日
 
 	private List<PricePair> mPriceList; // 每个日期的价格
 }
