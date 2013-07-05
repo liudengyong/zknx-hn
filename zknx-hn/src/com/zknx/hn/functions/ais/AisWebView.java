@@ -86,18 +86,15 @@ public class AisWebView {
 		}
 		
 		String mediaTags = genMediaIconTags(aisDoc);
-		
-		// html文本
-		return genHtmlString(mediaTags, imageTags, text);
-	}
 
-	/**
-	 * 获取html文本
-	 * @return
-	 */
-	private static String genHtmlString(String mediaIconTags, String imageTags, String text) {
-		// 文本换行（添加<div>）
-		return mediaIconTags + "<div class=\"profile-datablock\"><div class=\"profile-content\" style=\"margin-top:8px;font-size:20px;color:white;\">" + imageTags + text.replaceAll("\r", "<div>") + "</div></div>";
+		String htmlStirng = mediaTags +
+				"<div class=\"profile-datablock\">"+ 
+					"<div class=\"profile-content\" style=\"margin-top:8px;font-size:20px;color:black;\">" +
+					imageTags +
+					text.replaceAll("\r", "<div>") +
+				"</div></div>";
+
+		return htmlStirng;
 	}
 
 	/**
