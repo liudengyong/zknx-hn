@@ -1681,10 +1681,7 @@ public class DataMan extends DataInterface {
 	 */
 	public static void SaveGrade(String title, int resultPoint) {
 		String time = GetCurrentTimeId();
-		String line = UserMan.GetUserId() + COMMON_TOKEN +
-				time + COMMON_TOKEN +
-				title + COMMON_TOKEN +
-				resultPoint;
+		String line = time + COMMON_TOKEN + title + COMMON_TOKEN + resultPoint;
 
 		// 附加一行数据
 		FileUtils.AppendLine(FILE_NAME_GRADE, line);
@@ -1703,7 +1700,8 @@ public class DataMan extends DataInterface {
 		//title：课件标题；
 		//grade：成绩
 
-		params.add(new BasicNameValuePair("file_name", FILE_NAME_GRADE));
+		params.add(new BasicNameValuePair("userid", UserMan.GetUserId()));
+		params.add(new BasicNameValuePair("filename", FILE_NAME_GRADE));
 
 		return Downloader.PostFile(URL_POST_GRADE, params, filePathName);
 	}
