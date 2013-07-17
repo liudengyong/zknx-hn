@@ -14,6 +14,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import org.apache.http.NameValuePair;
+import org.apache.http.message.BasicNameValuePair;
+
 import android.os.Environment;
 
 import com.zknx.hn.common.Debug;
@@ -1447,8 +1450,10 @@ public class DataMan extends DataInterface {
 
 	private static final String TIME_FORMAT = "yyyy-MM-dd hh:mm:ss";
 	private static final String DATE_FORMAT = "yyyy-MM-dd";
+	private static final String TIMEID_FORMAT = "yyyyMMddhhmmss";
 	private static final SimpleDateFormat mTimeFormater = new SimpleDateFormat(TIME_FORMAT, Locale.CHINA);
 	private static final SimpleDateFormat mDateFormater = new SimpleDateFormat(DATE_FORMAT, Locale.CHINA);
+	private static final SimpleDateFormat mTimeIdFormater = new SimpleDateFormat(TIMEID_FORMAT);
 	
 	/**
 	 * 获取日期格式者
@@ -1468,6 +1473,14 @@ public class DataMan extends DataInterface {
 	 */
 	public static String GetCurrentTime(boolean withTime) {
 		return GetDateFormator(withTime).format(new java.util.Date());
+	}
+	
+	/**
+	 * 获取时间id
+	 * @return
+	 */
+	private static String GetCurrentTimeId() {
+		return mTimeIdFormater.format(new java.util.Date());
 	}
 
 	/**
@@ -1659,5 +1672,39 @@ public class DataMan extends DataInterface {
 		// TODO GetExpertAnwserList
 		
 		return list;
+	}
+	
+	/**
+	 * 保存测试成绩
+	 * @param title
+	 * @param resultPoint
+	 */
+	public static void SaveGrade(String title, int resultPoint) {
+		String time = GetCurrentTimeId();
+		String line = UserMan.GetUserId() + COMMON_TOKEN +
+				time + COMMON_TOKEN +
+				title + COMMON_TOKEN +
+				resultPoint;
+
+		// 附加一行数据
+		FileUtils.AppendLine(FILE_NAME_GRADE, line);
+	}
+	
+	/**
+	 * 上传成绩
+	 * @return
+	 */
+	public static String PostGrade() {
+		String filePathName = DataFile(FILE_NAME_GRADE);
+		List<NameValuePair> params = new ArrayList<NameValuePair>();
+
+		//user_id：用户id；
+		//time：时间；
+		//title：课件标题；
+		//grade：成绩
+
+		params.add(new BasicNameValuePair("file_name", FILE_NAME_GRADE));
+
+		return Downloader.PostFile(URL_POST_GRADE, params, filePathName);
 	}
 }

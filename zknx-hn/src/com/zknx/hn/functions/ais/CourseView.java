@@ -147,7 +147,7 @@ public class CourseView {
 	 * @param button
 	 * @param reset
 	 */
-	public static void SubmitOrReset(View button, boolean reset) {
+	public static void SubmitOrReset(String title, View button, boolean reset) {
 		LinearLayout courseLayout = GetCourseLayout(button);
 		
 		// 没有课件时点击无效
@@ -252,9 +252,10 @@ public class CourseView {
 		
 		if (!reset) {
 			Dialog.MessageBox(button.getContext(), "您本次得分：" + resultPoint + "分");
+			DataMan.SaveGrade(title, resultPoint);
 		}
 	}
-	
+
 	/**
 	 * 从交卷和重做按钮查找course视图
 	 * @param button

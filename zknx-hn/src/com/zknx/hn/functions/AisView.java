@@ -378,10 +378,10 @@ public class AisView extends FunctionView {
 				
 				switch (view.getId()) {
 				case ID_SUBMIT:
-					CourseView.SubmitOrReset(view, false);
+					CourseView.SubmitOrReset(mAisTitle, view, false);
 					break;
 				case ID_RESET:
-					CourseView.SubmitOrReset(view, true);
+					CourseView.SubmitOrReset(mAisTitle, view, true);
 					break;
 				}
 			}

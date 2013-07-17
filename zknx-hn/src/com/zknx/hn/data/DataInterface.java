@@ -6,6 +6,7 @@ public class DataInterface {
 	//public static final String URL_SERVER = "http://www.yczjxt.com.cn/appfora/";
 	public static final String URL_SERVER = "http://218.106.254.101:8077/";
 	public static final String URL_GET_USER_INFO = URL_SERVER + "getuserinfo.asp";
+	public static final String URL_POST_GRADE = URL_SERVER + "post_grade.aspx";
 	public final static String RTMP_SERVER = "rtmp://192.168.0.101/zknx-hn";
 	
 	// 省级地址列表文件名
@@ -32,6 +33,10 @@ public class DataInterface {
 	protected static final String FILE_NAME_MY_GROUP_MESSAGE = "my_group_message.txt";
 	// 专家问答
 	protected static final String FILE_NAME_EXPERTS = "experts.txt";
+	// 当前用户本地分数（待同步）
+	protected static final String FILE_NAME_GRADE = "grade.txt";
+	// 所有用户历史分数
+	protected static final String FILE_NAME_GRADES = "grades.txt";
 	// ais列表文件名
 	protected static final String FILE_NAME_AIS_LIST = "ais_file_list.txt";
 	// 获取ais文件接口

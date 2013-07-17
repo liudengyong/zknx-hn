@@ -5,6 +5,7 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -50,7 +51,27 @@ public class FileUtils {
         File file = new File(path + fileName);   
         file.createNewFile();
         return file;   
-    }   
+    }
+    
+    /**   
+     * 创建文件
+     * @param fileName   
+     * @return   
+     * @throws IOException   
+     */   
+    public static File CreateFile(String fileName) throws IOException
+    {
+    	int end = fileName.lastIndexOf('/');
+    	String path = fileName.substring(0, end);
+        File file = new File(fileName);
+
+        // 创建目录
+        File dir = new File(path);
+        if (dir.exists() || dir.mkdirs())
+        	file.createNewFile();
+
+        return file;   
+    } 
        
     /**   
      * 递归创建目录
@@ -182,6 +203,23 @@ public class FileUtils {
     }
     
     /**
+     * 写文件
+     * @param fileName
+     * @param text
+     * @return
+     * @throws IOException
+     */
+    public static String WriteText(String fileName, String text) throws IOException
+    {
+    	File file = CreateFile(fileName);
+		OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(file));
+        writer.write(text);
+        writer.flush();
+        writer.close();
+        return null;
+    }
+    
+    /**
      * 默认编码（UTF8）写文件
      * @param path
      * @param fileName
@@ -254,4 +292,38 @@ public class FileUtils {
 
 		return true;
 	}
+    
+    /**
+     * 附加一行数据
+     * @param path
+     * @param fileName
+     * @param line
+     * @return
+     */
+    public static String AppendLine(String fileName, String line) {
+    	FileWriter writer = null;  
+        try {
+        	String fullPathfileName = DataMan.DataFile(fileName);
+        	
+            // 打开一个写文件器，构造函数中的第二个参数true表示以追加形式写文件
+        	if (!FileUtils.IsFileExist(fullPathfileName))
+        		WriteText(fullPathfileName, line);
+        	else {
+	            writer = new FileWriter(fullPathfileName, true);
+	            writer.write("\n" + line);
+        	}
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if(writer != null) {
+                    writer.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return null;
+    }
 }
