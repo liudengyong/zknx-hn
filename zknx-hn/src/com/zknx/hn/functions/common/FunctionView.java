@@ -149,4 +149,35 @@ public class FunctionView {
 
 		return layout;
 	}
+	
+	/**
+	 * 生成并初始化按钮3
+	 * @param clickListener
+	 * 如果clickListener为空,则禁用按钮
+	 * @return
+	 */
+	protected LinearLayout initButtonTriple(int left, int middle, int right, OnClickListener listener) {
+
+		LinearLayout layout = (LinearLayout)mInflater.inflate(R.layout.common_btn_triple, null);
+
+		Button btnLeft = (Button) layout.findViewById(R.id.common_btn_triple_left);
+		Button btnMiddle = (Button) layout.findViewById(R.id.common_btn_triple_middle);
+		Button btnRight = (Button) layout.findViewById(R.id.common_btn_triple_right);
+		
+		btnLeft.setText(left);
+		btnMiddle.setText(middle);
+		btnRight.setText(right);
+		
+		if (listener != null) {
+			btnLeft.setOnClickListener(listener);
+			btnMiddle.setOnClickListener(listener);
+			btnRight.setOnClickListener(listener);
+		} else {
+			btnLeft.setEnabled(false);
+			btnMiddle.setEnabled(false);
+			btnRight.setEnabled(false);
+		}
+
+		return layout;
+	}
 }

@@ -69,8 +69,9 @@
     <string name="confirm_post_message">确认发布留言吗？</string>
     
     <!-- 精选课件 -->
+    <string name="grade">分数</string>
     <string name="submit">交卷</string>
-    <string name="resset">重做</string>
+    <string name="reset">重做</string>
     <string name="confirm_submit_course">确认交卷吗？</string>
     <string name="confirm_reset_course">确认要重做吗？</string>
     <string name="key_anwser">anwser</string>

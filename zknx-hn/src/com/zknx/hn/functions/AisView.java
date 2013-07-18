@@ -62,8 +62,9 @@ public class AisView extends FunctionView {
 	
 	private int mFunctionId = DataMan.INVALID_ID;
 	
-	private final static int ID_RESET = R.id.common_btn_pair_left;
-	private final static int ID_SUBMIT = R.id.common_btn_pair_right;
+	private final static int ID_GRADE = R.id.common_btn_triple_left;
+	private final static int ID_RESET = R.id.common_btn_triple_middle;
+	private final static int ID_SUBMIT = R.id.common_btn_triple_right;
 
 	public AisView(LayoutInflater inflater, LinearLayout frameRoot, int function_id, int frameResId) {
 		super(inflater, frameRoot, frameResId);
@@ -372,16 +373,20 @@ public class AisView extends FunctionView {
 	 * 初始化交卷视图
 	 */
 	private void initCouseSubmitButtons() {
-		mCourseSubmitLayout = initButtonPair(R.string.resset, R.string.submit, new OnClickListener() {
+		mCourseSubmitLayout = initButtonTriple(R.string.grade, R.string.reset, R.string.submit, new OnClickListener() {
 			@Override
 			public void onClick(View view) {
 				
 				switch (view.getId()) {
-				case ID_SUBMIT:
-					CourseView.SubmitOrReset(mAisTitle, view, false);
+				case ID_GRADE:
+					String grades = DataMan.GetGrade(mTitle);
+					Dialog.MessageBox(mContext, grades);
 					break;
 				case ID_RESET:
 					CourseView.SubmitOrReset(mAisTitle, view, true);
+					break;
+				case ID_SUBMIT:
+					CourseView.SubmitOrReset(mAisTitle, view, false);
 					break;
 				}
 			}
