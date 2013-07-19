@@ -47,7 +47,7 @@ public class Function extends Activity {
 	private WaitDialog mWaitDialog;
 	// 更新数据完成消息
 	private static final int MESSAGE_UPDATE_DATA_COMPLETE = 1;
-	
+
 	private int mFunctionId = DataMan.INVALID_ID;
 	private Intent mSavedIntent;
 
@@ -101,22 +101,21 @@ public class Function extends Activity {
      * @param id
      */
     private static DataService mDataService;
-    
+
     // 只有一个静态连接实例存在
     private static ServiceConnection mConnection = new ServiceConnection() {
     	@Override
     	public void onServiceConnected(ComponentName name, IBinder service) {
-    		mDataService = ((DataService.DataBinder)service).getService();
-    		mDataService.initHandler(mHandler);
-    		mDataService.processBroadcastData();
-    		mDataService.getNewMessage();
+    		mDataService = ((DataService.DataBinder)service).getService(mHandler);
+    		mDataService.startProcessBroadcastData();
+    		mDataService.startGetNewMessage();
     	}
     	@Override
     	public void onServiceDisconnected(ComponentName name) {
     		mDataService = null;	
     	}
     };
-	
+
 	/**
 	 * 初始化全局变量
 	 */

@@ -24,8 +24,9 @@ public class DataService extends Service {
 	public static final int MESSAGE_NEW_MESSAGE = 3;
 	
 	// 获取服务实例
-	public class DataBinder extends Binder{
-		DataService getService() {
+	public class DataBinder extends Binder {
+		DataService getService(Handler handler) {
+			mHandler = handler;
 			return DataService.this;
 		}
 	}
@@ -39,7 +40,6 @@ public class DataService extends Service {
 	public boolean onUnbind(Intent intent) {
 		return false;
 	}
-
 	
 	@Override
 	public void onDestroy() { 
@@ -49,19 +49,19 @@ public class DataService extends Service {
 	/**
 	 * 开始检查广播数据
 	 */
-	public void processBroadcastData() {
-		new Thread(mCheckDataRunnable).start();
+	public void startProcessBroadcastData() {
+		new Thread(mProcessDataRunnable).start();
 	}
 	
 	/**
 	 * 开始检查新留言
 	 */
-	public void getNewMessage() {
+	public void startGetNewMessage() {
 		new Thread(mGetNewMessageRunnable).start();
 	}
 
 	// 数据更新Runnable
-	private Runnable mCheckDataRunnable= new Runnable() {    
+	private Runnable mProcessDataRunnable= new Runnable() {    
         public void run() {
 
         	// 每1分钟检查新数据
@@ -79,16 +79,9 @@ public class DataService extends Service {
         	// 每5秒检查新留言
          	String message = DataMan.GetNewMessages();
          	if (message != null)
-         		mHandler.sendEmptyMessage(MESSAGE_NEW_DATA);
+         		mHandler.sendEmptyMessage(MESSAGE_NEW_MESSAGE);
 
          	mHandler.postDelayed(this, 5 * SECOND);
          }
      };
-
-    /**
-     * 初始化handler
-     */
-	public void initHandler(Handler handler) {
-		mHandler = handler;
-	} 
 }
