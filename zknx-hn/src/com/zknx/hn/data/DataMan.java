@@ -1419,9 +1419,45 @@ public class DataMan extends DataInterface {
 	
 	/**
 	 * 获取当前用户新的留言
+	 * return：返回上次留言的时间
 	 */
-	private static void GetNewMessages() {
-		Downloader.DownFile(URL_GET_MESSAGE + "?userid=" + UserMan.GetUserId(), DataFile("", true), FILE_NAME_NEW_MESSAGE /* TODO 获取新留言 */);
+	private static final String FILE_STAMP_LAST_MESSAGE = "lastMessage.txt";
+	public static String GetNewMessages() {
+
+		int ret = Downloader.DownFile(URL_GET_MESSAGE + "?userid=" + UserMan.GetUserId(), DataFile("", true), FILE_NAME_NEW_MESSAGE);
+		
+		// 下载错误
+		if (ret != 0)
+			return null;
+
+		List<String> lines = ReadLines(FILE_NAME_NEW_MESSAGE, true);
+		
+		if (lines.size() == 0)
+			return null;
+
+		// 获取最后一行的数据
+		// liu,a,sdfsdf,0;
+		String lastLine = lines.get(lines.size() - 1);
+		String token[] = lastLine.split(COMMON_TOKEN);
+		String time = token[3];
+		
+		List<String> lastTime = ReadLines(FILE_STAMP_LAST_MESSAGE, true);
+		if (lastTime != null &&
+			lastTime.size() > 0 &&
+			!lastTime.get(0).equals(time)) {
+			try {
+				FileUtils.WriteText(DataFile(FILE_STAMP_LAST_MESSAGE, true), time);
+			} catch (IOException e) {
+				Debug.Log("写新信息时间戳错误");
+				return null;
+			}
+			
+			String message = token[0] + "：" + token[2];
+
+			return message;
+		}
+		
+		return null;
 	}
 	
 	/**

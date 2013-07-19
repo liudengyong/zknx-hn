@@ -17,6 +17,11 @@ import com.zknx.hn.home.Functions;
 import com.zknx.hn.home.Params;
 
 import android.app.Activity;
+import android.app.ActivityManager;
+import android.app.ActivityManager.RunningAppProcessInfo;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -41,13 +46,18 @@ public class Function extends Activity {
 	// 更新数据等待进度条
 	private WaitDialog mWaitDialog;
 	// 更新数据完成消息
-	private static final int MESSAGE_UPDATE_DATA_COMPLETE = 2;
+	private static final int MESSAGE_UPDATE_DATA_COMPLETE = 1;
+	
+	private int mFunctionId = DataMan.INVALID_ID;
+	private Intent mSavedIntent;
 
 	@Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         
         FunctionInstance = this;
+        
+        mSavedIntent = getIntent();
 
         initFunctionView(getIntent());
 
@@ -97,7 +107,9 @@ public class Function extends Activity {
     	@Override
     	public void onServiceConnected(ComponentName name, IBinder service) {
     		mDataService = ((DataService.DataBinder)service).getService();
-    		mDataService.checkBroadcastData(mHandler);
+    		mDataService.initHandler(mHandler);
+    		mDataService.processBroadcastData();
+    		mDataService.getNewMessage();
     	}
     	@Override
     	public void onServiceDisconnected(ComponentName name) {
@@ -114,12 +126,17 @@ public class Function extends Activity {
 
 	// 处理更新数据完成消息
 	protected void processWaitMessage(int what) {
-		if (MESSAGE_UPDATE_DATA_COMPLETE == what) {
+		switch (what) {
+		case MESSAGE_UPDATE_DATA_COMPLETE:
+		{
 			// 隐藏等待进度条
 			mWaitDialog.dismiss();
 			// 重新更新
 			initFunctionView(getIntent());
-		} else if (DataService.MESSAGE_NEW_DATA == what) {
+		}
+		break;
+		case DataService.MESSAGE_NEW_DATA:
+		{
 			// 提示是否立即更新数据
 			Dialog.Confirm(this, R.string.new_data_tip, new ConfirmListener() {
 				@Override
@@ -128,6 +145,52 @@ public class Function extends Activity {
 				}
 			});
 		}
+		break;
+		case DataService.MESSAGE_NEW_MESSAGE:
+		{
+			List<RunningAppProcessInfo> appProcesses = ((ActivityManager)getSystemService(ACTIVITY_SERVICE)).getRunningAppProcesses(); 
+			if (appProcesses != null) {
+				for (RunningAppProcessInfo appProcess : appProcesses)
+					// The name of the process that this object is associated with.
+					if (appProcess.processName.equals("com.zknx.hn") &&
+						appProcess.importance == RunningAppProcessInfo.IMPORTANCE_FOREGROUND) {
+						return;
+					}
+			}
+
+			showNotification("收到新留言");
+		}
+		break;
+		}
+	}
+	
+	/**
+	  * 在状态栏显示通知
+	  */
+	 private void showNotification(String message){
+
+	     // 定义Notification的各种属性  
+	     Notification notification = new Notification(R.drawable.icon_back,  
+	    		 message, System.currentTimeMillis());
+
+	     notification.flags |= Notification.FLAG_SHOW_LIGHTS;  
+	     notification.defaults = Notification.DEFAULT_LIGHTS;
+
+	     CharSequence contentTitle ="中科农信"; // 通知栏标题  
+	     CharSequence contentText = message; // 通知栏内容  
+
+	     PendingIntent contentItent = PendingIntent.getActivity(this, 0, mSavedIntent, 0);  
+
+	     notification.setLatestEventInfo(this, contentTitle, contentText, contentItent);  
+
+	     // 把Notification传递给NotificationManager  
+	     ((NotificationManager)getSystemService(NOTIFICATION_SERVICE)).notify(0, notification);  
+	 }
+
+	 //删除通知   
+	 private void clearNotification() {
+	     // 启动后删除之前我们定义的通知  
+		 ((NotificationManager)getSystemService(NOTIFICATION_SERVICE)).cancel(0); 
 	}
 
 	/***
@@ -197,10 +260,15 @@ public class Function extends Activity {
 		
 		LinearLayout frameRoot = (LinearLayout)findViewById(R.id.function_frame_content);
 		LayoutInflater inflater = getLayoutInflater();
-		int functionId = Params.GetFunction(extras);
+
+		mFunctionId = Params.GetFunction(extras);
+		
+		// 清除通知栏消息
+		if (mFunctionId == UIConst.FUNCTION_ID_MY_GROUP)
+			clearNotification();
 
 		// 初始化功能视图
-		mFunctionView = Params.GetFunctionView(functionId, inflater, frameRoot);
+		mFunctionView = Params.GetFunctionView(mFunctionId, inflater, frameRoot);
 	}
 	
 	/**
