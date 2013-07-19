@@ -19,9 +19,6 @@ import com.zknx.hn.home.Params;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.ActivityManager.RunningAppProcessInfo;
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -49,7 +46,7 @@ public class Function extends Activity {
 	private static final int MESSAGE_UPDATE_DATA_COMPLETE = 1;
 
 	private int mFunctionId = DataMan.INVALID_ID;
-	private Intent mSavedIntent;
+	//private Intent mSavedIntent;
 
 	@Override
     public void onCreate(Bundle savedInstanceState) {
@@ -57,7 +54,7 @@ public class Function extends Activity {
         
         FunctionInstance = this;
         
-        mSavedIntent = getIntent();
+        //mSavedIntent = getIntent();
 
         initFunctionView(getIntent());
 
@@ -153,7 +150,7 @@ public class Function extends Activity {
 					// The name of the process that this object is associated with.
 					if (appProcess.processName.equals("com.zknx.hn") &&
 						appProcess.importance == RunningAppProcessInfo.IMPORTANCE_FOREGROUND) {
-						return;
+						//return;
 					}
 			}
 
@@ -162,14 +159,15 @@ public class Function extends Activity {
 		break;
 		}
 	}
-	
+
 	/**
 	  * 在状态栏显示通知
 	  */
-	 private void showNotification(String message){
-
+	 private void showNotification(String message) {
+		 Dialog.Toast(this, message);
+		 /*
 	     // 定义Notification的各种属性  
-	     Notification notification = new Notification(R.drawable.icon_back,  
+	     Notification notification = new Notification(R.drawable.icon_back,
 	    		 message, System.currentTimeMillis());
 
 	     notification.flags |= Notification.FLAG_SHOW_LIGHTS;  
@@ -183,13 +181,16 @@ public class Function extends Activity {
 	     notification.setLatestEventInfo(this, contentTitle, contentText, contentItent);  
 
 	     // 把Notification传递给NotificationManager  
-	     ((NotificationManager)getSystemService(NOTIFICATION_SERVICE)).notify(0, notification);  
+	     ((NotificationManager)getSystemService(NOTIFICATION_SERVICE)).notify(0, notification);
+	     */
 	 }
 
 	 //删除通知   
 	 private void clearNotification() {
 	     // 启动后删除之前我们定义的通知  
-		 ((NotificationManager)getSystemService(NOTIFICATION_SERVICE)).cancel(0); 
+		 /*
+		 ((NotificationManager)getSystemService(NOTIFICATION_SERVICE)).cancel(0);
+		 */
 	}
 
 	/***

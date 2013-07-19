@@ -67,4 +67,8 @@ public class Dialog {
 	public static void Toast(Context context, int msgRes) {
 		Toast.makeText(context, msgRes, Toast.LENGTH_LONG).show();
 	}
+	
+	public static void Toast(Context context, String msgRes) {
+		Toast.makeText(context, msgRes, Toast.LENGTH_LONG).show();
+	}
 }
