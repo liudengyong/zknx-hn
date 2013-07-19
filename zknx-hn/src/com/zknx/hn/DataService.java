@@ -61,11 +61,11 @@ public class DataService extends Service {
 	}
 
 	// 数据更新Runnable
-	private Runnable mProcessDataRunnable= new Runnable() {    
+	private Runnable mProcessDataRunnable = new Runnable() {    
         public void run() {
 
         	// 每1分钟检查新数据
-         	if (DataMan.CheckBroadcastData())
+         	if (DataMan.ProcessBroadcastData())
          		mHandler.sendEmptyMessage(MESSAGE_NEW_DATA);
 
         	mHandler.postDelayed(this, 60 * SECOND);
@@ -73,7 +73,7 @@ public class DataService extends Service {
     };
     
     // 检查新留言Runnable
- 	private Runnable mGetNewMessageRunnable= new Runnable() {    
+ 	private Runnable mGetNewMessageRunnable = new Runnable() {    
          public void run() {
 
         	// 每5秒检查新留言

@@ -1401,23 +1401,48 @@ public class DataMan extends DataInterface {
 
 	/**
 	 * 检查广播数据
-	 * TODO (讨论) 检查广播数据更新，并更新界面？
 	 */
-	public static boolean CheckBroadcastData() {
-		// 模拟耗时操作
-		/*
-		int x = 3000;
-		while(x-- > 0)
-			Debug.Log("" + x);
-		*/
+	public static boolean ProcessBroadcastData() {
+
+		List<ListItemMap> province = GetAddressList();
 		
-		GetNewMessages();
+		if (province == null ||province.size() == 0)
+			return false;
+		
+		// 循环获取所有地区所有市场的所有商品信息（优先处理数据）
+		for (ListItemMap item : province) {
+			int addressId = item.getInt(KEY_ADDRESS_ID);
+			if (addressId != INVALID_ID) {
+				// 获取所有市场信息
+				List<ListItemMap> markets = GetMarketListByArea(addressId);
+				
+				if (markets == null ||markets.size() == 0)
+					continue;
+				
+				for (ListItemMap market : markets) {
+					
+					// 获取所有产品信息
+					int marketId = market.getInt(KEY_MARKET_ID);
+					List<ListItemMap> products = GetProductList(marketId);
+					
+					if (products == null ||products.size() == 0)
+						continue;
+					
+					for (ListItemMap product : products) {
+						String productId = product.getString(KEY_PRODUCT_ID);
+						// 获取某商品的市场信息
+						GetMarketListByProduct(productId);
+						// 获取某商品的价格信息（服务器已经处理）
+					}
+				}
+			}
+		}
 
 		// 检查时间戳
 		if (ShouldUpdateData()) {
 			return UpdateTodayData();
 		}
-		
+
 		return false;
 	}
 	
