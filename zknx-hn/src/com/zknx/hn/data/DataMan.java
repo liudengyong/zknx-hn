@@ -19,6 +19,7 @@ import org.apache.http.message.BasicNameValuePair;
 
 import android.os.Environment;
 
+import com.zknx.hn.App;
 import com.zknx.hn.common.Debug;
 import com.zknx.hn.common.Restraint;
 import com.zknx.hn.common.UIConst;
@@ -1362,6 +1363,9 @@ public class DataMan extends DataInterface {
 	 * @return
 	 */
 	private static String AppDataPath(boolean root) {
+		if (App.mDebug)
+			root = true;// TODO ต๗สิ
+
 		if (root)
 			return Environment.getExternalStorageDirectory() + "/zknx.hn";
 		else

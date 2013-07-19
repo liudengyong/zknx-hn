@@ -114,6 +114,10 @@ public class DataInterface {
 	 * @return
 	 */
 	protected static boolean ProductClassMatch(String product_class_id, String product_id) {
+		
+		if (product_class_id == null ||
+			product_id == null)
+			return false;
 
 		/*
 		int max_product_id = (product_class_id + 1) * 1000;

@@ -99,7 +99,7 @@ public class Market extends FunctionView {
 		
 		LinearLayout custom = ProductListAdapter.ListHeader(mInflater, "产品", mAddButton);
 		
-		CommonListParams listParams = new CommonListParams(mInflater, mContentFrame[2], mAdapterProduct, null);
+		CommonListParams listParams = new CommonListParams(mInflater, mContentFrame[2], mAdapterProduct, null/*TODO 电视遥控器*/);
 		
 		CommonList.Init(listParams, custom);
 	}

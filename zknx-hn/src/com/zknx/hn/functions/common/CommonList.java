@@ -82,6 +82,9 @@ public class CommonList {
 		// 列表是否有监听动作
 		if (params.item_listener != null)
 			listView.setOnItemClickListener(params.item_listener);
+		/*else
+			listView.setDescendantFocusability(ListView.FOCUS_AFTER_DESCENDANTS);
+		*/
 
 		// FIXME 默认选择列表第一项无效
 		listView.setSelection(0);

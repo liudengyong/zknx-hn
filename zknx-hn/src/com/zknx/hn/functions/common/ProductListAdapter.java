@@ -49,7 +49,7 @@ public class ProductListAdapter extends CommonListAdapter {
 				R.id.product_list_item_price_unit,
 				R.id.product_list_item_add_custom_chk});
 		
-		mAdd= add;
+		mAdd = add;
 		
 		// 实现Button绑定数据（改变背景）
 		setViewBinder(mBinder);
@@ -110,7 +110,7 @@ public class ProductListAdapter extends CommonListAdapter {
 	SimpleAdapter.ViewBinder mBinder = new SimpleAdapter.ViewBinder() {
 
         @Override
-        public boolean setViewValue(View view, Object data, String textRepresentation) {
+        public boolean setViewValue(final View view, Object data, String textRepresentation) {
         	if (view.getId() == R.id.product_list_item_add_custom_chk) {
             //if (view instanceof ImageView) {
         		
@@ -121,6 +121,15 @@ public class ProductListAdapter extends CommonListAdapter {
 
             	setCheckMyPriductStatus(view, Boolean.parseBoolean(checked));
             	view.setOnClickListener(mAddMyProduct);
+            	
+            	View parent = (View) view.getParent().getParent();
+            	parent.setOnClickListener(new OnClickListener() {
+					@Override
+					public void onClick(View layout) {
+						Debug.Log("setViewValue");
+						clickCheckbox(view);
+					}
+            	});
                 
                 return true;
             }
@@ -135,37 +144,45 @@ public class ProductListAdapter extends CommonListAdapter {
     OnClickListener mAddMyProduct = new OnClickListener() {
 		@Override
 		public void onClick(View view) {
-			if (view.getTag() != null) {
-				
-				// 取反，check则改成uncheck
-				boolean checked = !Boolean.parseBoolean(view.getTag().toString());
-
-				// 获取ListItem（父亲的父亲，从Layout结构来）
-				View parent = (View) view.getParent().getParent();
-
-				int position = parent.getId();
-
-				if (position < getCount() && position >= 0) {
-					ListItemMap map = getItem(position);
-					
-					boolean ok = false;
-					int product_id = map.getInt(DataMan.KEY_PRODUCT_ID);
-
-					if (checked)
-						ok = DataMan.MyProductListAdd(product_id, map.getString(KEY_PRODUCT_NAME));
-					else
-						ok = DataMan.MyProductListRemove(product_id);
-					
-					// 更新chengbox状态和tag
-					if (ok) {
-						setCheckMyPriductStatus(view, checked);
-					}
-				} else {
-					Debug.Log("严重错误：mAddMyProduct处理逻辑错误2");
-				}
-			}
+			clickCheckbox(view);
 		}
 	};
+	
+	/**
+	 * 点击checkbox
+	 * @param view
+	 */
+	private void clickCheckbox(View view) {
+		if (view.getTag() != null) {
+			
+			// 取反，check则改成uncheck
+			boolean checked = !Boolean.parseBoolean(view.getTag().toString());
+
+			// 获取ListItem（父亲的父亲，从Layout结构来）
+			View parent = (View) view.getParent().getParent();
+
+			int position = parent.getId();
+
+			if (position < getCount() && position >= 0) {
+				ListItemMap map = getItem(position);
+				
+				boolean ok = false;
+				int product_id = map.getInt(DataMan.KEY_PRODUCT_ID);
+
+				if (checked)
+					ok = DataMan.MyProductListAdd(product_id, map.getString(KEY_PRODUCT_NAME));
+				else
+					ok = DataMan.MyProductListRemove(product_id);
+				
+				// 更新chengbox状态和tag
+				if (ok) {
+					setCheckMyPriductStatus(view, checked);
+				}
+			} else {
+				Debug.Log("严重错误：mAddMyProduct处理逻辑错误2");
+			}
+		}
+	}
 	
 	/**
 	 * 改变checkbox背景
