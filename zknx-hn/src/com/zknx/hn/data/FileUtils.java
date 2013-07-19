@@ -303,13 +303,11 @@ public class FileUtils {
     public static String AppendLine(String fileName, String line) {
     	FileWriter writer = null;  
         try {
-        	String fullPathfileName = DataMan.DataFile(fileName);
-        	
             // 打开一个写文件器，构造函数中的第二个参数true表示以追加形式写文件
-        	if (!FileUtils.IsFileExist(fullPathfileName))
-        		WriteText(fullPathfileName, line);
+        	if (!FileUtils.IsFileExist(fileName))
+        		WriteText(fileName, line);
         	else {
-	            writer = new FileWriter(fullPathfileName, true);
+	            writer = new FileWriter(fileName, true);
 	            writer.write("\n" + line);
         	}
         } catch (IOException e) {

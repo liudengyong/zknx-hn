@@ -379,8 +379,9 @@ public class AisView extends FunctionView {
 				
 				switch (view.getId()) {
 				case ID_GRADE:
-					String grades = DataMan.GetGrade(mTitle);
-					Dialog.MessageBox(mContext, grades);
+					String grades = DataMan.GetGrades(mAisTitle);
+					if (grades != null && grades.length() > 0)
+						Dialog.MessageBox(mContext, grades);
 					break;
 				case ID_RESET:
 					CourseView.SubmitOrReset(mAisTitle, view, true);

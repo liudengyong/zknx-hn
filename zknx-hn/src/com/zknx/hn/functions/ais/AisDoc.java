@@ -94,7 +94,7 @@ CString column_child15[]={"基本法律","三农法律"};
 CString column_child16[]={"生产类","生活类","医疗类","教育类"};
 	 */
 	
-	private static int COLUMN_COURSE = 10; // 课件column
+	private static int COLUMN_COURSE = 12; // 课件column
 
 	/**
 	 * Ais文件头

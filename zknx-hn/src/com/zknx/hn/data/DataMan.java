@@ -1683,8 +1683,9 @@ public class DataMan extends DataInterface {
 		String time = GetCurrentTimeId();
 		String line = time + COMMON_TOKEN + title + COMMON_TOKEN + resultPoint;
 
+		String fileName = DataMan.DataFile(FILE_NAME_GRADE, true);
 		// 附加一行数据
-		FileUtils.AppendLine(FILE_NAME_GRADE, line);
+		FileUtils.AppendLine(fileName, line);
 	}
 	
 	/**
@@ -1703,6 +1704,64 @@ public class DataMan extends DataInterface {
 		params.add(new BasicNameValuePair("userid", UserMan.GetUserId()));
 		params.add(new BasicNameValuePair("filename", FILE_NAME_GRADE));
 
-		return Downloader.PostFile(URL_POST_GRADE, params, filePathName);
+		String ret = Downloader.PostFile(URL_POST_GRADE, params, filePathName);
+		
+		if (ret == null)
+			FileUtils.DeleteFile(filePathName);
+		
+		return ret;
+	}
+
+	/**
+	 * 获取成绩
+	 * @param title
+	 * @return
+	 */
+	public static String GetGrades(String title) {
+		String grades = "";
+		String user = UserMan.GetUserId();
+		
+		// 本地数据(待上传)
+		List<String> lines = ReadLinesWithEncoding(FILE_NAME_GRADE, "UTF8", true);
+		
+		for (String line : lines) {
+			String token[] = line.split(COMMON_TOKEN);
+			
+			// time,title,grade
+			if (token.length == 3 &&
+				title.equals(token[1])) {
+				String time = token[0];
+				try {
+					time = mTimeFormater.format(mTimeIdFormater.parse(time));
+				} catch (ParseException e) {
+					e.printStackTrace();
+				}
+				String grade = token[2];
+				grades += time + "\t分数：" + grade + "\n";
+			}
+		}
+
+		// 历史数据
+		lines = ReadLines(FILE_NAME_GRADES);
+		
+		for (String line : lines) {
+			String token[] = line.split(COMMON_TOKEN);
+			
+			// user_id,time,title,grade
+			if (token.length == 4 &&
+				user.equals(token[0]) &&
+				title.equals(token[2])) {
+				String time = token[1];
+				try {
+					time = mTimeFormater.format(mTimeIdFormater.parse(time));
+				} catch (ParseException e) {
+					e.printStackTrace();
+				}
+				String grade = token[3];
+				grades += time + "\t分数：" + grade + "\n";
+			}
+		}
+		
+		return grades;
 	}
 }
