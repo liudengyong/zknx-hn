@@ -13,10 +13,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
+
 import android.annotation.SuppressLint;
 import android.os.Environment;
+
 import com.zknx.hn.App;
 import com.zknx.hn.common.Debug;
 import com.zknx.hn.common.Restraint;
@@ -830,11 +833,22 @@ public class DataMan extends DataInterface {
 	 */
 	private static String supplyDemandClassLines = "";
 	public static List<ListItemMap> GetSupplyDemandList(final String product_class_id, final boolean supply) {
+		return GetSupplyDemandList(product_class_id, supply, false);
+	}
+	
+	private static void GenSupplyDemandList(final String product_class_id, final boolean supply) {
+		GetSupplyDemandList(product_class_id, supply, true);
+	}
+
+	private static List<ListItemMap> GetSupplyDemandList(final String product_class_id, final boolean supply, boolean justGen) {
 		
 		String supplyDemandClassCache = "supplyDemandClass_" + product_class_id + "_" + supply +"_.txt";
 		
 		// 优化效率 省级地址
 	    if (FileUtils.IsFileExist(DataFile(supplyDemandClassCache))) {
+	    	if (justGen)
+	    		return null;
+
 	    	List<String> lines = ReadLines(supplyDemandClassCache);
 	    	List<ListItemMap> list = new ArrayList<ListItemMap>();
 
@@ -975,11 +989,43 @@ public class DataMan extends DataInterface {
 	 * 获取供求对接信息列表(不分供求)
 	 * @return
 	 */
+	private static String pairLines = "";
 	public static List<ListItemMap> GetSupplyDemandPairList(final String product_class_id) {
+		return GetSupplyDemandPairList(product_class_id, false);
+	}
+	
+	private static void GenSupplyDemandPairList(String product_class_id) {
+		GetSupplyDemandPairList(product_class_id, true);
+	}
+	
+	private static List<ListItemMap> GetSupplyDemandPairList(final String product_class_id, boolean justGen) {
 		
 		final String curUserId = UserMan.GetUserId();
 		
 		Debug.Log("curUserId=" + curUserId);
+		
+		String pairCache = "pair_" + product_class_id +".txt";
+		
+		// 优化效率 省级地址
+	    if (FileUtils.IsFileExist(DataFile(pairCache))) {
+	    	if (justGen)
+	    		return null;
+
+	    	List<String> lines = ReadLines(pairCache);
+	    	List<ListItemMap> list = new ArrayList<ListItemMap>();
+
+	        for (String line : lines) {
+	        	// product_id,产品名,供求信息id(第一位编码0代表供应，1代表求购),user,标题,供求信息内容,发布时间,有效期,数量,单价,产地,产品特点,联系人名字,联系电话,手机号,详细地址
+	        	// 1003021000,果树苗,0,,供应各种果树苗、绿化苗,,2011-2-23,2011-3-22,,面议,北京市,,王敏,13521120562,13521120562,陆辛庄华源发苗木市场
+	        	String[] token = GetToken(line);
+	        	if (token.length != 16)
+	        		continue;
+
+	    		list.add(GetSupplyDemandMap(token));  
+	        }
+	        
+	        return list;
+	    }
 		
 		SupplyDemandListener listener = new SupplyDemandListener() {
 			@Override
@@ -1003,6 +1049,8 @@ public class DataMan extends DataInterface {
 		
 		final List<ListItemMap> myInfoList = GetSupplyDemandList(listener);
 		
+		pairLines = "";
+		
 		SupplyDemandListener listener2 = new SupplyDemandListener() {
 			@Override
 			public boolean meetCondition(String[] token, String line) {
@@ -1021,6 +1069,7 @@ public class DataMan extends DataInterface {
 	        		// 用到亦或操作
 	        		if (ProductClassMatch(ListItemMap.GetMapString(pairInfo, KEY_PRODUCT_CLASS_ID), product_class) && 
 	        			(IsSupply(supply_demand_id) ^ IsSupply(ListItemMap.GetMapInt(pairInfo, KEY_SUPPLY_DEMAND_INFO_ID)))) {
+	        			pairLines += line + "\n";
 	        			return true;
 	        		}
 	        	}
@@ -1029,7 +1078,11 @@ public class DataMan extends DataInterface {
 			}
 		};
 		
-		return GetSupplyDemandList(listener2);
+		List<ListItemMap> list = GetSupplyDemandList(listener2);
+		
+		FileUtils.WriteGB2312Text(false, pairCache, pairLines);
+		
+		return list;
 	}
 
 	/**
@@ -1423,6 +1476,22 @@ public class DataMan extends DataInterface {
 	 * 检查广播数据
 	 */
 	public static boolean ProcessBroadcastData() {
+		
+		//  处理供求信息
+		List<ListItemMap> productClass = GetProductClassList();
+		
+		if (productClass != null && productClass.size() > 0) {
+			for (ListItemMap item : productClass) {
+				String productClassId = item.getString(KEY_PRODUCT_CLASS_ID);
+				
+				// 供或者求
+				GenSupplyDemandList(productClassId, true);
+				GenSupplyDemandList(productClassId, false);
+				
+				// 对接信息，我的供求
+				GenSupplyDemandPairList(productClassId);
+			}
+		}
 
 		List<ListItemMap> province = GetAddressList();
 		
@@ -1445,12 +1514,15 @@ public class DataMan extends DataInterface {
 					int marketId = market.getInt(KEY_MARKET_ID);
 					List<ListItemMap> products = GetProductList(marketId);
 					
+					Debug.Log("处理市场：" + marketId);
+					
 					if (products == null ||products.size() == 0)
 						continue;
 					
 					for (ListItemMap product : products) {
 						String productId = product.getString(KEY_PRODUCT_ID);
 						// 获取某商品的市场信息
+						Debug.Log("处理产品：" + productId);
 						GenMarketListByProduct(productId);
 						// 获取某商品的价格信息（服务器已经处理）
 					}
