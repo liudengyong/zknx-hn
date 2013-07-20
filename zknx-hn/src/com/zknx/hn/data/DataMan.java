@@ -533,12 +533,28 @@ public class DataMan extends DataInterface {
 	    
 	    return (null == FileUtils.WriteGB2312Text(true, FILE_NAME_MY_PRODUCTS, lines));
 	}
-
+	
+	/**
+	 * 获取所有有该产品的市场列表
+	 * @return
+	 */
+	public static void GenMarketListByProduct(String product_id) {
+		GetMarketListByProduct(product_id, true);
+	}
+	
 	/**
 	 * 获取所有有该产品的市场列表
 	 * @return
 	 */
 	public static List<ListItemMap> GetMarketListByProduct(String product_id) {
+		return GetMarketListByProduct(product_id, false);
+	}
+
+	/**
+	 * 获取所有有该产品的市场列表
+	 * @return
+	 */
+	private static List<ListItemMap> GetMarketListByProduct(String product_id, boolean justGenerate) {
 
 		List<String> lines = null;
 		ArrayList<ListItemMap> list = new ArrayList<ListItemMap>();
@@ -549,6 +565,11 @@ public class DataMan extends DataInterface {
 
 		// 优化
 		if (FileUtils.IsFileExist(DataFile(productMarketFileName, true))) {
+			
+			// 只是生成处理数据，不返回
+			if (justGenerate)
+				return null;
+
 			lines = ReadLines(productMarketFileName, true);
 			
 			for (String line : lines)
@@ -1431,7 +1452,7 @@ public class DataMan extends DataInterface {
 					for (ListItemMap product : products) {
 						String productId = product.getString(KEY_PRODUCT_ID);
 						// 获取某商品的市场信息
-						GetMarketListByProduct(productId);
+						GenMarketListByProduct(productId);
 						// 获取某商品的价格信息（服务器已经处理）
 					}
 				}
