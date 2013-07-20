@@ -13,12 +13,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
-
+import android.annotation.SuppressLint;
 import android.os.Environment;
-
 import com.zknx.hn.App;
 import com.zknx.hn.common.Debug;
 import com.zknx.hn.common.Restraint;
@@ -26,6 +24,7 @@ import com.zknx.hn.common.UIConst;
 import com.zknx.hn.functions.ais.AisDoc;
 import com.zknx.hn.functions.common.ProductPriceInfo;
 
+@SuppressLint("SimpleDateFormat")
 public class DataMan extends DataInterface {
 
 	// 通用为名字，也用于ListItem显示文本
