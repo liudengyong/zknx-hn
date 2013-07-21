@@ -1,6 +1,5 @@
 package com.zknx.hn.functions;
 
-import com.zknx.hn.common.widget.Dialog;
 import com.zknx.hn.data.DataMan;
 import com.zknx.hn.functions.common.CommonList;
 import com.zknx.hn.functions.common.CommonListAdapter;
@@ -101,15 +100,10 @@ public class Market extends FunctionView {
 		LinearLayout custom = ProductListAdapter.ListHeader(mInflater, "产品", mAddButton);
 		
 		OnItemClickListener listener = new OnItemClickListener() {
-
 			@Override
-			public void onItemClick(AdapterView<?> adapterView, View view, int position,
-					long id) {
-				Dialog.Toast(mContext, "点击：" + position);
-				
+			public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
 				mAdapterProduct.clickListItem(view);
 			}
-			
 		};
 		
 		CommonListParams listParams = new CommonListParams(mInflater, mContentFrame[2], mAdapterProduct, listener/*TODO 电视遥控器*/);

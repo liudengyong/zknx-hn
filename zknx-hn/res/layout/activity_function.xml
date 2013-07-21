@@ -19,11 +19,12 @@
 	        android:layout_height="32sp"
 	        android:contentDescription="@string/divider"
 	        android:background="@drawable/back_button"
-	        android:layout_marginRight="10dip"/>
+	        android:layout_marginRight="10dip"
+	        android:layout_marginTop="4dip"/>
 	    
 	    <TextView
 	        android:id="@+id/function_title_text"
-	        style="@style/TitleText_TODO">
+	        style="@style/TitleText_Back">
 	    </TextView>
 
      </LinearLayout>
