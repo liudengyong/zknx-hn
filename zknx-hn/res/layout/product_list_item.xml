@@ -66,7 +66,7 @@
 		    android:src="@drawable/checkbox_none"
 		    android:contentDescription="@string/divider"
 		    android:scaleType="center"
-		    android:focusable="true" />
+		    android:focusable="false" />
 
 	</LinearLayout>
 

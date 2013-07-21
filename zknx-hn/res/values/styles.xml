@@ -57,6 +57,7 @@
 	    <item name="android:layout_width">fill_parent</item>
 	    <item name="android:layout_height">fill_parent</item>
 	    <item name="android:gravity">left|center_vertical</item>
+	    <item name="android:focusable">false</item>
 	</style>
 	
     <!-- 二级标题文字 -->
@@ -66,6 +67,7 @@
 	    <item name="android:layout_width">fill_parent</item>
 	    <item name="android:layout_height">wrap_content</item>
 	    <item name="android:gravity">center</item>
+	    <item name="android:focusable">false</item>
 	</style>
 	
     <!-- ListItem 文字 -->

@@ -9,7 +9,6 @@ import com.zknx.hn.common.UIConst.L_LAYOUT_TYPE;
 import com.zknx.hn.common.widget.Dialog;
 import com.zknx.hn.common.widget.WaitDialog;
 import com.zknx.hn.common.widget.Dialog.ConfirmListener;
-import com.zknx.hn.common.widget.WaitDialog.WaitListener;
 import com.zknx.hn.data.DataMan;
 import com.zknx.hn.data.UserMan;
 import com.zknx.hn.functions.common.FunctionView;
@@ -66,12 +65,10 @@ public class Function extends Activity {
         	bindService(new Intent(this, DataService.class), mConnection, Context.BIND_AUTO_CREATE);
         }
 
+        /*
         if (DataMan.ShouldUpdateData()) {
         	// 创建等待进度条
         	mWaitDialog = WaitDialog.Show(this, null, "正在更新数据", new WaitListener() {
-				/**
-				 * 开始登录
-				 */
 				@Override
 				public void startWait() {
 					DataMan.UpdateTodayData();
@@ -79,6 +76,7 @@ public class Function extends Activity {
 				}
 			});
         }
+        */
 	}
 	
 	// 为静态Handler保存实例

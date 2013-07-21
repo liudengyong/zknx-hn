@@ -341,6 +341,14 @@ public class DataMan extends DataInterface {
 	 * @return
 	 */
 	public static List<ListItemMap> GetProductList(int market_id) {
+		return GetProductList(market_id, false);
+	}
+	
+	public static List<ListItemMap> GenProductList(int market_id) {
+		return GetProductList(market_id, true);
+	}
+
+	private static List<ListItemMap> GetProductList(int market_id, boolean justGen) {
 
         ArrayList<ListItemMap> list = new ArrayList<ListItemMap>();
         if (market_id == INVALID_ID)
@@ -367,7 +375,11 @@ public class DataMan extends DataInterface {
         		String averagePrice = token[4];
         		String hostPrice = token[5];
         		String unit = token[6];
-        		boolean isMyProduct = IsMyProduct(product_id); /* 添加自选按钮状态 */
+        		boolean isMyProduct = false;
+        		
+        		// 生成时不用关心是否自选
+        		if (!justGen)
+        			IsMyProduct(product_id); /* 添加自选按钮状态 */
         		
         		AddProductList(list, productId, product_name, minPrice, maxPrice, averagePrice, hostPrice, unit, isMyProduct);
             }
@@ -405,7 +417,11 @@ public class DataMan extends DataInterface {
         		String averagePrice = minPrice;//token[6];
         		String hostPrice = minPrice;// token[7];
         		String unit = token[5];
-        		boolean isMyProduct = IsMyProduct(product_id); /* 添加自选按钮状态 */
+        		boolean isMyProduct = false;
+        		
+        		// 生成时不用关心是否自选
+        		if (!justGen)
+        			IsMyProduct(product_id); /* 添加自选按钮状态 */
         		
         		//list.add(new ProductListItemMap("名字", "最低价", "最高价", "平均价", "产地价", "单位", "添加"));
         		AddProductList(list, productId, product_name, minPrice, maxPrice, averagePrice, hostPrice, unit, isMyProduct);
@@ -1493,6 +1509,7 @@ public class DataMan extends DataInterface {
 			}
 		}
 
+		// 处理商品信息
 		List<ListItemMap> province = GetAddressList();
 		
 		if (province == null ||province.size() == 0)
@@ -1512,7 +1529,7 @@ public class DataMan extends DataInterface {
 					
 					// 获取所有产品信息
 					int marketId = market.getInt(KEY_MARKET_ID);
-					List<ListItemMap> products = GetProductList(marketId);
+					List<ListItemMap> products = GenProductList(marketId);
 					
 					Debug.Log("处理市场：" + marketId);
 					
@@ -1560,6 +1577,13 @@ public class DataMan extends DataInterface {
 		// liu,a,sdfsdf,0;
 		String lastLine = lines.get(lines.size() - 1);
 		String token[] = lastLine.split(COMMON_TOKEN);
+		
+		if (token == null ||
+			token.length != 4) {
+			Debug.Log("消息格式错误");
+			return null;
+		}
+
 		String time = token[3];
 		
 		List<String> lastTime = ReadLines(FILE_STAMP_LAST_MESSAGE, true);

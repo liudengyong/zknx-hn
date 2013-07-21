@@ -105,6 +105,14 @@ public class ProductListAdapter extends CommonListAdapter {
 	}
 	
 	/**
+	 * 点击列表自选
+	 * @param view
+	 */
+	public void clickListItem(View view) {
+		clickCheckbox(view.findViewById(R.id.product_list_item_add_custom_chk));
+	}
+	
+	/**
 	 * 定制特殊checkbox数据绑定
 	 */
 	SimpleAdapter.ViewBinder mBinder = new SimpleAdapter.ViewBinder() {
@@ -121,15 +129,6 @@ public class ProductListAdapter extends CommonListAdapter {
 
             	setCheckMyPriductStatus(view, Boolean.parseBoolean(checked));
             	view.setOnClickListener(mAddMyProduct);
-            	
-            	View parent = (View) view.getParent().getParent();
-            	parent.setOnClickListener(new OnClickListener() {
-					@Override
-					public void onClick(View layout) {
-						Debug.Log("setViewValue");
-						clickCheckbox(view);
-					}
-            	});
                 
                 return true;
             }
