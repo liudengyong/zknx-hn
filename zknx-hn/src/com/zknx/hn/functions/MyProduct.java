@@ -1,14 +1,18 @@
 package com.zknx.hn.functions;
 
 import android.content.DialogInterface;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.View.OnKeyListener;
+import android.view.View.OnLongClickListener;
 import android.widget.AdapterView;
 import android.widget.LinearLayout;
 import android.widget.AdapterView.OnItemClickListener;
 
 import com.zknx.hn.R;
+import com.zknx.hn.common.Debug;
 import com.zknx.hn.common.UIConst;
 import com.zknx.hn.common.UIConst.L_LAYOUT_TYPE;
 import com.zknx.hn.common.widget.Dialog;
@@ -139,22 +143,29 @@ public class MyProduct extends FunctionView {
 	
 	/** 监听删除自选产品
 	 */
-    private OnClickListener mOnClickRemove = new OnClickListener() {
+    private OnKeyListener mOnClickRemove = new OnKeyListener() {
 		@Override
-		public void onClick(final View view) {
+		public boolean onKey(View view, int arg1, KeyEvent keyEvent) {
 
-			Dialog.Confirm(mContext, R.string.confirm_remove_my_product, new ConfirmListener() {
-				@Override
-				public void onClick(DialogInterface dialog, int which) {
-
-					int product_id = view.getId();
-					if (product_id != DataMan.INVALID_ID) {
-						DataMan.MyProductListRemove(product_id);
-						// XXX 待优化（是否需要重画所有试图？）
-						initMyProductList();
+			if (keyEvent.getAction() == KeyEvent.ACTION_DOWN &&
+				keyEvent.getKeyCode() == KeyEvent.KEYCODE_DEL) {
+			Dialog.Toast(mContext, "HIT");
+				final int product_id = view.getId();
+				Dialog.Confirm(mContext, R.string.confirm_remove_my_product, new ConfirmListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						if (product_id != DataMan.INVALID_ID) {
+							DataMan.MyProductListRemove(product_id);
+							// XXX 待优化（是否需要重画所有试图？）
+							initMyProductList();
+						}
 					}
-				}
-			});
+				});
+			} else
+			
+			Dialog.Toast(mContext, "NO HIT:" + keyEvent.getKeyCode());
+
+			return false;
 		}
 	};
 }
