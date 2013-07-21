@@ -1046,6 +1046,11 @@ public class DataMan extends DataInterface {
 		SupplyDemandListener listener = new SupplyDemandListener() {
 			@Override
 			public boolean meetCondition(String[] token, String line) {
+				
+				if (token == null ||
+					token.length < 4 ||
+					curUserId == null)
+					return false;
 
 				// 筛选我的供求信息
 	        	// 判断是当用户自己的供求信息
@@ -1070,6 +1075,11 @@ public class DataMan extends DataInterface {
 		SupplyDemandListener listener2 = new SupplyDemandListener() {
 			@Override
 			public boolean meetCondition(String[] token, String line) {
+				
+				if (token == null ||
+					token.length < 4 ||
+					curUserId == null)
+					return false;
 	        
 	        	// 判断是当用户自己的供求信息
 	        	if (curUserId.equals(token[3]))
@@ -1501,11 +1511,11 @@ public class DataMan extends DataInterface {
 				String productClassId = item.getString(KEY_PRODUCT_CLASS_ID);
 				
 				// 供或者求
-				GenSupplyDemandList(productClassId, true);
-				GenSupplyDemandList(productClassId, false);
+				//GenSupplyDemandList(productClassId, true);
+				//GenSupplyDemandList(productClassId, false);
 				
 				// 对接信息，我的供求
-				GenSupplyDemandPairList(productClassId);
+				//GenSupplyDemandPairList(productClassId);
 			}
 		}
 

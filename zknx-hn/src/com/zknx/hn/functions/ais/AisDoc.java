@@ -468,12 +468,18 @@ CString column_child16[]={"生产类","生活类","医疗类","教育类"};
 			return;
 		}
 		
+		if (mQuestionList == null) {
+			throw new IOException("Ais结构错误：mQuestionList == null");
+		}
+		
 		Question lastQuestion = mQuestionList.get(mQuestionList.size() - 1);
 
 		switch (v) {
 		// 添加分数
 		case DataMan.AIS_TOKEN_COURSE_GRADE:
 			lastQuestion.grade = DataMan.ParseInt(new String(data, 0, 2));
+			if (lastQuestion.grade == -1)
+				lastQuestion.grade = DataMan.ParseInt(new String(data, 0, 1));
 			break;
 		case DataMan.AIS_TOKEN_COURSE_ANSWER:
 			if (data.length != 4) {
