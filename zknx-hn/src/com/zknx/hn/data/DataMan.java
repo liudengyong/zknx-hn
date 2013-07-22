@@ -6,6 +6,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -1262,12 +1264,18 @@ public class DataMan extends DataInterface {
 	 * @return
 	 */
 	public static boolean PostNewMessage(String userId, String friendId, String message) {
-		// TODO interface 留言参数需调整? encoding?
-		String params = "user=" + userId + "&friend=" + friendId + "&message=" + message;
+		String params;
+		try {
+			params = "user=" + userId + "&friend=" + friendId +
+					"&message=" + URLEncoder.encode(message, "UTF-8");
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+			return false;
+		}
 
 		String ret = Downloader.PostUrl(URL_SERVER + URL_POST_MESSAGE, params);
 
-		if (ret.equals("true"))
+		if (ret.equals("TRUE"))
 			return true;
 		
 		Debug.Log("发布留言错误：返回：" + ret);
@@ -1315,28 +1323,27 @@ public class DataMan extends DataInterface {
 	 * 如果function_id为0则返回一级分类，否则返回function_id对应的子级分类
 	 * @return
 	 */
+	private static String FILE_NAME_GEN_AIS_LIST = "gen_ais_list.txt";
 	public static List<ListItemMap> GetAisColumnChildList(int functionId) {
 
 		List<ListItemMap> list = new ArrayList<ListItemMap>();
 		List<String> lines = ReadLines(FILE_NAME_AIS_LIST);
 		Map<String, String> map = new HashMap<String, String>();
 		
+		GenAisList();
+		
 		String[] token;
 		for (String line : lines) {
 			token = line.split(TOKEN_SEP);
 			
-			if (token != null && token.length == 4) {
-				// 20130607112901281,10,试卷一,2013-6-7
+			if (token != null && token.length == 5) {
+				// 20130607112901281,10,食品,试卷一,2013-6-7
 				int column = ParseInt(token[1]);
 				if (!IsAisColumnMatch(functionId, column))
 					continue;
 				
-				String name = token[2];
-				String fileName = name + ".ais";
-				
-				AisDoc aisDoc = new AisDoc(fileName);
-				String child = aisDoc.getAisChildColumn();
-				
+				String child = token[2];
+
 				// 不重复添加
 				if (!child.isEmpty() && map.get(child) == null)
 					map.put(child, child);
@@ -1350,6 +1357,46 @@ public class DataMan extends DataInterface {
 		}
 		
 		return list;
+	}
+	
+	/**
+	 * 生成ais list
+	 */
+	private static void GenAisList() {
+		if (FileUtils.IsFileExist(DataFile(FILE_NAME_GEN_AIS_LIST)))
+			return;
+
+		List<String> lines = ReadLines(FILE_NAME_AIS_LIST);
+		
+		String newAisList = "";
+		
+		String[] token;
+		for (String line : lines) {
+			token = line.split(TOKEN_SEP);
+			
+			if (token != null && token.length == 4) {
+				// 20130607112901281,10,试卷一,2013-6-7
+				int column = ParseInt(token[1]);
+				if (column == INVALID_ID)
+					continue;
+				
+				String name = token[2];
+				String fileName = name + ".ais";
+				
+				AisDoc aisDoc = new AisDoc(fileName);
+				String child = aisDoc.getAisChildColumn();
+				
+				// 重新生成list
+				newAisList += token[0] + COMMON_TOKEN +
+						token[1] + COMMON_TOKEN +
+						child + COMMON_TOKEN +
+						token[2] + COMMON_TOKEN +
+						token[3] + COMMON_TOKEN + "\n";
+			}
+		}
+		
+		// 重新生成
+		FileUtils.WriteFile(DataFile(FILE_NAME_GEN_AIS_LIST), newAisList.getBytes());
 	}
 
 	/**
@@ -1397,24 +1444,26 @@ public class DataMan extends DataInterface {
 		if (childColumn == null)
 			return list;
 		
+		GenAisList();
+		
 		String[] token;
 		for (String line : lines) {
 			token = line.split(TOKEN_SEP);
 			
 			if (token != null && token.length == 4) {
-				// 20130607112901281,10,试卷一,2013-6-7
+				// 20130607112901281,10,食品,试卷一,2013-6-7
 				int column = ParseInt(token[1]);
 				if (!IsAisColumnMatch(functionId, column))
 					continue;
 				
-				String name = token[2];
+				String name = token[3];
 				String fileName = name + ".ais";
 				
-				AisDoc aisDoc = new AisDoc(fileName);
+				String child = token[2];
 				
 				// 符合条件
 				if (childColumn.isEmpty() ||
-					aisDoc.getAisChildColumn().equals(childColumn)) {
+					child.equals(childColumn)) {
 					list.add(new ListItemMap(name, KEY_AIS_FILE_NAME, fileName));
 				}
 			}
@@ -1503,6 +1552,10 @@ public class DataMan extends DataInterface {
 	 */
 	public static boolean ProcessBroadcastData() {
 		
+		// AIS列表
+		
+		GenAisList();
+		
 		//  处理供求信息
 		List<ListItemMap> productClass = GetProductClassList();
 		
@@ -1568,6 +1621,7 @@ public class DataMan extends DataInterface {
 	/**
 	 * 获取当前用户新的留言
 	 * return：返回上次留言的时间
+	 * TODO 逗号问题，暂时是默认消息内部可以存在逗号，只取后面几个分隔符
 	 */
 	private static final String FILE_STAMP_LAST_MESSAGE = "lastMessage.txt";
 	public static String GetNewMessages() {
@@ -1589,12 +1643,13 @@ public class DataMan extends DataInterface {
 		String token[] = lastLine.split(COMMON_TOKEN);
 		
 		if (token == null ||
-			token.length != 4) {
+			token.length < 6) {
 			Debug.Log("消息格式错误");
 			return null;
 		}
 
-		String time = token[3];
+		// 最后一个分隔符是时间
+		String time = token[token.length - 1];
 		
 		List<String> lastTime = ReadLines(FILE_STAMP_LAST_MESSAGE, true);
 		if (lastTime != null &&
@@ -1711,24 +1766,31 @@ public class DataMan extends DataInterface {
 	
 	public static boolean PostSupplyDemandInfo(SupplyDemandInfo info) {
 		//type=0&title=供应西红柿&userid=linshi&addressid=06056&commodityid=0305002000&count=大量&price=5&unit=元/公斤&phonenumber=15941652887&place=辽宁锦州凌海市新庄子乡小马村范坨&linkman=刘春宇&remark=备注&validity=2013-06-24&publishdate=2013-05-25
-		String params = "type=" + info.type + 
-			"&title=" + info.title + 
-			"&userid=" + UserMan.GetUserId() + 
-			"&addressid=" + UserMan.GetUserAddressId() +
-			"&commodityid=" + info.commodityid + 
-			"&count=" + info.count +
-			"&price=" + info.price + 
-			"&unit=" + info.unit + 
-			"&phonenumber=" + UserMan.GetUserPhone() + 
-			"&place=" + info.place + 
-			"&linkman=" + UserMan.GetUserName() + 
-			"&remark=" + // NO need remark 
-			"&validity=" + info.validity + 
-			"&publishdate=" + info.publishdate;
+		String params;
+		try {
+			params = "type=" + info.type + 
+				"&title=" + URLEncoder.encode(info.title, "UTF-8") + 
+				"&userid=" + UserMan.GetUserId() + 
+				"&addressid=" + UserMan.GetUserAddressId() +
+				"&commodityid=" + info.commodityid + 
+				"&count=" + URLEncoder.encode(info.count, "UTF-8") +
+				"&price=" + URLEncoder.encode(info.price, "UTF-8") + 
+				"&unit=" + URLEncoder.encode(info.unit, "UTF-8") + 
+				"&phonenumber=" + URLEncoder.encode(UserMan.GetUserPhone(), "UTF-8") + 
+				"&place=" + URLEncoder.encode(info.place, "UTF-8") + 
+				"&linkman=" + URLEncoder.encode(UserMan.GetUserName(), "UTF-8") + 
+				"&remark=" + // NO need remark 
+				"&validity=" + URLEncoder.encode(info.validity, "UTF-8") + 
+				"&publishdate=" + URLEncoder.encode(info.publishdate, "UTF-8");
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+			Debug.Log("URL编码错误");
+			return false;
+		}
 		
 		String ret = Downloader.PostUrl(URL_SERVER + URL_POST_SUPPLY_DEMAND_INFO, params);
 
-		if (ret.equals("0"))
+		if (ret.equals("TRUE"))
 			return true;
 		
 		Debug.Log("发布供求信息错误：返回：" + ret);
@@ -1756,11 +1818,11 @@ public class DataMan extends DataInterface {
 
 		String ret = Downloader.PostUrl(URL_ASK_EXPERT, params);
 
-		if (ret.equals("true")) {
+		if (ret.equals("TRUE")) {
 			SaveTodayLocalQuestion(expertId, subject, question);
 			return true;
 		}
-		
+
 		Debug.Log("提问专家错误：返回：" + ret);
 
 		return false;

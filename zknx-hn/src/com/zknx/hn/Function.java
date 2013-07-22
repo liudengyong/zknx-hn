@@ -18,6 +18,7 @@ import com.zknx.hn.home.Params;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.ActivityManager.RunningAppProcessInfo;
+import android.app.ActivityManager.RunningServiceInfo;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -51,6 +52,14 @@ public class Function extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         
+        // TODO 调试用户登勇
+        UserMan.SetUserInfo("dengyong", "刘登勇", "0100101", "北京市朝阳区东四环中路远洋国际中心A座23层", "18911939853");
+        
+        // TODO 调试用户林适
+        //UserMan.SetUserInfo("linshi", "林适", "0200101", "北京市朝阳区东四环中路远洋国际中心A座23层", "18911939853");
+        
+        //checkServiceRunning();
+        
         FunctionInstance = this;
         
         //mSavedIntent = getIntent();
@@ -77,6 +86,26 @@ public class Function extends Activity {
 			});
         }
         */
+	}
+	
+	/**
+	 * 检查后台服务是否运行
+	 * @return
+	 */
+	private void checkServiceRunning() {
+		boolean running = false;
+	    ActivityManager manager = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
+	    for (RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+	        if (DataService.class.equals(service.service.getClassName())) {
+	        	running = true;
+	        	break;
+	        }
+	    }
+	    
+	    if (!running) {
+	    	Intent service = new Intent(this, DataService.class);
+	        this.startService(service);
+	    }
 	}
 	
 	// 为静态Handler保存实例

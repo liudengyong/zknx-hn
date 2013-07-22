@@ -2,6 +2,7 @@ package com.zknx.hn.functions;
 
 import java.util.List;
 
+import android.app.Activity;
 import android.content.DialogInterface;
 import android.text.Editable;
 import android.view.Gravity;
@@ -133,7 +134,28 @@ public class MySupplyDemand extends FunctionView {
 			postBtn.setOnClickListener(mClickPostButton);
 		}
 	}
+
+	private DataMan.SupplyDemandInfo mInfo;
 	
+	WaitListener waitListener = new WaitListener() {
+		@Override
+		public void startWait() {
+			final boolean ret = DataMan.PostSupplyDemandInfo(mInfo);
+			Activity act = (Activity) mContext;
+			act.runOnUiThread(new Runnable() {
+				@Override
+				public void run() {
+					if (ret) {
+						Toast.makeText(mContext, R.string.post_supply_demand_info_ok, Toast.LENGTH_LONG).show();
+						clearInfo();
+					} else {
+						Toast.makeText(mContext, R.string.post_supply_demand_info_failed, Toast.LENGTH_LONG).show();
+					}
+				}
+			});
+		}
+	};
+
 	/**
 	 * 监听发布供求信息按钮
 	 */
@@ -161,41 +183,41 @@ public class MySupplyDemand extends FunctionView {
 				return;
 			}
 			
-			final DataMan.SupplyDemandInfo info = new DataMan.SupplyDemandInfo();
+			mInfo = new DataMan.SupplyDemandInfo();
 			
-			info.type = mIsSupply.getCheckedRadioButtonId();
+			mInfo.type = mIsSupply.getCheckedRadioButtonId();
 			// 获取产品分类id
 			String productClassId = mProductList.get(mProductClass.getSelectedItemPosition()).getString(DataMan.KEY_PRODUCT_CLASS_ID);
-			info.commodityid =  productClassId;
-			info.count = mAmount.getEditableText().toString();
-			info.place = mHost.getEditableText().toString();
-			info.price = mPrice.getEditableText().toString();
-			info.publishdate = DataMan.GetCurrentTime(false); // 发布日期
-			info.title = mContent.getEditableText().toString();
-			info.unit = mUnit.getEditableText().toString();
-			info.validity = mValidDate.getEditableText().toString();
+			mInfo.commodityid =  productClassId;
+			mInfo.count = mAmount.getEditableText().toString();
+			mInfo.place = mHost.getEditableText().toString();
+			mInfo.price = mPrice.getEditableText().toString();
+			mInfo.publishdate = DataMan.GetCurrentTime(false); // 发布日期
+			mInfo.title = mContent.getEditableText().toString();
+			mInfo.unit = mUnit.getEditableText().toString();
+			mInfo.validity = mValidDate.getEditableText().toString();
 
 			// 确认发布信息
 			Dialog.Confirm(mContext, R.string.confirm_post_supply_demand_info, new ConfirmListener() {
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
-
-					WaitListener waitListener = new WaitListener() {
-						@Override
-						public void startWait() {
-							if (DataMan.PostSupplyDemandInfo(info)) {
-								Toast.makeText(mContext, R.string.post_supply_demand_info_ok, Toast.LENGTH_LONG).show();
-							} else {
-								Toast.makeText(mContext, R.string.post_supply_demand_info_failed, Toast.LENGTH_LONG).show();
-							}
-						}
-					};
-
 					WaitDialog.Show(mContext, "请稍等", "正在发布信息", waitListener);
 				}
 			});
 		}
 	};
+	
+	/**
+	 * 发布成功后清除填写内容
+	 */
+	private void clearInfo() {
+		mAmount.setText("");
+		mUnit.setText("");
+		mValidDate.setText("");
+		mHost.setText("");
+		mPrice.setText("");
+		mContent.setText("");
+	}
 	
 	/**
 	 * 判断输入控件是否为空，为空返回true
