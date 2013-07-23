@@ -66,6 +66,9 @@ public class MyGroup extends FunctionView {
 	// 商友列表视图
 	ListView mFriendListView;
 	
+	// 当前留言界面
+	private int mCurMessageButtonId = DataMan.INVALID_ID;
+	
 	// 保存当前好友信息
 	private FriendInfo mCurFriendInfo;
 	class FriendInfo {
@@ -275,6 +278,8 @@ public class MyGroup extends FunctionView {
 		mMyMessageBtn.setBackgroundResource(getMessageButtonRes(messageButtonId == R.id.my_group_message_my_message));
 		mFriendMessageBtn.setBackgroundResource(getMessageButtonRes(messageButtonId == R.id.my_group_message_friend_message));
 		mGroupBtn.setBackgroundResource(getMessageButtonRes(messageButtonId == R.id.my_group_message_group));
+		
+		mCurMessageButtonId = messageButtonId;
 	}
 	
 	/**
@@ -469,5 +474,20 @@ public class MyGroup extends FunctionView {
 				WaitDialog.Show(mContext, "请稍等", "正在发布留言", waitListener);
 			}
 		});
+	}
+	
+	/**
+	 * 有新留言时更显界面
+	 */
+	public void updateMessageView() {
+		if (mCurFriendInfo == null)
+			return;
+
+		// 判断留言界面
+		if (mCurMessageButtonId == R.id.my_group_message_my_message ||
+			mCurMessageButtonId == R.id.my_group_message_friend_message) {
+			// 我的留言界面和商友留言界面
+			initMessageTab(mCurMessageButtonId);
+		}
 	}
 }

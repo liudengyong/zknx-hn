@@ -11,6 +11,7 @@ import com.zknx.hn.common.widget.WaitDialog;
 import com.zknx.hn.common.widget.Dialog.ConfirmListener;
 import com.zknx.hn.data.DataMan;
 import com.zknx.hn.data.UserMan;
+import com.zknx.hn.functions.MyGroup;
 import com.zknx.hn.functions.common.FunctionView;
 import com.zknx.hn.home.Functions;
 import com.zknx.hn.home.Params;
@@ -205,6 +206,10 @@ public class Function extends Activity {
 	  */
 	 private void showNotification(String message) {
 		 Dialog.Toast(this, message);
+		 
+		 if (mFunctionView instanceof MyGroup) {
+			 ((MyGroup)mFunctionView).updateMessageView();
+		 }
 		 /*
 	     // 定义Notification的各种属性  
 	     Notification notification = new Notification(R.drawable.icon_back,
