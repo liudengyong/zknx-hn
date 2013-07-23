@@ -1197,15 +1197,41 @@ public class DataMan extends DataInterface {
 	 */
 	public static List<ListItemMap> GetMyGroupMessageList(int fiend_id) {
 		
-		ArrayList<ListItemMap> list = new ArrayList<ListItemMap>();  
-        List<String> lines = ReadLines(FILE_NAME_MY_GROUP_MESSAGE);
+		ArrayList<ListItemMap> list = new ArrayList<ListItemMap>();
+		
+		List<String> lines = ReadLines(FILE_NAME_NEW_MESSAGE);
+		for (String line : lines) {
+			String[] token = GetToken(line);
+			// dengyong,test,ni hao a ge men, henhao ,0,201307222129
+			if (token.length >= 5) {
+				String frienId = token[1];
+        		String message = token[2];
+        		String time = token[token.length - 1];
+        		
+        		for (int i = 3; i < token.length - 2; ++i) {
+        			// 为防止消息中有逗号，出去前两个分割，和后两个分割，其他都为消息内容
+        			message += "," + token[i];
+        		}
+
+        		String itemText = frienId;
+        		if (DataMan.MY_MESSAGE == fiend_id)
+        			itemText = frienId + " " + time + " ： " + message;
+
+        		ListItemMap map = new ListItemMap(itemText/* 名字 */, KEY_FRIEND_ID, frienId/* id */);
+        		
+        		map.put(KEY_FRIEND_MESSAGE_CONTENT, message);
+        		// 最后一个分割为时间
+        		map.put(KEY_FRIEND_MESSAGE_DATE, time);
+        		
+        		GetUserInfo(frienId, map);
+        		
+        		list.add(map);
+			}
+        }
+		
+        lines = ReadLines(FILE_NAME_MY_GROUP_MESSAGE);
         
         //int  = ParseInt(friendId);
-        
-        // TODO 待删除测试代码
-        list.add(new ListItemMap("我的自我介绍……"/* 名字 */, KEY_MY_GROUP_MESSAGE_ID, "friend"/* id */));
-        list.add(new ListItemMap("你好，我有一百吨大米出售，请联系我：18911939853"/* 名字 */, KEY_MY_GROUP_MESSAGE_ID, "id"/* id */));
-        list.add(new ListItemMap("我想买你的苹果，你的电话是多少？"/* 名字 */, KEY_MY_GROUP_MESSAGE_ID, "id"/* id */));
         
         for (String line : lines)  
         {
@@ -1255,6 +1281,32 @@ public class DataMan extends DataInterface {
 
         return list;
 	}
+	
+	/**
+	 * 从用户列表中查询用户信息
+	 */
+	private static void GetUserInfo(String userId, ListItemMap info) {
+		
+		List<String> lines = ReadLines(FILE_NAME_USERS);
+		
+		for (String line : lines) {
+			// liye3,10,13800138000,‘注册默认地址’,注册默认备注信息
+			String[] token = GetToken(line);
+			if (token.length == 5 &&
+				token[0].equals(userId)) {
+				String majorId = token[1];
+				String phone = token[2];
+				String address = token[3];
+				String note = token[4];
+
+				info.put(KEY_FRIEND_MAJOR, majorId);
+				info.put(KEY_FRIEND_ADDRESS, address);
+				info.put(KEY_FRIEND_TELEPHONE, phone);
+				info.put(KEY_FRIEND_MESSAGE_CONTENT, note);
+				return;
+			}
+		}
+	}
 
 	/**
 	 * 发布新留言
@@ -1266,7 +1318,8 @@ public class DataMan extends DataInterface {
 	public static boolean PostNewMessage(String userId, String friendId, String message) {
 		String params;
 		try {
-			params = "user=" + userId + "&friend=" + friendId +
+			// TODO userId ？ friendId ？ 定义？
+			params = "user=" + friendId + "&friend=" + userId +
 					"&message=" + URLEncoder.encode(message, "UTF-8");
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();

@@ -53,10 +53,23 @@ public class Function extends Activity {
         super.onCreate(savedInstanceState);
         
         // TODO 调试用户登勇
-        UserMan.SetUserInfo("dengyong", "刘登勇", "0100101", "北京市朝阳区东四环中路远洋国际中心A座23层", "18911939853");
-        
-        // TODO 调试用户林适
-        //UserMan.SetUserInfo("linshi", "林适", "0200101", "北京市朝阳区东四环中路远洋国际中心A座23层", "18911939853");
+        List<String> lines = DataMan.ReadLines("fake_user.txt");
+
+        String user = "dengyong";
+    	String name = "刘登勇";
+    	String addressId = "0100101";
+    	String address = "北京市朝阳区东四环中路远洋国际中心A座23层";
+    	String phone = "18911939853";
+    	
+        if (lines.size() >= 5) {
+        	user = lines.get(0);
+        	name = lines.get(1);
+        	addressId = lines.get(2);
+        	address = lines.get(3);
+        	phone = lines.get(4);
+        }
+
+        UserMan.SetUserInfo(user, name, addressId, address, phone);
         
         //checkServiceRunning();
         

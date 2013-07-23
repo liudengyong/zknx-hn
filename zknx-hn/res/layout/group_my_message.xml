@@ -13,7 +13,8 @@
     <RelativeLayout android:id="@+id/my_group_my_message_introduce"
     android:layout_width="match_parent"
     android:layout_height="63sp"
-    android:layout_above="@+id/new_message_divider_bottom" >
+    android:layout_above="@+id/new_message_divider_bottom"
+    android:visibility="gone">
 		<TextView android:id="@+id/my_group_my_message_introduce_label"
 		   android:layout_width="wrap_content"
 		   android:layout_height="match_parent"

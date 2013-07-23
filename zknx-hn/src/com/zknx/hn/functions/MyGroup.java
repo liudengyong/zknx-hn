@@ -1,5 +1,6 @@
 package com.zknx.hn.functions;
 
+import android.app.Activity;
 import android.content.DialogInterface;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -427,13 +428,22 @@ public class MyGroup extends FunctionView {
 				WaitListener waitListener = new WaitListener() {
 					@Override
 					public void startWait() {
-						if (!DataMan.PostNewMessage(userId, friendId, newMessage)) {
-							Toast.makeText(mContext, "发布留言失败", Toast.LENGTH_LONG).show();
-							return;
-						}
 						
-						Toast.makeText(mContext, "发布留言成功", Toast.LENGTH_LONG).show();
-						mNewMessageContent.setText(""); // 成功发布留言后清空留言内容
+						final boolean ret = DataMan.PostNewMessage(userId, friendId, newMessage);
+						
+						Activity act = (Activity) mContext;
+						act.runOnUiThread(new Runnable() {
+							@Override
+							public void run() {
+								if (!ret) {
+									Toast.makeText(mContext, "发布留言失败", Toast.LENGTH_LONG).show();
+									return;
+								}
+
+								Toast.makeText(mContext, "发布留言成功", Toast.LENGTH_LONG).show();
+								mNewMessageContent.setText(""); // 成功发布留言后清空留言内容
+							}
+						});
 					}
 				};
 
