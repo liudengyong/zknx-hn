@@ -1693,12 +1693,12 @@ public class DataMan extends DataInterface {
 			return null;
 
 		// 获取最后一行的数据
-		// liu,a,sdfsdf,0;
+		// dengyong,test,ceshishij,0,2013-7-23 20:45:15;
 		String lastLine = lines.get(lines.size() - 1);
 		String token[] = lastLine.split(COMMON_TOKEN);
 		
 		if (token == null ||
-			token.length < 6) {
+			token.length < 5) {
 			Debug.Log("消息格式错误");
 			return null;
 		}
@@ -1706,23 +1706,24 @@ public class DataMan extends DataInterface {
 		// 最后一个分隔符是时间
 		String time = token[token.length - 1];
 		
-		List<String> lastTime = ReadLines(FILE_STAMP_LAST_MESSAGE, true);
-		if (lastTime != null &&
-			lastTime.size() > 0 &&
-			!lastTime.get(0).equals(time)) {
-			try {
-				FileUtils.WriteText(DataFile(FILE_STAMP_LAST_MESSAGE, true), time);
-			} catch (IOException e) {
-				Debug.Log("写新信息时间戳错误");
-				return null;
-			}
-			
-			String message = token[0] + "：" + token[2];
-
-			return message;
-		}
+		String message = null;
 		
-		return null;
+		List<String> lastTime = ReadLines(FILE_STAMP_LAST_MESSAGE, true);
+		if (lastTime == null ||
+			lastTime.size() == 0 ||
+			!lastTime.get(0).equals(time)) {
+			
+			message = token[0] + "：" + token[2];
+		}
+
+		try {
+			FileUtils.WriteText(DataFile(FILE_STAMP_LAST_MESSAGE, true), time);
+		} catch (IOException e) {
+			Debug.Log("写新信息时间戳错误");
+			return null;
+		}
+
+		return message;
 	}
 	
 	/**
