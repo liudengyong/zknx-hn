@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -278,12 +279,29 @@ public class MyGroup extends FunctionView {
 	/**
 	 * 初始化我的留言视图
 	 */
+	private CommonListAdapter mAdapterMyMessage;
 	private void initMyMessageView() {
 		RelativeLayout myMessageLayout = (RelativeLayout) mInflater.inflate(R.layout.group_my_message, null);
 		LinearLayout listViewLayout = (LinearLayout) myMessageLayout.findViewById(R.id.my_group_my_message_listview);
 		
-		CommonListAdapter adapter = new CommonListAdapter(mContext, DataMan.GetMyGroupMessageList(DataMan.MY_MESSAGE));
-		CommonListParams listParams = new CommonListParams(mInflater, listViewLayout, adapter, null);
+		mAdapterMyMessage = new CommonListAdapter(mContext, DataMan.GetMyGroupMessageList(DataMan.MY_MESSAGE));
+		CommonListParams listParams = new CommonListParams(mInflater, listViewLayout, mAdapterMyMessage, new OnItemClickListener() {
+			@Override
+			public void onItemClick(AdapterView<?> adapter, View view, int position, long id) {
+				ListItemMap map = mAdapterMyMessage.getItem(position);
+				if (map != null) {
+					String name = map.getString(DataMan.KEY_FRIEND_ID);
+					String time = map.getString(DataMan.KEY_FRIEND_MESSAGE_DATE);
+					String message = map.getString(DataMan.KEY_FRIEND_MESSAGE_CONTENT);
+					
+					String content = "好友：" + name + "\n" +
+					"时间：" + time + "\n" +
+					"消息：" + message;
+
+					Dialog.MessageBox(mContext, content);
+				}
+			}
+		});
 		
 		// 初始化我的留言列表
 		CommonList.Init(listParams);
