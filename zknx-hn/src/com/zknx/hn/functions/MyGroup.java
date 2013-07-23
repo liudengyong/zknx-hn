@@ -71,7 +71,7 @@ public class MyGroup extends FunctionView {
 	class FriendInfo {
 		public FriendInfo(ListItemMap info) {
 			id        = info.getString(DataMan.KEY_FRIEND_ID);
-			name      = info.getString(DataMan.KEY_NAME);
+			name      = info.getString(DataMan.KEY_FRIEND_ID);
 			major     = info.getString(DataMan.KEY_FRIEND_MAJOR);
 			address   = info.getString(DataMan.KEY_FRIEND_ADDRESS);
 			phone     = info.getString(DataMan.KEY_FRIEND_TELEPHONE);
@@ -89,8 +89,6 @@ public class MyGroup extends FunctionView {
 		super(inflater, frameRoot, frameResId);
 		
 		initFriendList();
-		
-		initGroupMessaage();
 	}
 	
 	/**
@@ -181,6 +179,9 @@ public class MyGroup extends FunctionView {
 	
 		// 清除第二区后添加视图
 		initContent("商友信息", layout, mContentFrame[1]);
+		
+		// 显示完商友信息显示留言
+		initGroupMessaage();
 	}
 	
 	/**
@@ -204,8 +205,8 @@ public class MyGroup extends FunctionView {
 			mMessageContent = (LinearLayout)mMessageLayout.findViewById(R.id.my_group_message_content);
 		}
 		
-		// 默认显示我的留言
-		initMessageTab(R.id.my_group_message_my_message);
+		// 默认显示当前好友的留言
+		initMessageTab(R.id.my_group_message_friend_message);
 		
 		// 清除第三区后添加视图
 		mContentFrame[2].removeAllViews();
@@ -328,8 +329,8 @@ public class MyGroup extends FunctionView {
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 				super.onItemClick(parent, view, position, id);
 				
-				String friendId = mAdapterFriendMessage.getItemMapString(position, DataMan.KEY_MY_GROUP_MESSAGE_ID);
-				String messageOwner = mAdapterFriendMessage.getItemMapString(position, DataMan.KEY_FRIEND_MESSAGE_POSER);
+				String friendId = mAdapterFriendMessage.getItemMapString(position, DataMan.KEY_FRIEND_ID);
+				String messageOwner = mAdapterFriendMessage.getItemMapString(position, DataMan.KEY_FRIEND_ID);
 				
 				// 切换为新建留言界面，传参好友留言组id
 				initNewMessageView(messageOwner, friendId, R.id.my_group_message_friend_message);

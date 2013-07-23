@@ -1213,14 +1213,12 @@ public class DataMan extends DataInterface {
         			message += "," + token[i];
         		}
 
-        		String itemText = "TODO";
+        		String itemText = time + "\t" + message;
         		if (DataMan.MY_MESSAGE == fiend_id)
         			itemText = frienId + " £º " + message;
         		else if (fiend_id != ParseInt(frienId))
         			continue;
         		
-        		itemText = time + "\t" + message;
-
         		ListItemMap map = new ListItemMap(itemText/* Ãû×Ö */, KEY_FRIEND_ID, frienId/* id */);
         		
         		map.put(KEY_FRIEND_MESSAGE_CONTENT, message);
