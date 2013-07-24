@@ -94,7 +94,7 @@ CString column_child15[]={"基本法律","三农法律"};
 CString column_child16[]={"生产类","生活类","医疗类","教育类"};
 	 */
 	
-	private static int COLUMN_COURSE = 12; // 课件column
+	public static int COLUMN_COURSE = 12; // 课件column
 
 	/**
 	 * Ais文件头
@@ -300,7 +300,9 @@ CString column_child16[]={"生产类","生活类","医疗类","教育类"};
 				case DataMan.AIS_TOKEN_COURSE_ANSWER:
 				case DataMan.AIS_TOKEN_COURSE_GRADE:
 				case DataMan.AIS_TOKEN_COURSE_NOTE:
-					if (isCourse())
+					if (isCourse() &&
+						(getTitle().contains("党的") || /* TODO ais文件格式错误 */
+						getTitle().contains("ais问卷")))
 						addQuestion(v, data);
 					else
 						Debug.Log("Ais结构错误：非试卷不应有答案结构，" + mHeader.column);

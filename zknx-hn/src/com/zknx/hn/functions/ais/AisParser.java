@@ -119,7 +119,9 @@ public class AisParser {
 		WebView webView = (WebView) contentLayout.findViewById(R.id.ais_webview);
 
 		// 是否课件
-		if (aisDoc.isCourse()) {
+		if (aisDoc.isCourse() &&
+			(aisDoc.getTitle().contains("党的") || /* TODO ais文件格式错误 */
+			aisDoc.getTitle().contains("ais问卷"))) {
 			webView.setVisibility(View.GONE);
 			//CourseWebView.GenHtml(ais_id, webView, aisDoc);
 			CourseView.InitView(mInflater, contentLayout, aisDoc);

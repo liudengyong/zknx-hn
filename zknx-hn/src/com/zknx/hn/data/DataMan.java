@@ -85,7 +85,7 @@ public class DataMan extends DataInterface {
 	// 默认非法id值
 	public static final int INVALID_ID = -1;
 	// 用于查询我的留言的标志
-	public static final int MY_MESSAGE = 0;
+	//public static final int MY_MESSAGE = 0;
 
 	// 通用分隔符
 	public static final String COMMON_TOKEN = ",";
@@ -668,6 +668,22 @@ public class DataMan extends DataInterface {
 		// 产品id或者市场id为空的话返回空
 		if (market_id == null || product_id == null)
 			return null;
+		
+		// TODO 历史价格待删除
+		
+		ProductPriceInfo info = new ProductPriceInfo();
+		
+		info.add("2013-07-10", 12.00F);
+		info.add("2013-07-11", 10.00F);
+		info.add("2013-07-12", 12.00F);
+		info.add("2013-07-13", 2.00F);
+		info.add("2013-07-14", 12.00F);
+		info.add("2013-07-15", 1.00F);
+		info.add("2013-07-16", 20.00F);
+		
+		return info;
+		
+		/*
 
 		// 获取某市场历史价格
 		String fileName = "history_price/" + market_id + ".txt";
@@ -690,6 +706,7 @@ public class DataMan extends DataInterface {
 		}
 
 		return null;
+		*/
 	}
 	
 	/**
@@ -1147,6 +1164,10 @@ public class DataMan extends DataInterface {
     			if (majorIid != INVALID_ID && majorIid != major_id)
     				continue;
 
+    			// 排除自己
+    			if (id.equals(UserMan.GetUserId()))
+    				continue;
+
         		String name = id;//token[2];
         		String telephone = token[2];
         		String address   = token[3];
@@ -1195,9 +1216,12 @@ public class DataMan extends DataInterface {
 	 * 0 表示返回我的留言
 	 * @return
 	 */
-	public static List<ListItemMap> GetMyGroupMessageList(int fiend_id) {
+	public static List<ListItemMap> GetMyGroupMessageList(String fiend_id) {
 		
 		ArrayList<ListItemMap> list = new ArrayList<ListItemMap>();
+		
+		if (fiend_id == null)
+			return list;
 		
 		List<String> lines = ReadLines(FILE_NAME_NEW_MESSAGE);
 		for (String line : lines) {
@@ -1214,9 +1238,9 @@ public class DataMan extends DataInterface {
         		}
 
         		String itemText = time + "\t" + message;
-        		if (DataMan.MY_MESSAGE == fiend_id)
+        		if (fiend_id.equals(UserMan.GetUserId()))
         			itemText = frienId + " ： " + message;
-        		else if (fiend_id != ParseInt(frienId))
+        		else if (!fiend_id.equals(frienId))
         			continue;
         		
         		ListItemMap map = new ListItemMap(itemText/* 名字 */, KEY_FRIEND_ID, frienId/* id */);
@@ -1231,6 +1255,10 @@ public class DataMan extends DataInterface {
 			}
         }
 		
+		return list;
+		
+		/*
+		// TODO 暂不读取历史留言，接口待协商？get_message只获取今日留言？
         lines = ReadLines(FILE_NAME_MY_GROUP_MESSAGE);
         
         //int  = ParseInt(friendId);
@@ -1266,7 +1294,7 @@ public class DataMan extends DataInterface {
 	        		String telephone = token[7];
 	        		String message = token[8];
 	
-	        		ListItemMap map = new ListItemMap(poster/* 名字 */, KEY_MY_GROUP_MESSAGE_ID, "id"/* id */);
+	        		ListItemMap map = new ListItemMap(poster, KEY_MY_GROUP_MESSAGE_ID, token[0]);
 	        		
 	        		map.put(KEY_FRIEND_MAJOR, owner_id);
 	        		map.put(KEY_FRIEND_MESSAGE_POSER, owner);
@@ -1282,6 +1310,8 @@ public class DataMan extends DataInterface {
         }
 
         return list;
+        
+        */
 	}
 	
 	/**
@@ -1382,10 +1412,11 @@ public class DataMan extends DataInterface {
 	public static List<ListItemMap> GetAisColumnChildList(int functionId) {
 
 		List<ListItemMap> list = new ArrayList<ListItemMap>();
-		List<String> lines = ReadLines(FILE_NAME_AIS_LIST);
 		Map<String, String> map = new HashMap<String, String>();
 		
 		GenAisList();
+		
+		List<String> lines = ReadLinesWithEncoding(FILE_NAME_GEN_AIS_LIST, "UTF-8", false);
 		
 		String[] token;
 		for (String line : lines) {
@@ -1398,6 +1429,10 @@ public class DataMan extends DataInterface {
 					continue;
 				
 				String child = token[2];
+				
+				// TODO ais格式错误
+				if (child.equals("药材"))
+					continue;
 
 				// 不重复添加
 				if (!child.isEmpty() && map.get(child) == null)
@@ -1429,7 +1464,7 @@ public class DataMan extends DataInterface {
 		for (String line : lines) {
 			token = line.split(TOKEN_SEP);
 			
-			if (token != null && token.length == 4) {
+			if (token != null && token.length == 5) {
 				// 20130607112901281,10,试卷一,2013-6-7
 				int column = ParseInt(token[1]);
 				if (column == INVALID_ID)
@@ -1494,18 +1529,19 @@ public class DataMan extends DataInterface {
 	public static List<ListItemMap> GetAisList(int functionId, String childColumn) {
 
 		List<ListItemMap> list = new ArrayList<ListItemMap>();
-		List<String> lines = ReadLines(FILE_NAME_AIS_LIST);
 
 		if (childColumn == null)
 			return list;
 		
 		GenAisList();
 		
+		List<String> lines = ReadLinesWithEncoding(FILE_NAME_GEN_AIS_LIST, "UTF-8", false);
+
 		String[] token;
 		for (String line : lines) {
 			token = line.split(TOKEN_SEP);
 			
-			if (token != null && token.length == 4) {
+			if (token != null && token.length == 5) {
 				// 20130607112901281,10,食品,试卷一,2013-6-7
 				int column = ParseInt(token[1]);
 				if (!IsAisColumnMatch(functionId, column))

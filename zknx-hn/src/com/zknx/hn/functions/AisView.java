@@ -21,6 +21,7 @@ import com.zknx.hn.common.widget.Dialog;
 import com.zknx.hn.data.DataMan;
 import com.zknx.hn.data.FileUtils;
 import com.zknx.hn.data.ListItemMap;
+import com.zknx.hn.functions.ais.AisDoc;
 import com.zknx.hn.functions.ais.AisParser;
 import com.zknx.hn.functions.ais.CourseView;
 import com.zknx.hn.functions.common.CommonList;
@@ -80,8 +81,13 @@ public class AisView extends FunctionView {
 		
 		if (function_id == UIConst.FUNCTION_ID_BEST_COUSE) {
 			initCouseSubmitButtons();
+			
+			// TODO ais格式错误
+			AisDoc.COLUMN_COURSE = 12;
 		} else {
 			mCourseSubmitLayout = null;
+			// TODO ais格式错误
+			AisDoc.COLUMN_COURSE = 10;
 		}
 		
 		// 初始化分类（三栏）或者初始化Ais列表（两栏）
@@ -207,7 +213,15 @@ public class AisView extends FunctionView {
 			
 			// 如果有音频则播放音频
 			playAisAudio();
+		} else {
+			// 停止播放
+			if (mPlayer.isPlaying()) {
+				mPlayer.stop();
+				Dialog.Toast(mInflater.getContext(), R.string.stop_play_audio);
+			}
 		}
+		
+		//mCourseSubmitLayout.setOnSystemUiVisibilityChangeListener(l);
 
 		initContent(title, layout, getCutomBottom(), root);
 	}

@@ -290,7 +290,7 @@ public class MyGroup extends FunctionView {
 		RelativeLayout myMessageLayout = (RelativeLayout) mInflater.inflate(R.layout.group_my_message, null);
 		LinearLayout listViewLayout = (LinearLayout) myMessageLayout.findViewById(R.id.my_group_my_message_listview);
 		
-		mAdapterMyMessage = new CommonListAdapter(mContext, DataMan.GetMyGroupMessageList(DataMan.MY_MESSAGE));
+		mAdapterMyMessage = new CommonListAdapter(mContext, DataMan.GetMyGroupMessageList(UserMan.GetUserId()));
 		CommonListParams listParams = new CommonListParams(mInflater, listViewLayout, mAdapterMyMessage, new OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> adapter, View view, int position, long id) {
@@ -322,10 +322,10 @@ public class MyGroup extends FunctionView {
 	 */
 	private void initFriendMessage() {
 		
-		int friendId = DataMan.INVALID_ID;
+		String friendId = null;
 		
 		if (mCurFriendInfo != null)
-			friendId = DataMan.ParseInt(mCurFriendInfo.id);
+			friendId = mCurFriendInfo.id;
 
 		mAdapterFriendMessage = new CommonListAdapter(mContext, DataMan.GetMyGroupMessageList(friendId));
 		
@@ -363,8 +363,8 @@ public class MyGroup extends FunctionView {
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 				super.onItemClick(parent, view, position, id);
 				
-				String friendId = mAdapterMajor.getItemMapString(position, DataMan.KEY_MY_GROUP_MESSAGE_ID);
-				String messageOwner = mAdapterMajor.getItemMapString(position, DataMan.KEY_FRIEND_MESSAGE_POSER);
+				String friendId = mAdapterMajor.getItemMapString(position, DataMan.KEY_FRIEND_ID);
+				String messageOwner = mAdapterMajor.getItemMapString(position, DataMan.KEY_FRIEND_ID);
 				
 				// 切换为新建留言界面，传参留言组id
 				initNewMessageView(messageOwner, friendId, R.id.my_group_message_group);

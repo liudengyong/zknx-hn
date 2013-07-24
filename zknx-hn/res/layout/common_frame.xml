@@ -14,8 +14,9 @@
     <TextView
         android:id="@+id/common_frame_title"
         android:textIsSelectable="true"
-        android:background="@drawable/tab_button_bg"
-        style="@style/TitleText">
+        android:background="@drawable/tab_button"
+        style="@style/TitleText"
+        android:focusable="true">
 	</TextView>
 
     <LinearLayout
