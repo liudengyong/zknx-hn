@@ -106,7 +106,7 @@ public class Market extends FunctionView {
 			}
 		};
 		
-		CommonListParams listParams = new CommonListParams(mInflater, mContentFrame[2], mAdapterProduct, listener/*TODO µçÊÓÒ£¿ØÆ÷*/);
+		CommonListParams listParams = new CommonListParams(mInflater, mContentFrame[2], mAdapterProduct, listener);
 		
 		CommonList.Init(listParams, custom);
 	}

@@ -4,9 +4,12 @@ import java.io.IOException;
 import java.util.List;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.media.MediaPlayer;
 import android.net.Uri;
+import android.os.StrictMode;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -51,7 +54,7 @@ public class AisView extends FunctionView {
 	private String mCurAisFileName;
 	
 	private static final String DEFAULT_TITLE = "内容";
-	private String mAisTitle = DEFAULT_TITLE;
+	private AisDoc.AisHeader mAisHeader = null;
 	
 	// 播放器
 	private MediaPlayer mPlayer;
@@ -81,13 +84,8 @@ public class AisView extends FunctionView {
 		
 		if (function_id == UIConst.FUNCTION_ID_BEST_COUSE) {
 			initCouseSubmitButtons();
-			
-			// TODO ais格式错误
-			AisDoc.COLUMN_COURSE = 12;
 		} else {
 			mCourseSubmitLayout = null;
-			// TODO ais格式错误
-			AisDoc.COLUMN_COURSE = 10;
 		}
 		
 		// 初始化分类（三栏）或者初始化Ais列表（两栏）
@@ -204,12 +202,11 @@ public class AisView extends FunctionView {
 		AisParser.AisLayout aisLayout = mAisParser.GetAisLayout(aisFileName, mInflater, getJsInterface());
 		
 		if (aisLayout != null) {
-			title = aisLayout.getTitle();
+			mAisHeader = aisLayout.getAisHeader();
 			layout = aisLayout.getLayout();
 			// 保存当前信息
 			mAisViewRoot = root;
 			mCurAisFileName = aisFileName;
-			mAisTitle = title;
 			
 			// 如果有音频则播放音频
 			playAisAudio();
@@ -244,7 +241,7 @@ public class AisView extends FunctionView {
 		ImageView newImageView = (ImageView) layout.findViewById(R.id.ais_image_view_image);
 		newImageView.setImageURI(Uri.parse(filePathName));
 
-		initContent(mAisTitle, layout, mAisViewRoot);
+		initContent(mAisHeader.getTitle(), layout, mAisViewRoot);
 	}
 
 	/**
@@ -387,21 +384,51 @@ public class AisView extends FunctionView {
 	 * 初始化交卷视图
 	 */
 	private void initCouseSubmitButtons() {
+		
+		StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
+		.detectDiskReads()
+		.detectDiskWrites()
+		.detectNetwork() // 这里可以替换为detectAll() 就包括了磁盘读写和网络I/O
+		.penaltyLog() //打印logcat，当然也可以定位到dropbox，通过文件保存相应的log
+		.build());
+		StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
+		.detectLeakedSqlLiteObjects() //探测SQLite数据库操作
+		.penaltyLog() //打印logcat
+		.penaltyDeath()
+		.build()); 
+		
 		mCourseSubmitLayout = initButtonTriple(R.string.grade, R.string.reset, R.string.submit, new OnClickListener() {
 			@Override
 			public void onClick(View view) {
 				
 				switch (view.getId()) {
 				case ID_GRADE:
-					String grades = DataMan.GetGrades(mAisTitle);
-					if (grades != null && grades.length() > 0)
-						Dialog.MessageBox(mContext, grades);
+					String grades = DataMan.GetGrades(mAisHeader.getAisId());
+					if (grades == null || grades.length() == 0)
+						return;
+					//Dialog.MessageBox(mContext, grades);
+					
+					new AlertDialog.Builder(mContext)
+			        .setIcon(null)
+			        .setTitle(R.string.app_name)
+			        .setMessage(grades)
+			        .setPositiveButton("上传", new DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							String ret = DataMan.PostGrade();
+							if (ret != null) {
+								Dialog.MessageBox(mContext, "返回：" + ret);
+							}
+						}
+			        })
+			        .show();
+
 					break;
 				case ID_RESET:
-					CourseView.SubmitOrReset(mAisTitle, view, true);
+					CourseView.SubmitOrReset(mAisHeader, view, true);
 					break;
 				case ID_SUBMIT:
-					CourseView.SubmitOrReset(mAisTitle, view, false);
+					CourseView.SubmitOrReset(mAisHeader, view, false);
 					break;
 				}
 			}

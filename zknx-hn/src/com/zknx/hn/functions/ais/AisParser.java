@@ -2,6 +2,7 @@ package com.zknx.hn.functions.ais;
 
 import com.zknx.hn.R;
 import com.zknx.hn.common.Debug;
+import com.zknx.hn.functions.ais.AisDoc.AisHeader;
 import com.zknx.hn.functions.ais.AisDoc.AisItem;
 
 import android.view.LayoutInflater;
@@ -56,14 +57,14 @@ public class AisParser {
 		// Ais内容滚动视图
 		LinearLayout contentLayout = (LinearLayout) aisLayout.findViewById(R.id.ais_content_view);
 
-		String title = parseAis(aisFileName, contentLayout, jsInterface);
+		AisHeader header = parseAis(aisFileName, contentLayout, jsInterface);
 
-		if (title == null) {
+		if (header == null) {
 			Debug.Log("严重错误：AIS parse错误");
 			return null;
 		}
 		
-		return new AisLayout(title, aisLayout);
+		return new AisLayout(header, aisLayout);
 	}
 
 	/** 
@@ -73,17 +74,17 @@ public class AisParser {
 	 */
 	public static class AisLayout {
 		
-		AisLayout(String _title, LinearLayout _layout) {
-			title  = _title;
+		AisLayout(AisHeader _header, LinearLayout _layout) {
+			header = _header;
 			layout = _layout;
 		}
-		
+
 		/**
-		 * 获取标题
+		 * 获取头
 		 * @return
 		 */
-		public String getTitle() {
-			return title;
+		public AisHeader getAisHeader() {
+			return header;
 		}
 		
 		/**
@@ -94,10 +95,10 @@ public class AisParser {
 			return layout;
 		}
 
-		// 标题
-		private String title;
 		// Ais视图
 		private LinearLayout layout;
+		// ais header
+		private AisHeader header;
 	}
 
 	/**
@@ -106,7 +107,7 @@ public class AisParser {
 	 * @param root
 	 * @return
 	 */
-	private String parseAis(String aisFileName, LinearLayout contentLayout, Object jsInterface) {
+	private AisHeader parseAis(String aisFileName, LinearLayout contentLayout, Object jsInterface) {
 		// 获取解析后的ais文档
 		AisDoc aisDoc = new AisDoc(aisFileName);
 		String title = aisDoc.getTitle();
@@ -119,9 +120,7 @@ public class AisParser {
 		WebView webView = (WebView) contentLayout.findViewById(R.id.ais_webview);
 
 		// 是否课件
-		if (aisDoc.isCourse() &&
-			(aisDoc.getTitle().contains("党的") || /* TODO ais文件格式错误 */
-			aisDoc.getTitle().contains("ais问卷"))) {
+		if (aisDoc.isCourse()) {
 			webView.setVisibility(View.GONE);
 			//CourseWebView.GenHtml(ais_id, webView, aisDoc);
 			CourseView.InitView(mInflater, contentLayout, aisDoc);
@@ -131,6 +130,6 @@ public class AisParser {
 		
 		webView.setBackgroundColor(0); // 设置透明
 
-		return title;
+		return aisDoc.getHeader();
 	}
 }

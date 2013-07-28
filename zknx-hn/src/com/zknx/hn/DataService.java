@@ -65,8 +65,10 @@ public class DataService extends Service {
         public void run() {
 
         	// 每1分钟检查新数据
+        	/*
          	if (DataMan.ProcessBroadcastData())
          		mHandler.sendEmptyMessage(MESSAGE_NEW_DATA);
+         		*/
 
         	mHandler.postDelayed(this, 60 * SECOND);
         }
@@ -77,9 +79,11 @@ public class DataService extends Service {
          public void run() {
 
         	// 每5秒检查新留言
+        	/* TODO
          	String message = DataMan.GetNewMessages();
          	if (message != null)
          		mHandler.sendEmptyMessage(MESSAGE_NEW_MESSAGE);
+         	*/
 
          	mHandler.postDelayed(this, 5 * SECOND);
          }

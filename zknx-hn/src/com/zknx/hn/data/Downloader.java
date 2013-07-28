@@ -323,6 +323,7 @@ public class Downloader {
 			DataOutputStream dos = new DataOutputStream(
 					httpURLConnection.getOutputStream());
 			
+			Debug.Log(strUrl);
 			for (NameValuePair nameValuePair : params)
 			{
 				// ±éÀú²ÎÊý
@@ -331,6 +332,8 @@ public class Downloader {
 						+ end);
 				dos.writeBytes(end);
 				dos.writeBytes(nameValuePair.getValue() + end);
+				
+				Debug.Log(nameValuePair.getName() + " = " + nameValuePair.getValue());
 			}
 
 			Debug.Log("Data=" + srcPath.substring(srcPath.lastIndexOf("/") + 1));
@@ -370,14 +373,14 @@ public class Downloader {
 			}
 			dos.close();
 			is.close();
-			Debug.Log("SERVICE£º " + result.toString());
+			Debug.Log("PostFile Return£º " + result.toString());
+			
+			return result.toString();
 
 		} catch (Exception e) {
 			e.printStackTrace();
 			Debug.Log("ERROR£º" + e.getMessage());
 			return e.getMessage();
 		}
-		
-		return null;
 	}
 }

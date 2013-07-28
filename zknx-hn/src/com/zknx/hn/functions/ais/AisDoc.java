@@ -101,7 +101,7 @@ CString column_child16[]={"生产类","生活类","医疗类","教育类"};
 	 * @author Dengyong
 	 *
 	 */
-	class AisHeader {
+	public class AisHeader {
 		String type;   //AIS标志
 		String fileId; //文件唯一ID
 		byte column;   //栏目ID
@@ -112,6 +112,12 @@ CString column_child16[]={"生产类","生活类","医疗类","教育类"};
 		String fileDate; //文件发布日期,到期的文件才会发布
 		String validDate;//有郊日期,过了日期不显示
 		String title;    //主题词
+		public String getTitle() {
+			return title;
+		}
+		public String getAisId() {
+			return fileId;
+		}
 	}
 
 	// Ais头
@@ -300,9 +306,7 @@ CString column_child16[]={"生产类","生活类","医疗类","教育类"};
 				case DataMan.AIS_TOKEN_COURSE_ANSWER:
 				case DataMan.AIS_TOKEN_COURSE_GRADE:
 				case DataMan.AIS_TOKEN_COURSE_NOTE:
-					if (isCourse() &&
-						(getTitle().contains("党的") || /* TODO ais文件格式错误 */
-						getTitle().contains("ais问卷")))
+					if (isCourse())
 						addQuestion(v, data);
 					else
 						Debug.Log("Ais结构错误：非试卷不应有答案结构，" + mHeader.column);
@@ -534,9 +538,9 @@ CString column_child16[]={"生产类","生活类","医疗类","教育类"};
 		header.type = new String(buffer, offset, size = 5);
 		offset += size;
 		
-		// 文件id
-		header.fileId = new String(buffer, offset, size = 18);
-		offset += size;
+		// 文件id（本来17位，但是头用吧8位表示）
+		header.fileId = new String(buffer, offset, size = 17);
+		offset += (size + 1);
 		
 		// 栏目id
 		size = 1;
@@ -674,5 +678,13 @@ CString column_child16[]={"生产类","生活类","医疗类","教育类"};
      */
 	public AisItem[] getImageItems() {
 		return mImageItems;
+	}
+
+	/**
+	 * 获取头
+	 * @return
+	 */
+	public AisHeader getHeader() {
+		return  mHeader;
 	}
 }

@@ -21,6 +21,7 @@ import com.zknx.hn.common.widget.Checkbox;
 import com.zknx.hn.common.widget.Dialog;
 import com.zknx.hn.common.widget.Label;
 import com.zknx.hn.data.DataMan;
+import com.zknx.hn.functions.ais.AisDoc.AisHeader;
 
 public class CourseView {
 
@@ -147,7 +148,7 @@ public class CourseView {
 	 * @param button
 	 * @param reset
 	 */
-	public static void SubmitOrReset(String title, View button, boolean reset) {
+	public static void SubmitOrReset(AisHeader header, View button, boolean reset) {
 		LinearLayout courseLayout = GetCourseLayout(button);
 		
 		// 没有课件时点击无效
@@ -252,7 +253,7 @@ public class CourseView {
 		
 		if (!reset) {
 			Dialog.MessageBox(button.getContext(), "您本次得分：" + resultPoint + "分");
-			DataMan.SaveGrade(title, resultPoint);
+			DataMan.SaveGrade(header.getAisId(), resultPoint);
 		}
 	}
 

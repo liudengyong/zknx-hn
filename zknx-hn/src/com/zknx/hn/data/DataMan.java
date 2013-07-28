@@ -1429,10 +1429,6 @@ public class DataMan extends DataInterface {
 					continue;
 				
 				String child = token[2];
-				
-				// TODO ais格式错误
-				if (child.equals("药材"))
-					continue;
 
 				// 不重复添加
 				if (!child.isEmpty() && map.get(child) == null)
@@ -1642,6 +1638,20 @@ public class DataMan extends DataInterface {
 	 * 检查广播数据
 	 */
 	public static boolean ProcessBroadcastData() {
+		
+		// 检查基础数据版本是否有更新
+		/*
+		if (IsDataUpdated(FILE_NAME_ADDRESS)) {
+			// 生成省市列表
+			GenProvinceList();
+		}
+		
+		if (IsDataUpdated(FILE_NAME_MARKETS)) {
+			// 按省市分割市场列表
+			GenProvinceMarketList();
+		}
+		*/
+		////////////////////////////////////////////////////
 		
 		// AIS列表
 		
@@ -2024,9 +2034,9 @@ public class DataMan extends DataInterface {
 	 * @param title
 	 * @param resultPoint
 	 */
-	public static void SaveGrade(String title, int resultPoint) {
+	public static void SaveGrade(String aisId, int resultPoint) {
 		String time = GetCurrentTimeId();
-		String line = time + COMMON_TOKEN + title + COMMON_TOKEN + resultPoint;
+		String line = time + COMMON_TOKEN + aisId + COMMON_TOKEN + resultPoint;
 
 		String fileName = DataMan.DataFile(FILE_NAME_GRADE, true);
 		// 附加一行数据
@@ -2051,7 +2061,7 @@ public class DataMan extends DataInterface {
 
 		String ret = Downloader.PostFile(URL_POST_GRADE, params, filePathName);
 		
-		if (ret == null)
+		if ("TRUE".equals(ret))
 			FileUtils.DeleteFile(filePathName);
 		
 		return ret;
@@ -2062,7 +2072,7 @@ public class DataMan extends DataInterface {
 	 * @param title
 	 * @return
 	 */
-	public static String GetGrades(String title) {
+	public static String GetGrades(String aisId) {
 		String grades = "";
 		String user = UserMan.GetUserId();
 		
@@ -2074,7 +2084,7 @@ public class DataMan extends DataInterface {
 			
 			// time,title,grade
 			if (token.length == 3 &&
-				title.equals(token[1])) {
+					aisId.equals(token[1])) {
 				String time = token[0];
 				try {
 					time = mTimeFormater.format(mTimeIdFormater.parse(time));
@@ -2095,7 +2105,7 @@ public class DataMan extends DataInterface {
 			// user_id,time,title,grade
 			if (token.length == 4 &&
 				user.equals(token[0]) &&
-				title.equals(token[2])) {
+				aisId.equals(token[2])) {
 				String time = token[1];
 				try {
 					time = mTimeFormater.format(mTimeIdFormater.parse(time));

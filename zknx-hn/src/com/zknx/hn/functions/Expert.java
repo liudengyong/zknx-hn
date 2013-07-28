@@ -66,7 +66,7 @@ public class Expert extends AisView {
 		initExpertQuestionList(position);
 		
 		// 默认第三栏视图
-		initContent("问题解答", null, mContentFrame[2]);
+		initContent("暂无问题解答", null, mContentFrame[2]);
 	}
 	
 	/**
