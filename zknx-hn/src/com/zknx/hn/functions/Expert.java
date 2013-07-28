@@ -64,7 +64,7 @@ public class Expert extends AisView {
 	@Override
 	protected void initAisList(int position) {
 		initExpertQuestionList(position);
-		
+
 		// 默认第三栏视图
 		initContent("暂无问题解答", null, mContentFrame[2]);
 	}
