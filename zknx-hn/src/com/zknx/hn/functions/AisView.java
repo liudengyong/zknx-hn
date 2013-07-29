@@ -195,7 +195,6 @@ public class AisView extends FunctionView {
 	}
 
 	void attachAisView(String aisFileName, LinearLayout root) {
-		String title = DEFAULT_TITLE;
 		LinearLayout layout = null;
 		Debug.Log("ais_file = " + aisFileName);
 		
@@ -218,7 +217,10 @@ public class AisView extends FunctionView {
 			}
 		}
 		
-		//mCourseSubmitLayout.setOnSystemUiVisibilityChangeListener(l);
+		String title = DEFAULT_TITLE;
+		
+		if (mAisHeader != null)
+			title = mAisHeader.getTitle();
 
 		initContent(title, layout, getCutomBottom(), root);
 	}
