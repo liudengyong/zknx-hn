@@ -136,7 +136,7 @@ CString column_child16[]={"生产类","生活类","医疗类","教育类"};
 	 * @param ais_id
 	 */
 	public AisDoc(String aisFileName, boolean parseHeader) {
-		parseAisDoc(aisFileName, true);
+		parseAisDoc(aisFileName, parseHeader);
 	}
 
 	/**

@@ -1118,9 +1118,9 @@ public class DataMan extends DataInterface {
 	        	String[] token = GetToken(line);
 	        	if (token.length != 16)
 	        		continue;
-	        	
+
 	        	String productId = token[0];
-	        	
+
 	        	if (productId.startsWith(product_class_id))
 	        		list.add(GetSupplyDemandMap(token));  
 	        }
