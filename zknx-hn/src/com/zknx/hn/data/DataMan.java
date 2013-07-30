@@ -1597,7 +1597,7 @@ public class DataMan extends DataInterface {
 				String name = token[2];
 				String fileName = name + ".ais";
 				
-				AisDoc aisDoc = new AisDoc(fileName, true);
+				AisDoc aisDoc = new AisDoc(date + fileName, true);
 				String child = aisDoc.getAisChildColumn();
 				
 				// 重新生成list

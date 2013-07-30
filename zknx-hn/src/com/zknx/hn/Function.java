@@ -11,6 +11,7 @@ import com.zknx.hn.common.widget.WaitDialog;
 import com.zknx.hn.common.widget.Dialog.ConfirmListener;
 import com.zknx.hn.data.DataMan;
 import com.zknx.hn.data.UserMan;
+import com.zknx.hn.functions.AisView;
 import com.zknx.hn.functions.MyGroup;
 import com.zknx.hn.functions.common.FunctionView;
 import com.zknx.hn.home.Functions;
@@ -398,5 +399,12 @@ public class Function extends Activity {
     	}
     	
     	return false;
+    }
+    
+    @Override
+    public void onBackPressed()
+    {
+    	super.onBackPressed();
+    	AisView.StopPlaying();
     }
 }

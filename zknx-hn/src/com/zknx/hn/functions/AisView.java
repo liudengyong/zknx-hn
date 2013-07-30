@@ -57,7 +57,16 @@ public class AisView extends FunctionView {
 	private AisDoc.AisHeader mAisHeader = null;
 	
 	// ²¥·ÅÆ÷
-	private MediaPlayer mPlayer;
+	private static MediaPlayer mPlayer;
+	public static void StopPlaying() {
+		if (mPlayer != null &&
+			mPlayer.isPlaying()) {
+			mPlayer.stop();
+		}
+	}
+	
+	public static boolean nongye_jishu_ais = false;
+
 	// ½âÎöÆ÷
 	AisParser mAisParser;
 	
@@ -73,12 +82,19 @@ public class AisView extends FunctionView {
 	public AisView(LayoutInflater inflater, LinearLayout frameRoot, int function_id, int frameResId) {
 		super(inflater, frameRoot, frameResId);
 		
+		AisView.StopPlaying();
+		
 		mPlayer = new MediaPlayer();
 		mAisParser = new AisParser(inflater);
 		
 		mFrameResId = frameResId;
 		
 		mFunctionId = function_id;
+		
+		if (mFunctionId == UIConst.FUNCTION_ID_ARGRI_TECH)
+			nongye_jishu_ais = true;
+		else
+			nongye_jishu_ais = false;
 		
 		mTitle = getTitle(mFunctionId);
 		
@@ -198,6 +214,8 @@ public class AisView extends FunctionView {
 	void attachAisView(String aisFileName, LinearLayout root) {
 		LinearLayout layout = null;
 		Debug.Log("ais_file = " + aisFileName);
+		
+		AisView.StopPlaying();
 		
 		AisParser.AisLayout aisLayout = mAisParser.GetAisLayout(aisFileName, mInflater, getJsInterface());
 		
