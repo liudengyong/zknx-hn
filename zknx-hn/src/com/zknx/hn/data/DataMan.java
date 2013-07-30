@@ -655,6 +655,11 @@ public class DataMan extends DataInterface {
         return list;
 	}
 	
+	static Float randomPrice() {
+		long time = System.currentTimeMillis();
+		return 4.0F + (time % 4);
+	}
+	
 	// 一天的毫秒数： 1天=24*60*60*1000=86400000毫秒
 	//private static final long MILLIS_ONE_DAY = 86400000;
 	
@@ -676,13 +681,31 @@ public class DataMan extends DataInterface {
 		
 		ProductPriceInfo info = new ProductPriceInfo();
 		
-		info.add("2013-07-10", 12.00F);
-		info.add("2013-07-11", 10.00F);
-		info.add("2013-07-12", 12.00F);
-		info.add("2013-07-13", 2.00F);
-		info.add("2013-07-14", 12.00F);
-		info.add("2013-07-15", 1.00F);
-		info.add("2013-07-16", 20.00F);
+		/*
+		info.add("2013-07-10", randomPrice());
+		info.add("2013-07-11", randomPrice());
+		info.add("2013-07-12", randomPrice());
+		info.add("2013-07-13", randomPrice());
+		info.add("2013-07-14", randomPrice());
+		info.add("2013-07-15", randomPrice());
+		info.add("2013-07-16", randomPrice());
+		*/
+		
+		// 日期格式（月.日）
+		SimpleDateFormat simpleDate = new SimpleDateFormat("M.d", Locale.CHINA);
+		// 向前减去7天
+		long today = System.currentTimeMillis();
+		for (int i = 0; i < 7; ++i) {
+
+			// 获取当天价格
+			Float price = randomPrice();
+			Debug.Log("随机生成历史价格：" + price);
+			// 添加当天的价格
+			if (price != 0F)
+				info.add(simpleDate.format(new Date(today)), price);
+
+			today -= MILLIS_ONE_DAY;
+		}
 		
 		return info;
 		
@@ -1075,8 +1098,35 @@ public class DataMan extends DataInterface {
 	 * @return
 	 */
 	private static String pairLines = "";
-	public static List<ListItemMap> GetSupplyDemandPairList(final String product_class_id) {
-		return GetSupplyDemandPairList(product_class_id, false);
+	public static List<ListItemMap> GetSupplyDemandPairList(String product_class_id) {
+		
+		List<ListItemMap> list = new ArrayList<ListItemMap>();
+
+		// 日期格式（月.日）
+		SimpleDateFormat simpleDate = new SimpleDateFormat("yyyyMMdd", Locale.CHINA);
+
+		// 向前减去30天
+		long today = System.currentTimeMillis();
+		for (int i = 0; i < 30; ++i, today -= MILLIS_ONE_DAY) {
+
+			String date = simpleDate.format(new Date(today)) + "/";
+			List<String> lines = ReadLines(date + "pair.txt");
+	
+	        for (String line : lines) {
+	        	// product_id,产品名,供求信息id(第一位编码0代表供应，1代表求购),user,标题,供求信息内容,发布时间,有效期,数量,单价,产地,产品特点,联系人名字,联系电话,手机号,详细地址
+	        	// 1003021000,果树苗,0,,供应各种果树苗、绿化苗,,2011-2-23,2011-3-22,,面议,北京市,,王敏,13521120562,13521120562,陆辛庄华源发苗木市场
+	        	String[] token = GetToken(line);
+	        	if (token.length != 16)
+	        		continue;
+	        	
+	        	String productId = token[0];
+	        	
+	        	if (productId.startsWith(product_class_id))
+	        		list.add(GetSupplyDemandMap(token));  
+	        }
+		}
+        
+        return list;
 	}
 	
 	private static void GenSupplyDemandPairList(String product_class_id) {
@@ -1287,7 +1337,7 @@ public class DataMan extends DataInterface {
         			message += "," + token[i];
         		}
 
-        		String itemText = time + "\t" + message;
+        		String itemText = message + "\t" + time;
         		if (fiend_id.equals(UserMan.GetUserId()))
         			itemText = frienId + " ： " + message;
         		else if (!fiend_id.equals(frienId))
@@ -2009,7 +2059,8 @@ public class DataMan extends DataInterface {
 	 * @return
 	 */
 	public static List<ListItemMap> GetExpertList() {
-		List<String> lines = ReadLines(FILE_NAME_EXPERTS);
+		// TODO 专家目录
+		List<String> lines = ReadLines("expert/" + FILE_NAME_EXPERTS);
 		//return ReadCommonIdName(, KEY_EXPERT_ID);
 		
 		List<ListItemMap> list = new ArrayList<ListItemMap>();
@@ -2078,8 +2129,9 @@ public class DataMan extends DataInterface {
 	public static List<ListItemMap> GetExpertAnwserList(String expertId) {
 		List<ListItemMap> list = new ArrayList<ListItemMap>();
 		
+		// TODO
 		// 读取本地问题列表
-		List<String> lines = ReadLines(LOCAL_QUESTION);
+		List<String> lines = ReadLines(/*LOCAL_QUESTION*/"expert/" + expertId + "/anwsers.txt");
 		
 		for (String line : lines) {
         	// id,名字
