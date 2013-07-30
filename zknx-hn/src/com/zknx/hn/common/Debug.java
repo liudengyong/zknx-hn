@@ -8,6 +8,8 @@ import java.io.InputStream;
 import android.content.Context;
 
 import com.zknx.hn.App;
+import com.zknx.hn.data.DataMan;
+import com.zknx.hn.data.FileUtils;
 
 public class Debug {
 	
@@ -18,6 +20,8 @@ public class Debug {
 	public static void Log(String log) {
 		if (App.mDebug)
 			android.util.Log.d("е╘пе", log);
+		
+		//FileUtils.AppendLine(DataMan.DataFile("log.txt"), log);
 	}
 	
 	/**
