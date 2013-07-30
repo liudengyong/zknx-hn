@@ -109,8 +109,7 @@ public class AisParser {
 	 */
 	private AisHeader parseAis(String aisFileName, LinearLayout contentLayout, Object jsInterface) {
 		// 获取解析后的ais文档
-		AisDoc aisDoc = new AisDoc(aisFileName);
-		String title = aisDoc.getTitle();
+		AisDoc aisDoc = new AisDoc(aisFileName, false);
 		
 		// 初始化音视频图标监听
 		mAudioItem = aisDoc.getAudioItem();

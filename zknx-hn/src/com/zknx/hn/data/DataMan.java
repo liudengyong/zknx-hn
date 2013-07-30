@@ -11,6 +11,7 @@ import java.net.URLEncoder;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -47,6 +48,8 @@ public class DataMan extends DataInterface {
 	public static final String KEY_AIS_COLUMN = "ais_column";
 	// ais子分类
 	public static final String KEY_AIS_COLUMN_CHILD = "ais_column_child";
+	// ais日期
+	public static final String KEY_AIS_DATE = "ais_date";
 
 	// messageId 同时也是发布留言的商友id
 	public static final String KEY_MY_GROUP_MESSAGE_ID = "my_group_message";
@@ -1413,46 +1416,74 @@ public class DataMan extends DataInterface {
 
 		List<ListItemMap> list = new ArrayList<ListItemMap>();
 		Map<String, String> map = new HashMap<String, String>();
-		
-		GenAisList();
-		
-		List<String> lines = ReadLinesWithEncoding(FILE_NAME_GEN_AIS_LIST, "UTF-8", false);
-		
-		String[] token;
-		for (String line : lines) {
-			token = line.split(TOKEN_SEP);
-			
-			if (token != null && token.length == 5) {
-				// 20130607112901281,10,食品,试卷一,2013-6-7
-				int column = ParseInt(token[1]);
-				if (!IsAisColumnMatch(functionId, column))
-					continue;
-				
-				String child = token[2];
 
-				// 不重复添加
-				if (!child.isEmpty() && map.get(child) == null)
-					map.put(child, child);
+		// 日期格式（月.日）
+		SimpleDateFormat simpleDate = new SimpleDateFormat("yyyyMMdd", Locale.CHINA);
+
+		// 向前减去30天
+		long today = System.currentTimeMillis();
+		for (int i = 0; i < 30; ++i) {
+
+			String date = simpleDate.format(new Date(today)) + "/";
+
+			GenAisList(date);
+			
+			List<String> lines = ReadLinesWithEncoding(date + FILE_NAME_GEN_AIS_LIST, "UTF-8", false);
+			
+			String[] token;
+			for (String line : lines) {
+				token = line.split(TOKEN_SEP);
+				
+				if (token != null && token.length == 5) {
+					// 20130607112901281,10,食品,试卷一,2013-6-7
+					int column = ParseInt(token[1]);
+					if (!IsAisColumnMatch(functionId, column))
+						continue;
+					
+					String child = token[2];
+
+					// 不重复添加
+					if (!child.isEmpty() && map.get(child) == null)
+						map.put(child, child);
+				}
 			}
 		}
-		
+
 		// 添加子分类
 		for (String childName : map.keySet()) {
 			ListItemMap item = new ListItemMap(childName, KEY_AIS_COLUMN_CHILD, childName);
 			list.add(item);
 		}
-		
+
 		return list;
+	}
+	
+	private static void GenAisList() {
+		// 日期格式（月.日）
+		SimpleDateFormat simpleDate = new SimpleDateFormat("yyyyMMdd", Locale.CHINA);
+
+		// 向前减去30天
+		long today = System.currentTimeMillis();
+		for (int i = 0; i < 30; ++i) {
+
+			String date = simpleDate.format(new Date(today)) + "/";
+
+			GenAisList(date);
+		}
 	}
 	
 	/**
 	 * 生成ais list
 	 */
-	private static void GenAisList() {
-		if (FileUtils.IsFileExist(DataFile(FILE_NAME_GEN_AIS_LIST)))
+	private static void GenAisList(String date) {
+		String genFileName = DataFile(date + FILE_NAME_GEN_AIS_LIST);
+		if (FileUtils.IsFileExist(genFileName))
 			return;
 
-		List<String> lines = ReadLines(FILE_NAME_AIS_LIST);
+		List<String> lines = ReadLines(date + FILE_NAME_AIS_LIST);
+		
+		if (lines.size() == 0)
+			return;
 		
 		String newAisList = "";
 		
@@ -1460,7 +1491,7 @@ public class DataMan extends DataInterface {
 		for (String line : lines) {
 			token = line.split(TOKEN_SEP);
 			
-			if (token != null && token.length == 5) {
+			if (token != null && token.length == 4) {
 				// 20130607112901281,10,试卷一,2013-6-7
 				int column = ParseInt(token[1]);
 				if (column == INVALID_ID)
@@ -1469,7 +1500,7 @@ public class DataMan extends DataInterface {
 				String name = token[2];
 				String fileName = name + ".ais";
 				
-				AisDoc aisDoc = new AisDoc(fileName);
+				AisDoc aisDoc = new AisDoc(fileName, true);
 				String child = aisDoc.getAisChildColumn();
 				
 				// 重新生成list
@@ -1482,7 +1513,7 @@ public class DataMan extends DataInterface {
 		}
 		
 		// 重新生成
-		FileUtils.WriteFile(DataFile(FILE_NAME_GEN_AIS_LIST), newAisList.getBytes());
+		FileUtils.WriteFile(genFileName, newAisList.getBytes());
 	}
 
 	/**
@@ -1516,6 +1547,9 @@ public class DataMan extends DataInterface {
 		return null;
 	}
 	
+	// 一天的毫秒数： 1天=24*60*60*1000=86400000毫秒
+	private static final long MILLIS_ONE_DAY = 86400000;
+
 	/**
 	 * 获取AIS第二级分类列表
 	 * @param class_id
@@ -1529,33 +1563,46 @@ public class DataMan extends DataInterface {
 		if (childColumn == null)
 			return list;
 		
-		GenAisList();
-		
-		List<String> lines = ReadLinesWithEncoding(FILE_NAME_GEN_AIS_LIST, "UTF-8", false);
+		// 日期格式（月.日）
+		SimpleDateFormat simpleDate = new SimpleDateFormat("yyyyMMdd", Locale.CHINA);
 
-		String[] token;
-		for (String line : lines) {
-			token = line.split(TOKEN_SEP);
+		// 向前减去30天
+		long today = System.currentTimeMillis();
+		for (int i = 0; i < 30; ++i) {
+
+			String date = simpleDate.format(new Date(today)) + "/";
+
+			GenAisList(date);
 			
-			if (token != null && token.length == 5) {
-				// 20130607112901281,10,食品,试卷一,2013-6-7
-				int column = ParseInt(token[1]);
-				if (!IsAisColumnMatch(functionId, column))
-					continue;
+			List<String> lines = ReadLinesWithEncoding(date + FILE_NAME_GEN_AIS_LIST, "UTF-8", false);
+
+			String[] token;
+			for (String line : lines) {
+				token = line.split(TOKEN_SEP);
 				
-				String name = token[3];
-				String fileName = name + ".ais";
-				
-				String child = token[2];
-				
-				// 符合条件
-				if (childColumn.isEmpty() ||
-					child.equals(childColumn)) {
-					list.add(new ListItemMap(name, KEY_AIS_FILE_NAME, fileName));
+				if (token != null && token.length == 5) {
+					// 20130607112901281,10,食品,试卷一,2013-6-7
+					int column = ParseInt(token[1]);
+					if (!IsAisColumnMatch(functionId, column))
+						continue;
+					
+					String name = token[3];
+					String fileName = name + ".ais";
+					
+					String child = token[2];
+					
+					// 符合条件(空表示获取所有ais)
+					if (childColumn.isEmpty() || child.equals(childColumn)) {
+						ListItemMap item = new ListItemMap(name, KEY_AIS_FILE_NAME, fileName);
+						item.put(KEY_AIS_DATE, date);
+						list.add(item);
+					}
 				}
 			}
+
+			today -= MILLIS_ONE_DAY;
 		}
-		
+
 		//String fileName = GetAisColumnFileName(functionId);
 
         return list;
@@ -1656,7 +1703,7 @@ public class DataMan extends DataInterface {
 		// AIS列表
 		
 		GenAisList();
-		
+
 		//  处理供求信息
 		List<ListItemMap> productClass = GetProductClassList();
 		

@@ -191,7 +191,8 @@ public class AisView extends FunctionView {
 	
 	void attachAisView(int position) {
 		String aisFileName = mAdapterAisList.getItemMapString(position, DataMan.KEY_AIS_FILE_NAME);
-		attachAisView(aisFileName, mAisContentFrame);
+		String aisDate = mAdapterAisList.getItemMapString(position, DataMan.KEY_AIS_DATE);
+		attachAisView(aisDate + aisFileName, mAisContentFrame);
 	}
 
 	void attachAisView(String aisFileName, LinearLayout root) {

@@ -135,8 +135,8 @@ CString column_child16[]={"生产类","生活类","医疗类","教育类"};
 	 * 通过ais_id构造AisDoc
 	 * @param ais_id
 	 */
-	public AisDoc(String aisFileName) {
-		parseAisDoc(aisFileName);
+	public AisDoc(String aisFileName, boolean parseHeader) {
+		parseAisDoc(aisFileName, true);
 	}
 
 	/**
@@ -221,7 +221,7 @@ CString column_child16[]={"生产类","生活类","医疗类","教育类"};
 	 * @param ais_id
 	 * @return
 	 */
-	private boolean parseAisDoc(String aisFileName) {
+	private boolean parseAisDoc(String aisFileName, boolean parseHeader) {
 		if (aisFileName == null || aisFileName.length() == 0) {
 			Debug.Log("严重错误：parseAisDoc，ais_file为空");
 			return false;
@@ -242,6 +242,9 @@ CString column_child16[]={"生产类","生活类","医疗类","教育类"};
 
 			// 解析Ais头
 			mHeader = parseAisHeader(file);
+			
+			if (parseHeader)
+				return (mHeader != null);
 			
 			// 生成行树
 			mItemTree = new ArrayList<List<AisItem>>();
