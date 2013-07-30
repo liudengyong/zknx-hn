@@ -209,13 +209,20 @@ public class FileUtils {
      * @return
      * @throws IOException
      */
-    public static String WriteText(String fileName, String text) throws IOException
+    public static String WriteText(String fileName, String text)
     {
-    	File file = CreateFile(fileName);
-		OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(file));
-        writer.write(text);
-        writer.flush();
-        writer.close();
+    	try {
+	    	File file = CreateFile(fileName);
+			OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(file));
+	        writer.write(text);
+	        writer.flush();
+	        
+			writer.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+			Debug.Log("Ð´ÎÄ¼þ´íÎó£º" + fileName);
+		}
+
         return null;
     }
     

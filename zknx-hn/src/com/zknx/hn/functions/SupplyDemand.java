@@ -139,10 +139,10 @@ public class SupplyDemand extends FunctionView {
 		@Override
 		public void startWait() {
 			String product_class_id = mAdapterProductClass.getItemMapString(position, DataMan.KEY_PRODUCT_CLASS_ID);
-			
+
 			mAdapterInfo = new CommonListAdapter(mContext, DataMan.GetSupplyDemandList(product_class_id, supply));
 		}
-		
+
 		int position;
 		boolean supply;
 	}

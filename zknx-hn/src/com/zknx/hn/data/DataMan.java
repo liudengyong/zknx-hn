@@ -870,67 +870,114 @@ public class DataMan extends DataInterface {
 	 * @return
 	 */
 	private static String supplyDemandClassLines = "";
-	public static List<ListItemMap> GetSupplyDemandList(final String product_class_id, final boolean supply) {
-		return GetSupplyDemandList(product_class_id, supply, false);
-	}
-	
-	private static void GenSupplyDemandList(final String product_class_id, final boolean supply) {
-		GetSupplyDemandList(product_class_id, supply, true);
-	}
-
-	private static List<ListItemMap> GetSupplyDemandList(final String product_class_id, final boolean supply, boolean justGen) {
+	public static List<ListItemMap> GetSupplyDemandList(String product_class_id, boolean supply) {
+		GenSupplyDemandList();
 		
-		String supplyDemandClassCache = "supplyDemandClass_" + product_class_id + "_" + supply +"_.txt";
+		List<ListItemMap> list = new ArrayList<ListItemMap>();
 		
-		// 优化效率 省级地址
-	    if (FileUtils.IsFileExist(DataFile(supplyDemandClassCache))) {
-	    	if (justGen)
-	    		return null;
+		// 日期格式（月.日）
+		SimpleDateFormat simpleDate = new SimpleDateFormat("yyyyMMdd", Locale.CHINA);
+		// 向前减去30天
+		long today = System.currentTimeMillis();
+		for (int i = 0; i < 30; ++i, today -= MILLIS_ONE_DAY) {
 
-	    	List<String> lines = ReadLines(supplyDemandClassCache);
-	    	List<ListItemMap> list = new ArrayList<ListItemMap>();
+			String date = simpleDate.format(new Date(today)) + "/";
 
-	        for (String line : lines)
-	        {
-	        	// product_id,产品名,供求信息id(第一位编码0代表供应，1代表求购),user,标题,供求信息内容,发布时间,有效期,数量,单价,产地,产品特点,联系人名字,联系电话,手机号,详细地址
-	        	// 1003021000,果树苗,0,,供应各种果树苗、绿化苗,,2011-2-23,2011-3-22,,面议,北京市,,王敏,13521120562,13521120562,陆辛庄华源发苗木市场
-	        	String[] token = GetToken(line);
+			// 判断当天的是否已经处理过
+			String stampFileName = DataFile(date + "processedSDInfo.txt");
+			if (!FileUtils.IsFileExist(stampFileName))
+				continue;
+
+			String genFileName = GetGenSupplyDemandFileName(date, product_class_id, supply);
+			List<String> lines = ReadLinesWithEncoding(genFileName, "UTF-8", false);
+
+			// 当天没有供求
+			if (lines.size() == 0)
+				continue;
+
+			for (String line : lines) {
+				String[] token = GetToken(line);
 	        	if (token.length != 16)
 	        		continue;
-
-	    		list.add(GetSupplyDemandMap(token));  
-	        }
-	        
-	        return list;
-	    }
-	    
-	    supplyDemandClassLines = "";
-	    
-		SupplyDemandListener listener = new SupplyDemandListener() {
-			@Override
-			public boolean meetCondition(String[] token, String line) {
-				
-				String product_id = token[0];
-				//int product_id = ParseInt(token[0]);
-	    		if (!ProductClassMatch(product_class_id, product_id))
-	    			return false;
-
-	    		int supply_demand_id = ParseInt(token[2]);
-	    		if (supply_demand_id == INVALID_ID ||
-	    			IsSupply(supply_demand_id) != supply)
-	    			return false;
-	    		
-	    		supplyDemandClassLines += line + "\n";
-
-	    		return true;
+	        	
+	        	// 添加供求信息
+	        	list.add(GetSupplyDemandMap(token));
 			}
-		};
+		}
+        
+        return list;
+	}
+	
+	/**
+	 * 生成的供求信息
+	 * @param date
+	 * @param productClass
+	 * @param supply
+	 * @return
+	 */
+	private static String GetGenSupplyDemandFileName(String date, String productClass, boolean supply) {
+		// 按商品分类+供/求保存生成文件
+    	String genFileName = "";
+    	if (supply)
+    		genFileName = date + productClass + "_supply";
+    	else
+    		genFileName = date + productClass + "_demand";
+    	
+    	return genFileName;
+	}
+	
+	/**
+	 * 生成供求数据
+	 * @param product_class_id
+	 * @param supply
+	 */
+	private static void GenSupplyDemandList() {
+		//GetSupplyDemandList(product_class_id, supply, true);
+		
+		List<ListItemMap> productClass = GetProductClassList();
+		
+		if (productClass == null || productClass.size() == 0) {
+			return;
+		}
+		
+		// 日期格式（月.日）
+		SimpleDateFormat simpleDate = new SimpleDateFormat("yyyyMMdd", Locale.CHINA);
 
-		List<ListItemMap> list = GetSupplyDemandList(listener);
-		
-		FileUtils.WriteGB2312Text(false, supplyDemandClassCache, supplyDemandClassLines);
-		
-		return list;
+		// 向前减去30天
+		long today = System.currentTimeMillis();
+		for (int i = 0; i < 30; ++i, today -= MILLIS_ONE_DAY) {
+
+			String date = simpleDate.format(new Date(today)) + "/";
+			
+			// 判断当天的是否已经处理过
+			String stampFileName = DataFile(date + "processedSDInfo.txt");
+			if (FileUtils.IsFileExist(stampFileName))
+				continue;
+
+			List<String> lines = ReadLines(date + FILE_NAME_SUPPLY_DEMAND_INFO, false);
+			
+			// 当天没有供求
+			if (lines.size() == 0)
+				continue;
+			
+			for (String line : lines) {
+				String[] token = GetToken(line);
+	        	if (token.length != 16)
+	        		continue;
+	        	
+	        	String productId = token[0];
+	        	String supplyOrDemand = token[2];
+	        	
+	        	String genFileName = GetGenSupplyDemandFileName(date, productId.substring(0, 2), 
+	        			supplyOrDemand.equals("0"));
+	        	
+	        	// 附加
+	        	FileUtils.AppendLine(DataFile(genFileName), line);
+			}
+
+			// 写时间戳用于判断是否已经处理过
+			FileUtils.WriteText(stampFileName, date);
+		}
 	}
 
 	// 产品分类id
@@ -1422,7 +1469,7 @@ public class DataMan extends DataInterface {
 
 		// 向前减去30天
 		long today = System.currentTimeMillis();
-		for (int i = 0; i < 30; ++i) {
+		for (int i = 0; i < 30; ++i, today -= MILLIS_ONE_DAY) {
 
 			String date = simpleDate.format(new Date(today)) + "/";
 
@@ -1464,7 +1511,7 @@ public class DataMan extends DataInterface {
 
 		// 向前减去30天
 		long today = System.currentTimeMillis();
-		for (int i = 0; i < 30; ++i) {
+		for (int i = 0; i < 30; ++i, today -= MILLIS_ONE_DAY) {
 
 			String date = simpleDate.format(new Date(today)) + "/";
 
@@ -1568,7 +1615,7 @@ public class DataMan extends DataInterface {
 
 		// 向前减去30天
 		long today = System.currentTimeMillis();
-		for (int i = 0; i < 30; ++i) {
+		for (int i = 0; i < 30; ++i, today -= MILLIS_ONE_DAY) {
 
 			String date = simpleDate.format(new Date(today)) + "/";
 
@@ -1599,8 +1646,6 @@ public class DataMan extends DataInterface {
 					}
 				}
 			}
-
-			today -= MILLIS_ONE_DAY;
 		}
 
 		//String fileName = GetAisColumnFileName(functionId);
@@ -1705,20 +1750,7 @@ public class DataMan extends DataInterface {
 		GenAisList();
 
 		//  处理供求信息
-		List<ListItemMap> productClass = GetProductClassList();
-		
-		if (productClass != null && productClass.size() > 0) {
-			for (ListItemMap item : productClass) {
-				String productClassId = item.getString(KEY_PRODUCT_CLASS_ID);
-				
-				// 供或者求
-				//GenSupplyDemandList(productClassId, true);
-				//GenSupplyDemandList(productClassId, false);
-				
-				// 对接信息，我的供求
-				//GenSupplyDemandPairList(productClassId);
-			}
-		}
+		GenSupplyDemandList();
 
 		// 处理商品信息
 		List<ListItemMap> province = GetAddressList();
@@ -1809,12 +1841,7 @@ public class DataMan extends DataInterface {
 			message = token[0] + "：" + token[2];
 		}
 
-		try {
-			FileUtils.WriteText(DataFile(FILE_STAMP_LAST_MESSAGE, true), time);
-		} catch (IOException e) {
-			Debug.Log("写新信息时间戳错误");
-			return null;
-		}
+		FileUtils.WriteText(DataFile(FILE_STAMP_LAST_MESSAGE, true), time);
 
 		return message;
 	}
