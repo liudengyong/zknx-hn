@@ -384,7 +384,7 @@ public class DataMan extends DataInterface {
         		
         		// 生成时不用关心是否自选
         		if (!justGen)
-        			IsMyProduct(product_id); /* 添加自选按钮状态 */
+        			isMyProduct = IsMyProduct(product_id); /* 添加自选按钮状态 */
         		
         		AddProductList(list, productId, product_name, minPrice, maxPrice, averagePrice, hostPrice, unit, isMyProduct);
             }
