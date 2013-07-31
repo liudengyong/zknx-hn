@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="GridLayout">
+        
+        <attr name="orientation" format="integer" />
+        <attr name="rowCount" format="integer" />
+        <attr name="columnCount" format="integer" />
+        <attr name="useDefaultMargins" format="boolean" />
+
+        <attr name="alignmentMode" format="integer"/>
+        <attr name="rowOrderPreserved" format="boolean" />
+        <attr name="columnOrderPreserved" format="boolean" />
+    </declare-styleable>
+    
+    <declare-styleable name="ViewGroup">
+        <attr name="animateLayoutChanges" format="boolean" />
+        <attr name="clipChildren" format="boolean" />
+        <attr name="clipToPadding" format="boolean" />
+        <attr name="layoutAnimation" format="reference" />
+        <attr name="animationCache" format="boolean" />
+        <attr name="persistentDrawingCache">
+            <flag name="none" value="0x0" />
+            <flag name="animation" value="0x1" />
+            <flag name="scrolling" value="0x2" />
+            <flag name="all" value="0x3" />
+        </attr>
+        <attr name="alwaysDrawnWithCache" format="boolean" />
+        <attr name="addStatesFromChildren" format="boolean" />
+
+        <attr name="descendantFocusability">
+            <enum name="beforeDescendants" value="0" />
+            <enum name="afterDescendants" value="1" />
+            <enum name="blocksDescendants" value="2" />
+        </attr>
+
+
+        <attr name="splitMotionEvents" format="boolean" />
+    </declare-styleable>
+</resources>

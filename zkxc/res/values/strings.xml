@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">中科信采</string>
+    <string name="app_title">野外科考数据采集系统</string>
+    
+    <string name="home">主页</string>
+    
+    <string name="colleection_table">科考信息采集表</string>
+    <string name="data_colleection">数据采集</string>
+    <string name="map_track">轨迹定位</string>
+    <string name="nature_protection_zone">自然保护区</string>
+    <string name="system_tool">系统工具</string>
+    
+    <color name="black">#FF000000</color>
+    
+    <string name="select_table_tip">当前保护区采集表</string>
+    
+    <string name="error">错误</string>
+    <string name="save_ok">保存成功</string>
+    <string name="save_failed">保存失败：</string>
+    
+    <string name="no_sdcard">未加载SD卡</string>
+    <string name="sel_file">请选择文件</string>
+    
+    <string name="start_record">采集</string>
+    <string name="stop_record">停止采集</string>
+    <string name="show_mark">显示标记</string>
+    <string name="hide_mark">隐藏标记</string>
+    <string name="ok">确定</string>
+    <string name="cancel">取消</string>
+    <string name="writer">记录信息</string>
+    <string name="youCanInput">你还可以输入%n个字</string>
+    <string name="youCanNotInput">已超出限制%n个字</string>
+    <string name="username">用户名：</string>
+    <string name="username_tip">请输入用户名</string>
+    <string name="login">登录</string>
+    <string name="password">密　码：</string>
+    <string name="play">回放</string>
+    <string name="setting">设置</string>
+    <string name="exit">退出</string>
+    <string name="photo">拍照</string>
+    <string name="reg">注册</string>
+    <string name="sound">录音</string>
+    <string name="video">视频</string>
+    <string name="edit">编辑</string>
+    <string name="all">全部</string>
+    <string name="date">日期</string>
+    <string name="image">图片</string>
+    
+    <string name="remem_password">记住密码</string>
+    <string name="reset">重置</string>
+    
+    <string name="failed_load_sd">加载SD卡失败</string>
+    
+    <string name="select_table">选择采集表</string>
+    <string name="save_record">保存记录</string>
+    
+    <string name="next_page">下一页</string>
+    <string name="prev_page">上一页</string>
+    
+    <string name="new_collection">新采</string>
+    <string name="sync">同步</string>
+    
+    <string name="save_modified">保存修改</string>
+    <color name="main_bk_color">#FF9C9C9C</color>
+    
+    <string name="short_input_switch_on">打开快输</string>
+    <string name="short_input_switch_off">关闭快输</string>
+    
+    <string name="congtains_reserved">输入包含保留字：</string>
+    
+    <item type="id" name="tag_cell_tag"></item>
+    <item type="id" name="tag_cell_parent"></item>
+    <item type="id" name="tag_key"></item>
+    <item type="id" name="tag_view"></item>
+
+    <item type="id" name="tag_sum_src"></item>
+    <item type="id" name="tag_short_input"></item>
+    
+    <string name="recorder_close">关闭Recorder</string>
+    
+    <string name="start">开始</string>
+    <string name="stop">停止</string>
+    <string name="save">保存</string>
+
+</resources>

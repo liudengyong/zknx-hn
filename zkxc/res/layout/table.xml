@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical" >
+    
+    <include layout="@layout/frame_main" />
+    
+    <LinearLayout android:id="@+id/ly_frozen_rows"
+        android:orientation="vertical"
+        android:background="#eeffcc"
+        android:layout_width="fill_parent" 
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/ly_frame" >
+        
+        <!--include layout="@layout/item"/-->
+        
+    </LinearLayout>
+    
+    <!--com.zkxc.android.table.FrozenableTable android:id="@android:id/list"
+            android:fastScrollEnabled="true"
+            android:fadingEdgeLength="0.0sp" android:layout_width="1400.0dip"
+            android:layout_height="fill_parent" android:drawSelectorOnTop="false"
+            android:cacheColorHint="@null" android:dividerHeight="1.0dip"
+            android:layout_below="@+id/ly_frozen_rows"
+            android:layout_above="@+id/ly_tab_action"
+            android:listSelector="@android:color/transparent" /-->
+            
+    <com.zkxc.android.table.GridLayout android:id="@+id/collection_table"
+        android:layout_height="fill_parent"
+        android:layout_width="fill_parent"
+            android:layout_below="@+id/ly_frozen_rows"
+            android:layout_above="@+id/ly_tab_action"
+            android:layout_margin="2dp"/>
+    
+    <RelativeLayout android:id="@+id/ly_tab_action"
+    android:layout_width="fill_parent"
+    android:layout_height="54dp"
+    android:orientation="vertical"
+    android:layout_alignParentBottom="true"
+    android:background="@android:drawable/title_bar">
+
+   <Button
+     android:id="@+id/btn_select_table"
+     android:layout_width="wrap_content"
+     android:layout_height="wrap_content"
+     android:layout_alignParentBottom="true"
+     android:layout_alignParentLeft="true"
+     android:layout_marginLeft="10dp"
+     android:layout_marginTop="5dp"
+     android:layout_marginBottom="5dp"
+     android:minWidth="120dp"
+     android:text="@string/select_table" />
+            
+    <Button
+     android:id="@+id/tab_btn_next_page"
+     android:layout_width="wrap_content"
+     android:layout_height="wrap_content"
+     android:layout_alignParentBottom="true"
+     android:layout_toRightOf="@+id/btn_select_table"
+     android:layout_marginLeft="10dp"
+     android:layout_marginTop="5dp"
+     android:layout_marginBottom="5dp"
+     android:minWidth="120dp"
+     android:text="@string/next_page" />"
+    
+    <Button
+     android:id="@+id/tab_btn_prev_page"
+     android:layout_width="wrap_content"
+     android:layout_height="wrap_content"
+     android:layout_toRightOf="@+id/tab_btn_next_page"
+     android:layout_alignParentBottom="true"
+     android:layout_marginLeft="10dp"
+     android:layout_marginTop="5dp"
+     android:layout_marginBottom="5dp"
+     android:minWidth="120dp"
+     android:text="@string/prev_page" />
+    
+    <TextView
+     android:id="@+id/tv_record_date"
+     android:layout_width="wrap_content"
+     android:layout_height="wrap_content"
+     android:layout_toLeftOf="@+id/btn_short_input_switch"
+     android:layout_toRightOf="@+id/tab_btn_prev_page"
+     android:gravity="center"
+     android:layout_marginTop="5dp"
+     android:textAppearance="?android:attr/textAppearanceLarge" />
+    
+     <Button
+     android:id="@+id/btn_short_input_switch"
+     android:layout_width="wrap_content"
+     android:layout_height="wrap_content"
+     android:layout_toLeftOf="@+id/btn_save_modified"
+     android:layout_marginTop="5dp"
+     android:layout_marginBottom="5dp"
+     android:layout_marginRight="10dp"
+     android:minWidth="120dp"
+     android:text="@string/short_input_switch_off" />
+
+    <Button
+    android:id="@+id/btn_save_modified"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_alignParentRight="true"
+    android:layout_marginTop="5dp"
+    android:layout_marginBottom="5dp"
+    android:layout_marginRight="10dp"
+    android:minWidth="120dp"
+    android:text="@string/save_modified" />
+    
+    </RelativeLayout>
+    
+</RelativeLayout>

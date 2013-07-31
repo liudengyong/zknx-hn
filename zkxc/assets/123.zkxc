@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<table name="test0728" time="634791077683012318" protection_zone="PA_B_19131_14" spice="101010101010101010102003" rowCount="10" colCount="10" rowFrozen="-1" colFrozen="-1" colWidth0="100" colWidth1="100" colWidth2="100" colWidth3="100" colWidth4="100" colWidth5="100" colWidth6="100" colWidth7="100" colWidth8="100" colWidth9="100" rowHeight0="23" rowHeight1="23" rowHeight2="23" rowHeight3="23" rowHeight4="23" rowHeight5="23" rowHeight6="23" rowHeight7="23" rowHeight8="23" rowHeight9="23">
+  <row index="0">
+    <cell index="0" relRow="-1" relCol="-1" rowSpan="-1" colSpan="-1" key="key_WenBen1" type="LABEL" name="文本1" />
+    <cell index="1" relRow="-1" relCol="-1" rowSpan="-1" colSpan="-1" key="key_BianJi1" type="EDIT" name="编辑1" />
+    <cell index="2" relRow="-1" relCol="-1" rowSpan="-1" colSpan="-1" data="好的" type="LIST" key="key_LieBiao" name="列表" />
+    <cell index="3" relRow="-1" relCol="-1" rowSpan="-1" colSpan="-1" key="key_RiQi" type="DATE" name="日期" />
+    <cell index="4" relRow="-1" relCol="-1" rowSpan="-1" colSpan="-1" key="key_ShiJian" type="TIME" name="时间" />
+    <cell index="5" relRow="-1" relCol="-1" rowSpan="-1" colSpan="-1" key="key_WeiZhi" type="LOCATION" name="位置" />
+    <cell index="6" relRow="-1" relCol="-1" rowSpan="-1" colSpan="-1" key="key_YinPin" type="AUDIO" name="音频" />
+    <cell index="7" relRow="-1" relCol="-1" rowSpan="-1" colSpan="-1" key="key_ZhaoPian" type="PICTURE" name="照片" />
+    <cell index="8" relRow="-1" relCol="-1" rowSpan="-1" colSpan="-1" key="key_ShiPin" type="VIDEO" name="视频" />
+    <cell index="9" relRow="-1" relCol="-1" rowSpan="-1" colSpan="-1" key="key_HeJi" src="文本1,编辑1,位置," type="SUM" name="合计" />
+  </row>
+  <row index="1">
+    <cell index="0" relRow="-1" relCol="-1" rowSpan="-1" colSpan="-1" key="key_DanXuan" type="CKECKBOX" name="单选" />
+    <cell index="1" />
+    <cell index="2" />
+    <cell index="3" />
+    <cell index="4" />
+    <cell index="5" />
+    <cell index="6" />
+    <cell index="7" />
+    <cell index="8" />
+    <cell index="9" />
+  </row>
+  <row index="2">
+    <cell index="0" relRow="-1" relCol="-1" rowSpan="-1" colSpan="-1" key="key_" type="NONE" name="" />
+    <cell index="1" />
+    <cell index="2" />
+    <cell index="3" />
+    <cell index="4" />
+    <cell index="5" />
+    <cell index="6" />
+    <cell index="7" />
+    <cell index="8" />
+    <cell index="9" />
+  </row>
+  <row index="3">
+    <cell index="0" />
+    <cell index="1" />
+    <cell index="2" />
+    <cell index="3" />
+    <cell index="4" />
+    <cell index="5" />
+    <cell index="6" />
+    <cell index="7" />
+    <cell index="8" />
+    <cell index="9" />
+  </row>
+  <row index="4">
+    <cell index="0" />
+    <cell index="1" />
+    <cell index="2" />
+    <cell index="3" />
+    <cell index="4" />
+    <cell index="5" />
+    <cell index="6" />
+    <cell index="7" />
+    <cell index="8" />
+    <cell index="9" />
+  </row>
+  <row index="5">
+    <cell index="0" />
+    <cell index="1" />
+    <cell index="2" />
+    <cell index="3" />
+    <cell index="4" />
+    <cell index="5" />
+    <cell index="6" />
+    <cell index="7" />
+    <cell index="8" />
+    <cell index="9" />
+  </row>
+  <row index="6">
+    <cell index="0" />
+    <cell index="1" />
+    <cell index="2" />
+    <cell index="3" />
+    <cell index="4" />
+    <cell index="5" />
+    <cell index="6" />
+    <cell index="7" />
+    <cell index="8" />
+    <cell index="9" />
+  </row>
+  <row index="7">
+    <cell index="0" />
+    <cell index="1" />
+    <cell index="2" />
+    <cell index="3" />
+    <cell index="4" />
+    <cell index="5" />
+    <cell index="6" />
+    <cell index="7" />
+    <cell index="8" />
+    <cell index="9" />
+  </row>
+  <row index="8">
+    <cell index="0" />
+    <cell index="1" />
+    <cell index="2" />
+    <cell index="3" />
+    <cell index="4" />
+    <cell index="5" />
+    <cell index="6" />
+    <cell index="7" />
+    <cell index="8" />
+    <cell index="9" />
+  </row>
+  <row index="9">
+    <cell index="0" />
+    <cell index="1" />
+    <cell index="2" />
+    <cell index="3" />
+    <cell index="4" />
+    <cell index="5" />
+    <cell index="6" />
+    <cell index="7" />
+    <cell index="8" />
+    <cell index="9" />
+  </row>
+</table>

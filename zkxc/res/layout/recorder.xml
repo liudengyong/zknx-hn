@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="460dp"
+    android:layout_height="120dp"
+    android:orientation="vertical" xmlns:android1="http://schemas.android.com/apk/res/android">
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/info_background">
+        
+    <ImageView android:id="@+id/recorder_close" 
+         android:layout_alignParentRight="true" 
+         android:src="@drawable/close" 
+         android:layout_width="wrap_content" 
+         android:layout_height="wrap_content"
+         android:paddingLeft="10dp"
+         android:paddingRight="10dp" 
+         android:contentDescription="@string/recorder_close"
+         android:layout_centerVertical="true"/>
+        
+    <TextView
+        android:id="@+id/recorder_title" 
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="left"
+        android:scaleType="fitXY"
+        style="@style/LLTextView"
+        android:layout_marginLeft="10dp" />
+    
+    <TextView
+        android:id="@+id/recorder_filename" 
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@+id/recorder_title"
+        android:layout_toLeftOf="@+id/recorder_close"
+        android:gravity="left"
+        android:scaleType="fitXY"
+        style="@style/LLTextView"/>
+    
+    </RelativeLayout>
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="50dp"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:layout_marginTop="25dp" >
+
+        <Button
+            android:id="@+id/recorder_start"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.5"
+            android:text="@string/start"/>
+
+        <Button
+            android:id="@+id/recorder_stop"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.5"
+            android:text="@string/stop" />
+        
+        <Button
+            android:id="@+id/recorder_save"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.5"
+            android:text="@string/save"/>
+    </LinearLayout>
+
+</LinearLayout>

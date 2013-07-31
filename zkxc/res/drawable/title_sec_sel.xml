@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:constantSize="true">
+    
+    <!-- 默认情况下的背景 -->
+    <item>
+        <shape>
+            <gradient
+                android:startColor="#00000000"
+                android:endColor="#00000000"
+                android:angle="90.0" />
+            <!--stroke 
+                android:width="2dp"
+                android:color="#FF000000" /-->
+            <padding 
+                android:top="10dp"
+                android:bottom="10dp"/>
+        </shape>
+    </item>
+</selector>

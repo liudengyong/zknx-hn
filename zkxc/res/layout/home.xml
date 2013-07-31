@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical"
+    android:background="@drawable/home">
+
+    <HorizontalScrollView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:paddingTop="8dp"
+        android:scrollbars="none" >
+
+    <ImageView
+        android:id="@+id/textView1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/home_top" />
+    </HorizontalScrollView>
+    
+    <HorizontalScrollView
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:paddingBottom="80dp"
+    android:layout_alignParentBottom="true"
+    android:scrollbars="none">
+    <ImageView
+        android:id="@+id/textView1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/home_bottom" />
+    </HorizontalScrollView>
+    
+    <LinearLayout
+    android:id="@+id/frame_title"
+    android:layout_width="fill_parent"
+    android:layout_height="66dp"
+    android:layout_alignParentBottom="true"
+    android:paddingBottom="10dp">
+    
+    <TextView
+        android:id="@+id/act_collection"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/data_colleection"
+        style="@style/ZKActTextView"
+        android:background="@drawable/home_txt_sel" />
+    
+        <TextView
+        android:id="@+id/act_map"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/map_track"
+        style="@style/ZKActTextView"
+        android:background="@drawable/home_txt_sel" />
+        
+        <TextView
+        android:id="@+id/act_protection_zone"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/nature_protection_zone"
+        style="@style/ZKActTextView"
+        android:background="@drawable/home_txt_sel" />
+            
+        <TextView
+        android:id="@+id/act_setting"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/system_tool"
+        style="@style/ZKActTextView"
+        android:background="@drawable/home_txt_sel" />
+    </LinearLayout >
+            
+</RelativeLayout>

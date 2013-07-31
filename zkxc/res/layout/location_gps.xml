@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center">
+    
+    <LinearLayout android:id="@+id/location_ly_location"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content">
+    
+    <TextView
+        android:id="@+id/location_label_lat"
+        style="@style/LLTextSize"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center|center_horizontal|center_vertical"
+        android:singleLine="false"
+        android:layout_weight="1"/>
+    
+    <TextView
+        android:id="@+id/location_label_lng"
+        style="@style/LLTextSize"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center|center_horizontal|center_vertical"
+        android:singleLine="false"
+        android:layout_weight="1"/>
+    
+    </LinearLayout>
+
+    <LinearLayout
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:layout_below="@+id/location_ly_location"
+    android:layout_alignParentBottom="true">
+	    <Button
+	        android:id="@+id/location_btn_getlocation"
+	        android:layout_width="0sp"
+	        android:layout_weight="1"
+	        android:layout_height="wrap_content"
+	        android:gravity="center|center_horizontal|center_vertical"
+	        android:text="获取位置" />
+		<Button
+	        android:id="@+id/location_btn_inputlocation"
+	        android:layout_width="0sp"
+	        android:layout_weight="1"
+	        android:layout_height="wrap_content"
+	        android:gravity="center|center_horizontal|center_vertical"
+	        android:text="手工输入" />
+    </LinearLayout>
+
+</RelativeLayout>

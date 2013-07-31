@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="640dp"
+    android:layout_height="500dp"
+    android:orientation="vertical" >
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/info_background">
+        
+    <ImageView android:id="@+id/fileselect_close" 
+	     android:layout_alignParentRight="true" 
+	     android:src="@drawable/close" 
+	     android:layout_width="wrap_content" 
+	     android:layout_height="wrap_content"
+	     android:paddingLeft="10dp"
+	     android:paddingRight="10dp" 
+	     android:layout_centerVertical="true"/>
+        
+    <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_toLeftOf="@+id/fileselect_close"
+        android:gravity="center"
+        android:scaleType="fitXY"
+        android:text="@string/sel_file"
+        style="@style/LLTextView" />
+    
+    </RelativeLayout>
+
+    <ListView
+        android:id="@+id/lv_file_list"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:cacheColorHint="#00000000" >
+    </ListView>
+
+</LinearLayout>

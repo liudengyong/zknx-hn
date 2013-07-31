@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<resources>
+	<style name="LLDialog" parent="android:Theme.Dialog">
+	    <!--item name="android:windowFrame">@null</item-->
+	    <item name="android:windowNoTitle">true</item>
+	    <item name="android:windowIsFloating">true</item>
+	    <item name="android:windowContentOverlay">@null</item>
+	    <item name="android:windowBackground">@android:color/transparent</item>
+	</style>
+	
+	<style name="LLTextView">
+	    <item name="android:textSize">20dp</item>
+	    <item name="android:textColor">#FFFFFFFF</item>
+	    <!--item name="android:layout_centerVertical">true</item-->
+	</style>
+	
+    <style name="LLTextSize">
+        <item name="android:textSize">20dp</item>
+        <item name="android:textColor">#FF000000</item>
+    </style>
+	
+	<style name="ZkTextView">
+	    <item name="android:textSize">20dp</item>
+	    <item name="android:textColor">#FFFFFFFF</item>
+	    <item name="android:layout_centerVertical">true</item>
+	    <item name="android:layout_centerHorizontal">true</item>
+	    <item name="android:layout_centerInParent">true</item>
+	    <item name="android:gravity">center</item>
+	    <item name="android:layout_width">80dp</item>
+	</style>
+	
+	<style name="LLButton">
+	    <!--item name="android:textSize">20dp</item-->
+	</style>
+	
+	<style name="LLEditText">
+	    <item name="android:background">@drawable/edit_text</item>
+	</style>
+	
+	<style name="ActStyle">
+        <item name="android:label">@string/app_name</item>
+        <item name="android:screenOrientation">landscape</item>
+        <item name="android:launchMode">singleInstance</item>
+    </style>
+	
+	<style name="ZKActTextView">
+	    <item name="android:layout_marginLeft">26dp</item>
+	    <item name="android:textColor">#FF000000</item>
+	    <item name="android:textSize">40dp</item>
+    </style>
+    
+	<style name="Popup" parent="android:style/Theme.Dialog">
+	 <item name="android:windowNoTitle">true</item>
+	 <item name="android:windowIsTranslucent">true</item>
+	 <item name="android:windowAnimationStyle">@+android:style/Animation.Translucent</item>
+	</style>
+    
+</resources>
+    
+

@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="@color/main_bk_color"
+    android:gravity="center_vertical"
+    android:orientation="vertical" >
+
+    <include layout="@layout/frame_main" />
+    
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_below="@+id/ly_frame"
+        android:layout_marginLeft="3dp"
+        android:layout_marginRight="3dp"
+        android:layout_marginBottom="3dp"
+        android:background="@color/black" >
+
+            <TextView
+                android:id="@+id/tv_collection_table"
+                android:layout_width="wrap_content"
+                android:layout_height="50dp"
+                android:layout_alignParentLeft="true"
+                android:gravity="center"
+                android:paddingLeft="68dp"
+                android:text="@string/colleection_table"
+                android:textAppearance="?android:attr/textAppearanceLarge" />
+
+        <ListView
+            android:id="@+id/table_list"
+            android:layout_width="300dp"
+            android:layout_height="fill_parent"
+            android:layout_alignParentLeft="true"
+            android:layout_above="@+id/table_btn_sync_tablelist"
+            android:layout_below="@+id/tv_collection_table">
+
+        </ListView>
+        
+        <Button
+            android:id="@+id/table_btn_sync_tablelist"
+            android:layout_width="300dp"
+            android:layout_height="50dp"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentBottom="true"
+            android:text="同步任务采集表">
+       </Button>
+        
+        <TextView
+            android:id="@+id/tv_placehoder"
+            android:layout_width="2dp"
+            android:layout_height="fill_parent"
+            android:layout_toRightOf="@+id/table_list"
+            android:background="@color/main_bk_color">
+       </TextView>
+
+    <RelativeLayout
+        android:id="@+id/ly_table_action"
+        android:layout_width="fill_parent"
+        android:layout_height="50dp"
+        android:layout_below="@+id/ly_frame"
+        android:layout_toRightOf="@+id/tv_placehoder"
+        android:paddingTop="4dp"
+        android:paddingRight="4dp">
+        <Button
+            android:id="@+id/btn_new_collection"
+            android:layout_width="88dp"
+            android:layout_height="fill_parent"
+            android:layout_toRightOf="@+id/table_list"
+            android:text="@string/new_collection" />
+        
+        <Button
+            android:id="@+id/btn_sync_table"
+            android:layout_width="88dp"
+            android:layout_height="fill_parent"
+            android:layout_toRightOf="@+id/btn_new_collection"
+            android:text="@string/sync" />
+
+         <Button
+            android:id="@+id/btn_table_record_sort_all"
+            android:layout_width="88dp"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/btn_sync_table"
+            android:text="全部" />
+        
+        <Button
+            android:id="@+id/btn_table_record_sort_date"
+            android:layout_width="88dp"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/btn_table_record_sort_all"
+            android:text="日期" />
+
+        <Button
+            android:id="@+id/btn_add_table_note"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/btn_table_record_sort_date"
+            android:text="添加备注" />
+                
+        <Button
+            android:id="@+id/btn_show_table_note"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/table_list"
+            android:layout_toRightOf="@+id/btn_add_table_note"
+            android:text="查看备注" />
+
+        <TextView
+            android:id="@+id/tv_record_table_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_toRightOf="@+id/btn_show_table_note"
+            android:text=""
+            android:paddingLeft="6dp"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        </RelativeLayout>
+        
+        <ListView
+            android:id="@+id/lv_record"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/ly_table_action"
+            android:layout_toRightOf="@+id/table_list" >
+        </ListView>
+
+    </RelativeLayout>
+
+</RelativeLayout>

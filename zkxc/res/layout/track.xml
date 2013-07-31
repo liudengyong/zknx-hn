@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="@color/main_bk_color"
+    android:orientation="vertical" >
+    
+    <include layout="@layout/frame_main" />
+
+<RelativeLayout
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:layout_below="@+id/ly_frame"
+    android:layout_marginLeft="3dp"
+    android:layout_marginRight="3dp"
+    android:layout_marginBottom="3dp"
+    android:background="@color/black" >
+
+    <LinearLayout
+        android:id="@+id/ly_track_action"
+        android:layout_width="240dp"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="12dp"
+        android:layout_marginTop="10dp"
+        android:orientation="horizontal" >
+
+        <Button
+            android:id="@+id/track_history"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="历史轨迹"
+            android:enabled="false" />
+
+        <Button
+            android:id="@+id/track_today"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="当前位置" />
+
+        <Button
+            android:id="@+id/track_upload"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="同步数据" />
+
+    </LinearLayout>
+
+	<LinearLayout
+	    android:id="@+id/ly_track_sort"
+	    android:layout_width="240dp"
+	    android:layout_height="280dp"
+	    android:layout_alignParentBottom="true"
+	    android:layout_marginLeft="12dp"
+	    android:layout_marginTop="10dp"
+	    android:orientation="vertical" >
+
+	    <TextView
+	        android:id="@+id/track_fileTitle"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_centerHorizontal="true"
+	        android:layout_marginBottom="10dp"
+	        android:layout_marginLeft="4dp"
+	        android:text="分类显示"
+	        android:textColor="@color/main_bk_color"
+	        android:textSize="20dp" />
+	     
+	    
+	     <Button
+            android:id="@+id/btn_track_sort_all"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:text="全部"/>
+	     
+        <Button
+            android:id="@+id/btn_track_sort_picture"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:text="图片"/>
+
+        <Button
+            android:id="@+id/btn_track_sort_video"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:text="视频" />
+
+        <Button
+            android:id="@+id/btn_track_sort_audio"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:text="音频" />
+        
+        <Button
+            android:id="@+id/btn_track_sort_file"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:text="文件" />
+
+    </LinearLayout>
+    
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_marginBottom="10dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_toRightOf="@+id/ly_track_action" >
+
+        <com.baidu.mapapi.MapView
+            android:id="@+id/track_mapsView"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:clickable="true"
+            android:visibility="gone" >
+        </com.baidu.mapapi.MapView>
+        
+        <LinearLayout
+            android:id="@+id/track_historyView"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:orientation="vertical" >
+
+            <LinearLayout
+                android:id="@+id/linearLayout4"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/track_all"
+                    android:layout_width="80dp"
+                    android:layout_height="wrap_content"
+                    android:text="@string/all" />
+
+                <Button
+                    android:id="@+id/track_date"
+                    android:layout_width="80dp"
+                    android:layout_height="wrap_content"
+                    android:text="@string/date" />
+
+                <!--CheckBox
+                    android:id="@+id/track_record1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"
+                    android:text="记录轨迹 " /-->
+
+            </LinearLayout>
+
+            <ListView
+                android:id="@+id/track_listView"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:layout_weight="1" >
+            </ListView>
+        </LinearLayout>
+
+
+    </RelativeLayout>
+
+    <TextView
+        android:id="@+id/track_fileTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true" />
+
+    <Button
+        android:id="@+id/btn_start_record_track"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/ly_track_action"
+        android:layout_below="@+id/ly_track_action"
+        android:layout_marginTop="22dp"
+        android:text="开始记录" />
+
+    <Button
+        android:id="@+id/btn_stop_record_track"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/btn_start_record_track"
+        android:layout_alignBottom="@+id/btn_start_record_track"
+        android:layout_toRightOf="@+id/btn_start_record_track"
+        android:text="停止记录" />
+
+</RelativeLayout>
+
+</RelativeLayout>
