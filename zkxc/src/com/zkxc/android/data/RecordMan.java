@@ -396,16 +396,26 @@ public class RecordMan {
 				
 				for (String recordPair : recordPairs)
 				{
-				
+					String mediaRecord = "";
+					//recordPair关联的数据 filed_04x00:[PICTURE],time,name,path
 					String recordValue[] = recordPair.split(":");
 					
 					// filed_04x00
 	                // [PICTURE],time,name,path
-					if (recordValue == null || recordValue.length < 2)
+					if (recordValue == null) {
 						continue;
+					} else if (recordValue.length == 1) {
+						// Dengyong 20130801增加没有关联数据时处理
+						// 没有关联的数据
+						// filed_05x00=[PICTURE]"2013_0801_215817"/mnt/sdcard/zkxc/media"20130801215820.jpg
+						
+						mediaRecord = recordValue[0];
+					} else {
+						mediaRecord = recordValue[1];
+					}
 					
 				// [PICTURE],time,name,path
-				String record[] = recordValue[1].split(MediaPicker.HALFEN);
+				String record[] = mediaRecord.split(MediaPicker.HALFEN);
 				
 				if (MediaPicker.IsContainsMedia(record))
 				{
