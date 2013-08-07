@@ -28,7 +28,7 @@ public class Market extends FunctionView {
 	public Market(LayoutInflater inflater, LinearLayout frameRoot, int frameResId) {
 		super(inflater, frameRoot, frameResId);
 
-		initAreaList();
+		initAreaList123();
 	}
 	
 	/**
