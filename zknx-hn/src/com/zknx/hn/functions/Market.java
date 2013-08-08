@@ -1,5 +1,6 @@
 package com.zknx.hn.functions;
 
+import com.zknx.hn.common.widget.WaitDialog;
 import com.zknx.hn.data.DataMan;
 import com.zknx.hn.functions.common.CommonList;
 import com.zknx.hn.functions.common.CommonListAdapter;
@@ -8,6 +9,8 @@ import com.zknx.hn.functions.common.ListItemClickListener;
 import com.zknx.hn.functions.common.ProductListAdapter;
 import com.zknx.hn.functions.common.CommonList.CommonListParams;
 
+import android.os.Handler;
+import android.os.Message;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
@@ -28,7 +31,14 @@ public class Market extends FunctionView {
 	public Market(LayoutInflater inflater, LinearLayout frameRoot, int frameResId) {
 		super(inflater, frameRoot, frameResId);
 
-		initAreaList();
+		loadArea();
+	}
+	
+	/**
+	 * 加载地区数据
+	 */
+	void loadArea() {
+		WaitDialog.Show(mContext, mLoadAreaListAction);
 	}
 	
 	/**
@@ -37,7 +47,7 @@ public class Market extends FunctionView {
 	 */
 	void initAreaList() {
 		
-		mAdapterArea = new CommonListAdapter(mContext, DataMan.GetAddressList());
+		WaitDialog.Show(mContext, mLoadAreaListAction);
 		
 		CommonListParams listParams = new CommonListParams(mInflater, mContentFrame[0], mAdapterArea, mOnAreaItemClick);
 		
@@ -65,8 +75,15 @@ public class Market extends FunctionView {
 		
 		int address_id = mAdapterArea.getItemMapInt(position,  DataMan.KEY_ADDRESS_ID);
 		
-		mAdapterMarket = new CommonListAdapter(mContext, DataMan.GetMarketListByArea(address_id));
+		setArea(address_id);
 		
+		WaitDialog.Show(mContext, mLoadMarketListAction);
+	}
+	
+	/**
+	 * 初始化市场的产品行情
+	 */
+	void initMarketProducts() {
 		// 初始化市场视图
 		CommonListParams listParams = new CommonListParams(mInflater, mContentFrame[1], mAdapterMarket, mOnMarketItemClick);
 		CommonList.Init(listParams, LEVEL2_TITLE);
@@ -110,4 +127,61 @@ public class Market extends FunctionView {
 		
 		CommonList.Init(listParams, custom);
 	}
+	
+	private int mCurAddressId = DataMan.INVALID_ID;
+
+	private void setArea(int addressId) {
+		mCurAddressId = addressId;
+	}
+	
+	/**
+	 * 加载地区列表action
+	 */
+	WaitDialog.Action mLoadAreaListAction = new WaitDialog.Action() {
+		@Override
+		public String getMessage() {
+			return "正在加载地址列表";
+		}
+
+		@Override
+		public void waitAction() {
+			mAdapterArea = new CommonListAdapter(mContext, DataMan.GetAddressList());
+			mHandler.sendEmptyMessage(MESSAGE_LOADED_ADDRESSS);
+		}
+	};
+	
+	/**
+	 * 加载市场列表action
+	 */
+	WaitDialog.Action mLoadMarketListAction = new WaitDialog.Action() {
+		@Override
+		public String getMessage() {
+			return "正在加载市场列表";
+		}
+
+		@Override
+		public void waitAction() {
+			mAdapterMarket = new CommonListAdapter(mContext, DataMan.GetMarketListByArea(mCurAddressId));
+			mHandler.sendEmptyMessage(MESSAGE_LOADED_MARKETS);
+		}
+	};
+
+	private final static int MESSAGE_LOADED_ADDRESSS = 1;
+	private final static int MESSAGE_LOADED_MARKETS  = 2;
+
+	Handler mHandler = new Handler() {
+		@Override
+		public void handleMessage(Message msg){
+		   super.handleMessage(msg);
+
+		   switch (msg.what) {
+		   case MESSAGE_LOADED_ADDRESSS:
+			   initAreaList();
+			   break;
+		   case MESSAGE_LOADED_MARKETS:
+			   initMarketProducts();
+			   break;
+		   }
+		}
+	};
 }
