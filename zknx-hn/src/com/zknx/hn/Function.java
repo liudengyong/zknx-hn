@@ -369,11 +369,12 @@ public class Function extends Activity {
 
 	    	// 功能参数
 	    	intent.replaceExtras(extras);
-	    	intent.setClass(context, Function.class);
 
 	    	if (isNeedLogin(id)) {
-	    		//intent.setClass(context, Login.class);
-	    		UserMan.SetUserInfo("userId", "userName", "addrId", "address", "phone");
+	    		intent.setClass(context, Login.class);
+	    		//UserMan.SetUserInfo("userId", "userName", "addrId", "address", "phone");
+	    	} else {
+	    		intent.setClass(context, Function.class);
 	    	}
 	    	
 	    	context.startActivity(intent);
@@ -395,6 +396,8 @@ public class Function extends Activity {
     	case UIConst.FUNCTION_ID_MY_GROUP:
     	case UIConst.FUNCTION_ID_CUSTOM_PRODUCT:
     	case UIConst.FUNCTION_ID_MY_SUPPLY_DEMAND:
+    	case UIConst.FUNCTION_ID_BEST_COUSE:
+    	case UIConst.FUNCTION_ID_EXPERT_GUIDE:
     		return true;
     	}
     	
