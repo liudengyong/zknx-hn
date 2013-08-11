@@ -20,7 +20,7 @@ public class App extends Application {
 	public static Context mContext;
 	
 	@Override
-	public void onCreate0() {
+	public void onCreate() {
 		super.onCreate();
 	}
 
