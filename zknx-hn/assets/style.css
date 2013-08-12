@@ -4,7 +4,7 @@ html, body, h1, form, fieldset, legend, ol, li {
 	}
 
 body {
-	background: #9cbc2c;
+	background: #072d4d;
 	color: #111111;
 	font-family: Georgia, "Times New Roman", Times, serif;
 	padding: 10px;
@@ -16,7 +16,7 @@ body {
 		}
 	
 	form#payment {
-		background: #9cbc2c;
+		background: #072d4d;
 		-moz-border-radius: 5px;
 		-webkit-border-radius: 5px;
 		-khtml-border-radius: 5px;
@@ -56,8 +56,8 @@ body {
 					}
 			
 			form#payment ol li {
-				background: #b9cf6a;
-				background: rgba(255,255,255,.3);
+				#background: #b9cf6a;
+				#background: rgba(255,255,255,.3);
 				border-color: #e3ebc3;
 				border-color: rgba(255,255,255,.6);
 				border-style: solid;
@@ -82,11 +82,13 @@ body {
 				float: left;
 				width: 100px;
 				text-align:center;
+				color: white;
 				}
 				
 			form#payment a {
 				width: 100px;
 				text-align:center;
+				color: white;
 				}
 
 			form#payment fieldset fieldset label {
@@ -95,20 +97,6 @@ body {
 				padding: 0 0 0 30px;
 				width: auto;
 				}
-					
-				form#payment label[for=visa] {
-					background-image: url(visa.gif);
-					}
-				form#payment label[for=amex] {
-					background-image: url(amex.gif);
-					}
-				form#payment label[for=mastercard] {
-					background-image: url(mastercard.gif);
-					}
-					
-				form#payment fieldset fieldset label:hover {
-					cursor: pointer;
-					}
 				
 			form#payment input:not([type=radio]),
 			form#payment textarea {
@@ -135,7 +123,7 @@ body {
 					}
 						
 			form#payment button {
-				background: #384313;
+				#background: #384313;
 				border: none;
 				-moz-border-radius: 6px;
 				-webkit-border-radius: 6px;
@@ -147,9 +135,10 @@ body {
 				letter-spacing: 1px;
 				margin: auto;
 				padding: 7px 25px;
-				text-shadow: 0 1px 1px #000000;
+				#text-shadow: 0 1px 1px #000000;
 				text-transform: uppercase;
 				width: 200px;
+				color: black;
 				}
 					
 				form#payment button:hover {
