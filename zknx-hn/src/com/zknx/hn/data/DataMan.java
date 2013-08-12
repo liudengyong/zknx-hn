@@ -296,7 +296,8 @@ public class DataMan extends DataInterface {
         	}
         }
         
-        FileUtils.WriteGB2312Text(true, FILE_NAME_ADDRESS_PROVINCE, provinceLines);
+        if (lines.size() > 0)
+        	FileUtils.WriteGB2312Text(true, FILE_NAME_ADDRESS_PROVINCE, provinceLines);
 
         return list;
 	}
@@ -311,11 +312,11 @@ public class DataMan extends DataInterface {
         ArrayList<ListItemMap> list = new ArrayList<ListItemMap>();
         
         // 优化效率
-        if (FileUtils.IsFileExist(DataFile(marketCacheFileName)))
+        if (FileUtils.IsFileExist(DataFile(marketCacheFileName, true)))
         	return ReadCommonIdName(marketCacheFileName, KEY_MARKET_ID);
         
         String marketLines = "";
-        List<String> lines = ReadLines(FILE_NAME_MARKETS);
+        List<String> lines = ReadLines(FILE_NAME_MARKETS, true);
         
         for (String line : lines)  
         {
@@ -336,7 +337,8 @@ public class DataMan extends DataInterface {
         	}
         }
         
-        FileUtils.WriteGB2312Text(false, marketCacheFileName, marketLines);
+        if (lines.size() > 0)
+        	FileUtils.WriteGB2312Text(true, marketCacheFileName, marketLines);
 
         return list;
 	}
@@ -361,9 +363,9 @@ public class DataMan extends DataInterface {
         
         List<String> lines;
         String marketProductsFileName = "market_" + market_id + "_products.txt";
-        
+
         // 优化
-        if (FileUtils.IsFileExist(DataFile(marketProductsFileName, true))) {
+        if (FileUtils.IsFileExist(DataFile(marketProductsFileName, false))) {
         	lines = ReadLines(marketProductsFileName, true);
         	for (String line : lines)
             {
@@ -393,7 +395,7 @@ public class DataMan extends DataInterface {
         }
 
         String marketProductLines = "";
-        lines = ReadLines(FILE_NAME_PRODUCTS, false);
+        lines = ReadLines(FILE_NAME_PRODUCTS_PRICE, false);
         for (String line : lines)
         {
         	String[] token = GetToken(line);
@@ -413,17 +415,17 @@ public class DataMan extends DataInterface {
         		if (product_id == INVALID_ID)
         			continue;
 
-        		String product_name = token[3];//FindCommodityName(productList, KEY_PRODUCT_ID, productId);
+        		String product_name = token[3];
         		String minPrice = token[4];
         		String maxPrice = minPrice;//token[5];
         		String averagePrice = minPrice;//token[6];
         		String hostPrice = minPrice;// token[7];
         		String unit = token[5];
         		boolean isMyProduct = false;
-        		
+
         		// 生成时不用关心是否自选
         		if (!justGen)
-        			IsMyProduct(product_id); /* 添加自选按钮状态 */
+        			isMyProduct = IsMyProduct(product_id); /* 添加自选按钮状态 */
         		
         		//list.add(new ProductListItemMap("名字", "最低价", "最高价", "平均价", "产地价", "单位", "添加"));
         		AddProductList(list, productId, product_name, minPrice, maxPrice, averagePrice, hostPrice, unit, isMyProduct);
@@ -438,7 +440,8 @@ public class DataMan extends DataInterface {
         	}
         }
 
-        FileUtils.WriteGB2312Text(true, marketProductsFileName, marketProductLines);
+        if (lines.size() > 0)
+        	FileUtils.WriteGB2312Text(false, marketProductsFileName, marketProductLines);
 
         return list;
 	}
@@ -612,7 +615,7 @@ public class DataMan extends DataInterface {
 		}
 		
 		String productMarketLines = "";
-		lines = ReadLines(FILE_NAME_PRODUCTS);
+		lines = ReadLines(FILE_NAME_PRODUCTS_PRICE);
 		
         for (String line : lines)
         {
@@ -647,7 +650,8 @@ public class DataMan extends DataInterface {
         			averagePrice + COMMON_TOKEN + hostPrice + COMMON_TOKEN + unit + "\n";
         }
         
-        FileUtils.WriteGB2312Text(true, productMarketFileName, productMarketLines);
+        if (lines.size() > 0)
+        	FileUtils.WriteGB2312Text(true, productMarketFileName, productMarketLines);
 
         return list;
 	}
@@ -810,41 +814,12 @@ public class DataMan extends DataInterface {
         	}
         }
 
-        FileUtils.WriteGB2312Text(true, productClassCacheFileName, productClassLines);
+        if (lines.size() > 0)
+        	FileUtils.WriteGB2312Text(true, productClassCacheFileName, productClassLines);
 
         return list;
 	}
-	
-	/**
-	 * 获取产品列表
-	 * @return
-	 */
-	public static List<ListItemMap> GetProductList() {
-		
-		ArrayList<ListItemMap> list = new ArrayList<ListItemMap>();
-        List<String> lines = ReadLines(FILE_NAME_COMMODITY);
-        
-        for (String line : lines)  
-        {
-        	// id,名字
-        	String[] token = GetToken(line);
-        	if (token.length == 2) {
 
-        		int id =  ParseInt(token[0]);
-
-        		// id 编码
-        		if (id != INVALID_ID && id > 100) {
-
-	        		String name = token[1];
-
-	        		list.add(new ListItemMap(name/* 名字 */, KEY_PRODUCT_ID, token[0]/* id */));
-        		}
-        	}
-        }
-
-        return list;
-	}
-	
 	/**
 	 * 根据产品分类获取供求信息列表
 	 * @return
@@ -1222,7 +1197,8 @@ public class DataMan extends DataInterface {
 		
 		List<ListItemMap> list = GetSupplyDemandList(listener2);
 		
-		FileUtils.WriteGB2312Text(false, pairCache, pairLines);
+		if (list.size() > 0)
+			FileUtils.WriteGB2312Text(false, pairCache, pairLines);
 		
 		return list;
 	}
@@ -1706,9 +1682,6 @@ public class DataMan extends DataInterface {
 	 * @return
 	 */
 	private static String AppDataPath(boolean root) {
-		if (App.mDebug)
-			root = true;// TODO 调试
-
 		if (root)
 			return Environment.getExternalStorageDirectory() + "/zknx.hn";
 		else

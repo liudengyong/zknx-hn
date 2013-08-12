@@ -16,7 +16,7 @@ public class DataInterface {
 	// 市场（所有地区）列表文件名
 	protected static final String FILE_NAME_MARKETS = "market.txt";
 	// 产品（所有市场）列表文件名
-	protected static final String FILE_NAME_PRODUCTS = "commodity_price.txt";
+	protected static final String FILE_NAME_PRODUCTS_PRICE = "commodity_price.txt";
 	// 产品名字
 	protected static final String FILE_NAME_COMMODITY = "commodity.txt";
 	// 自选产品列表
