@@ -1,21 +1,21 @@
 package com.zknx.hn.functions;
 
 import android.content.DialogInterface;
+import android.os.Handler;
+import android.os.Message;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.View.OnKeyListener;
-import android.view.View.OnLongClickListener;
 import android.widget.AdapterView;
 import android.widget.LinearLayout;
 import android.widget.AdapterView.OnItemClickListener;
 
 import com.zknx.hn.R;
-import com.zknx.hn.common.Debug;
 import com.zknx.hn.common.UIConst;
 import com.zknx.hn.common.UIConst.L_LAYOUT_TYPE;
 import com.zknx.hn.common.widget.Dialog;
+import com.zknx.hn.common.widget.WaitDialog;
 import com.zknx.hn.common.widget.Dialog.ConfirmListener;
 import com.zknx.hn.data.DataMan;
 import com.zknx.hn.functions.common.CommonList;
@@ -31,6 +31,7 @@ public class MyProduct extends FunctionView {
 
 	private MyProductListAdapter  mAdapterMyProduct;
 	private ProductListAdapter mMarketAdapter;
+	private ProductPriceInfo mPriceInfo;
 	
 	private LinearLayout mProductListLayout;
 	private LinearLayout mChartLayout;
@@ -43,8 +44,26 @@ public class MyProduct extends FunctionView {
 	
 	public MyProduct(LayoutInflater inflater, LinearLayout frameRoot, int frameResId) {
 		super(inflater, frameRoot, frameResId);
-		
-		initMyProductList();
+
+		loadMyProducts();
+	}
+	
+	/**
+	 * 加载地区数据
+	 */
+	void loadMyProducts() {
+		WaitDialog.Show(mContext, new WaitDialog.Action() {
+			@Override
+			public String getMessage() {
+				return "正在加载自选产品";
+			}
+
+			@Override
+			public void waitAction() {
+				mAdapterMyProduct = new MyProductListAdapter(mContext, DataMan.GetMyProductList(), mOnClickRemove);
+				mHandler.sendEmptyMessage(MESSAGE_LOADED_MY_PRODUCT);
+			}
+		});
 	}
 	
 	/**
@@ -54,8 +73,6 @@ public class MyProduct extends FunctionView {
 	 */
 	private void initMyProductList() {
 		
-		mAdapterMyProduct = new MyProductListAdapter(mContext, DataMan.GetMyProductList(), mOnClickRemove);
-		
 		CommonListParams listParams = new CommonListParams(mInflater, mContentFrame[0], mAdapterMyProduct, mOnMyProductClick);
 		
 		CommonList.Init(listParams, LEVEL1_TITLE);
@@ -64,7 +81,7 @@ public class MyProduct extends FunctionView {
 		initProductFrame();
 		
 		// 默认第一个产品
-		initProductView(0);
+		loadMarketsList(0);
 	}
 	
 	/**
@@ -89,22 +106,39 @@ public class MyProduct extends FunctionView {
 		@Override
 		public void onItemClick(AdapterView<?> parent, View view, int position, long product_id) {
 			super.onItemClick(parent, view, position, product_id);
-			initProductView(position);
+			loadMarketsList(position);
 		}
 	};
+	
+	/**
+	 * 加载市场数据
+	 */
+	private void loadMarketsList(final int position) {
+		WaitDialog.Show(mContext, new WaitDialog.Action() {
+			@Override
+			public String getMessage() {
+				return "正在加载市场列表";
+			}
+
+			@Override
+			public void waitAction() {
+				mCurProductId = mAdapterMyProduct.getItemMapString(position, DataMan.KEY_PRODUCT_ID);
+				
+				// 添加市场列表
+				mMarketAdapter = new ProductListAdapter(mContext, DataMan.GetMarketListByProduct(mCurProductId), IS_NEED_CHECKBOX);
+
+				mHandler.sendEmptyMessage(MESSAGE_LOADED_MARKETS_BY_PRODUCT);
+			}
+		});
+	}
 	
 	/**
 	 * 添加产品行情视图（各个市场）
 	 * @param product_id
 	 * @return
 	 */
-	private void initProductView(int position) {
-
-		mCurProductId = mAdapterMyProduct.getItemMapString(position, DataMan.KEY_PRODUCT_ID);
+	private void initProductView() {
 		
-		// 添加市场列表
-		mMarketAdapter = new ProductListAdapter(mContext, DataMan.GetMarketListByProduct(mCurProductId), IS_NEED_CHECKBOX);
-
 		LinearLayout custom = ProductListAdapter.ListHeader(mInflater, "市场", IS_NEED_CHECKBOX);
 		
 		CommonListParams listParams = new CommonListParams(mInflater, mProductListLayout, mMarketAdapter, OnMarketClickListener);
@@ -112,32 +146,49 @@ public class MyProduct extends FunctionView {
 		CommonList.Init(listParams, custom);
 		
 		// 默认价格走势
-		initPriceChartView(0);
+		loadHistoryPrice(0);
 	}
 	
 	OnItemClickListener OnMarketClickListener = new OnItemClickListener() {
 		@Override
 		public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-			initPriceChartView(position);
+			loadHistoryPrice(position);
 		}
 	};
+	
+	/**
+	 * 加载市场数据
+	 */
+	private void loadHistoryPrice(final int position) {
+		WaitDialog.Show(mContext, new WaitDialog.Action() {
+			@Override
+			public String getMessage() {
+				return "正在加载历史价格";
+			}
+
+			@Override
+			public void waitAction() {
+				String market_id = mMarketAdapter.getItemMapString(position, DataMan.KEY_MARKET_ID);
+				
+				mPriceInfo = DataMan.GetHistoryPrice(mCurProductId, market_id);
+
+				mHandler.sendEmptyMessage(MESSAGE_LOADED_HISTORY_PRICE);
+			}
+		});
+	}
 	
 	/**
 	 * 初始化价格走势图
 	 * @param position
 	 * @return
 	 */
-	private void initPriceChartView(int position) {
-		
-		String market_id = mMarketAdapter.getItemMapString(position, DataMan.KEY_MARKET_ID);
-
+	private void initPriceChartView() {
 		// 添加价格图表
 		PriceChart priceChart = null;
-		ProductPriceInfo priceInfo = DataMan.GetHistoryPrice(mCurProductId, market_id);
 		
-		if (priceInfo != null)
-			priceChart = new PriceChart(mContext, priceInfo);
-
+		if (mPriceInfo != null)
+			priceChart = new PriceChart(mContext, mPriceInfo);
+		
 		initContent("价格走势", priceChart, mChartLayout);
 	}
 	
@@ -156,8 +207,7 @@ public class MyProduct extends FunctionView {
 					public void onClick(DialogInterface dialog, int which) {
 						if (product_id != DataMan.INVALID_ID) {
 							DataMan.MyProductListRemove(product_id);
-							// XXX 待优化（是否需要重画所有试图？）
-							initMyProductList();
+							loadMyProducts();
 						}
 					}
 				});
@@ -166,6 +216,29 @@ public class MyProduct extends FunctionView {
 			Dialog.Toast(mContext, "NO HIT:" + keyEvent.getKeyCode());
 
 			return false;
+		}
+	};
+	
+	private final static int MESSAGE_LOADED_MY_PRODUCT     = 1;
+	private final static int MESSAGE_LOADED_MARKETS_BY_PRODUCT  = 2;
+	private final static int MESSAGE_LOADED_HISTORY_PRICE  = 3;
+
+	Handler mHandler = new Handler() {
+		@Override
+		public void handleMessage(Message msg){
+		   super.handleMessage(msg);
+
+		   switch (msg.what) {
+		   case MESSAGE_LOADED_MY_PRODUCT:
+			   initMyProductList();
+			   break;
+		   case MESSAGE_LOADED_MARKETS_BY_PRODUCT:
+			   initProductView();
+			   break;
+		   case MESSAGE_LOADED_HISTORY_PRICE:
+			   initPriceChartView();
+			   break;
+		   }
 		}
 	};
 }

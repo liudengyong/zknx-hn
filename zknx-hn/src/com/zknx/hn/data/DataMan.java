@@ -313,7 +313,7 @@ public class DataMan extends DataInterface {
         
         // 优化效率
         if (FileUtils.IsFileExist(DataFile(marketCacheFileName, true)))
-        	return ReadCommonIdName(marketCacheFileName, KEY_MARKET_ID);
+        	return ReadCommonIdName(marketCacheFileName, KEY_MARKET_ID, true);
         
         String marketLines = "";
         List<String> lines = ReadLines(FILE_NAME_MARKETS, true);
