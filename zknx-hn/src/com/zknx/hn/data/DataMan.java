@@ -381,7 +381,7 @@ public class DataMan extends DataInterface {
         		String hostPrice = token[5];
         		String unit = token[6];
         		boolean isMyProduct = false;
-        		
+
         		// 生成时不用关心是否自选
         		if (!justGen)
         			isMyProduct = IsMyProduct(product_id); /* 添加自选按钮状态 */
@@ -392,18 +392,15 @@ public class DataMan extends DataInterface {
         	return list;
         }
 
-        // 在内存中查找
-        List<ListItemMap> productList = GetProductList();
-        
         String marketProductLines = "";
-        lines = ReadLines(FILE_NAME_PRODUCTS);
+        lines = ReadLines(FILE_NAME_PRODUCTS, false);
         for (String line : lines)
         {
         	String[] token = GetToken(line);
         	// 0101301,北京昌平区水屯农副产品批发市场,0101001000,0101301,13.5,元/公斤
-        	// TODO 接口确定
         	if (token.length == 6) {
         		// market_id,市场名字,product_id,产品名,最低价,最高价,平均价,产地价,价格单位
+        		// 1506901,山东寿光批发市场,0101001000,花生,3.23,元/公斤
         		int market_id_parsed = ParseInt(token[0]);
         		if (market_id_parsed != market_id)
         			continue;
@@ -416,7 +413,7 @@ public class DataMan extends DataInterface {
         		if (product_id == INVALID_ID)
         			continue;
 
-        		String product_name = FindCommodityName(productList, KEY_PRODUCT_ID, productId);
+        		String product_name = token[3];//FindCommodityName(productList, KEY_PRODUCT_ID, productId);
         		String minPrice = token[4];
         		String maxPrice = minPrice;//token[5];
         		String averagePrice = minPrice;//token[6];
@@ -1613,37 +1610,6 @@ public class DataMan extends DataInterface {
 		FileUtils.WriteFile(genFileName, newAisList.getBytes());
 	}
 
-	/**
-	 * 查找商品名字
-	 * @param id
-	 * @return
-	 */
-	private static String FindCommodityName(List<ListItemMap> productList, String key, String id) {
-		/*
-		List<String> lines = ReadLines(FILE_NAME_COMMODITY);
-		
-		int intId = ParseInt(id);
-		if (intId == INVALID_ID)
-			return null;
-
-		String[] token;
-		for (String line : lines) {
-			token = line.split(TOKEN_SEP);
-			if (token != null && token.length >= 2) {
-				if (intId == ParseInt(token[0]))
-					return token[1];
-			}
-		}
-		*/
-		
-		for (ListItemMap item : productList) {
-			if (item.getString(key).equals(id))
-				return item.getString(KEY_NAME);
-		}
-
-		return null;
-	}
-	
 	// 一天的毫秒数： 1天=24*60*60*1000=86400000毫秒
 	private static final long MILLIS_ONE_DAY = 86400000;
 

@@ -38,7 +38,18 @@ public class Market extends FunctionView {
 	 * 加载地区数据
 	 */
 	void loadArea() {
-		WaitDialog.Show(mContext, mLoadAreaListAction);
+		WaitDialog.Show(mContext, new WaitDialog.Action() {
+			@Override
+			public String getMessage() {
+				return "正在加载地址列表";
+			}
+
+			@Override
+			public void waitAction() {
+				mAdapterArea = new CommonListAdapter(mContext, DataMan.GetAddressList());
+				mHandler.sendEmptyMessage(MESSAGE_LOADED_ADDRESSS);
+			}
+		});
 	}
 	
 	/**
@@ -46,9 +57,7 @@ public class Market extends FunctionView {
 	 * @return
 	 */
 	void initAreaList() {
-		
-		WaitDialog.Show(mContext, mLoadAreaListAction);
-		
+
 		CommonListParams listParams = new CommonListParams(mInflater, mContentFrame[0], mAdapterArea, mOnAreaItemClick);
 		
 		CommonList.Init(listParams, LEVEL1_TITLE);
@@ -71,15 +80,23 @@ public class Market extends FunctionView {
 	 * @param position
 	 * 地区列表适配器中第一个地区
 	 */
-	void initMarketList(int position) {
+	void initMarketList(final int position) {
 		
-		int address_id = mAdapterArea.getItemMapInt(position,  DataMan.KEY_ADDRESS_ID);
-		
-		setArea(address_id);
-		
-		WaitDialog.Show(mContext, mLoadMarketListAction);
+		WaitDialog.Show(mContext, new WaitDialog.Action() {
+			@Override
+			public String getMessage() {
+				return "正在加载市场列表";
+			}
+
+			@Override
+			public void waitAction() {
+				int address_id = mAdapterArea.getItemMapInt(position,  DataMan.KEY_ADDRESS_ID);
+				mAdapterMarket = new CommonListAdapter(mContext, DataMan.GetMarketListByArea(address_id));
+				mHandler.sendEmptyMessage(MESSAGE_LOADED_MARKETS);
+			}
+		});
 	}
-	
+
 	/**
 	 * 初始化市场的产品行情
 	 */
@@ -107,13 +124,30 @@ public class Market extends FunctionView {
 	 * @param positon
 	 * @return
 	 */
-	void initMarketView(int position) {
+	void initMarketView(final int position) {
 		
-		int market_id = mAdapterMarket.getItemMapInt(position, DataMan.KEY_MARKET_ID);
-		
-		// 添加新视图
-		mAdapterProduct = new ProductListAdapter(mContext, DataMan.GetProductList(market_id), mAddButton);
-		
+		WaitDialog.Show(mContext, new WaitDialog.Action() {
+			@Override
+			public String getMessage() {
+				return "正在加载产品列表";
+			}
+
+			@Override
+			public void waitAction() {
+				int market_id = mAdapterMarket.getItemMapInt(position, DataMan.KEY_MARKET_ID);
+				
+				// 添加新视图
+				mAdapterProduct = new ProductListAdapter(mContext, DataMan.GetProductList(market_id), mAddButton);
+				
+				mHandler.sendEmptyMessage(MESSAGE_LOADED_PRODUCTS);
+			}
+		});
+	}
+
+	/**
+	 * 初始化产品列表
+	 */
+	void initProductsView() {	
 		LinearLayout custom = ProductListAdapter.ListHeader(mInflater, "产品", mAddButton);
 		
 		OnItemClickListener listener = new OnItemClickListener() {
@@ -127,47 +161,10 @@ public class Market extends FunctionView {
 		
 		CommonList.Init(listParams, custom);
 	}
-	
-	private int mCurAddressId = DataMan.INVALID_ID;
-
-	private void setArea(int addressId) {
-		mCurAddressId = addressId;
-	}
-	
-	/**
-	 * 加载地区列表action
-	 */
-	WaitDialog.Action mLoadAreaListAction = new WaitDialog.Action() {
-		@Override
-		public String getMessage() {
-			return "正在加载地址列表";
-		}
-
-		@Override
-		public void waitAction() {
-			mAdapterArea = new CommonListAdapter(mContext, DataMan.GetAddressList());
-			mHandler.sendEmptyMessage(MESSAGE_LOADED_ADDRESSS);
-		}
-	};
-	
-	/**
-	 * 加载市场列表action
-	 */
-	WaitDialog.Action mLoadMarketListAction = new WaitDialog.Action() {
-		@Override
-		public String getMessage() {
-			return "正在加载市场列表";
-		}
-
-		@Override
-		public void waitAction() {
-			mAdapterMarket = new CommonListAdapter(mContext, DataMan.GetMarketListByArea(mCurAddressId));
-			mHandler.sendEmptyMessage(MESSAGE_LOADED_MARKETS);
-		}
-	};
 
 	private final static int MESSAGE_LOADED_ADDRESSS = 1;
 	private final static int MESSAGE_LOADED_MARKETS  = 2;
+	private final static int MESSAGE_LOADED_PRODUCTS = 3;
 
 	Handler mHandler = new Handler() {
 		@Override
@@ -180,6 +177,9 @@ public class Market extends FunctionView {
 			   break;
 		   case MESSAGE_LOADED_MARKETS:
 			   initMarketProducts();
+			   break;
+		   case MESSAGE_LOADED_PRODUCTS:
+			   initProductsView();
 			   break;
 		   }
 		}
