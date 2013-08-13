@@ -8,7 +8,6 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.URLEncoder;
 import java.net.UnknownHostException;
 
 import com.zknx.hn.common.Debug;
@@ -26,7 +25,7 @@ public class UserMan {
 	private static class UserInfo {
 		String userId; // 用户id
 		String userName; // 用户注册名字
-		String addrId; // 用户注册地址
+		String major; // 用户注册专业
 		String address; // 用户注册地址
 		String phone; // 电话
 	}
@@ -57,8 +56,8 @@ public class UserMan {
 	 * @return
 	 * 如果用户已经登录，则返回用户地址id
 	 */
-	public static String GetUserAddressId() {
-		return (mUserInfo != null) ? mUserInfo.addrId : null;
+	public static String GetUserMajor() {
+		return (mUserInfo != null) ? mUserInfo.major : null;
 	}
 
 	/**
@@ -85,13 +84,13 @@ public class UserMan {
 	 * @param addressId
 	 * @param phone
 	 */
-	public static void SetUserInfo(String userId, String userName, String addrId, String address, String phone) {
+	public static void SetUserInfo(String userId, String userName, String major, String address, String phone) {
 		if (mUserInfo == null)
 			mUserInfo = new UserInfo();
 		
 		mUserInfo.userId = userId;
 		mUserInfo.userName = userName;
-		mUserInfo.addrId = addrId;
+		mUserInfo.major = major;
 		mUserInfo.address = address;
 		mUserInfo.phone= phone;
 		
@@ -108,16 +107,13 @@ public class UserMan {
 		String ret = null;
 		
 		try {
-			String param = "?data=<?xml%20version=\"1.0\"%20encoding=\"gb2312\"?><Upload><Getinfo><UserInfo><UserId>"
-					+ URLEncoder.encode(user, "gb2312") + "</UserId><Password>"
-					+ URLEncoder.encode(passwd, "gb2312") + "</Password></UserInfo></Getinfo></Upload>";
+			String param = "?userid=" + user + "&password=" + passwd;
 
-			String value = SaveUserInfo(DataMan.URL_GET_USER_INFO + param, USER_INFO_FILE_NMAE + "." + user);
+			String value = SaveUserInfo(DataMan.URL_LOGIN + param, USER_INFO_FILE_NMAE + "." + user);
 
-			int start = value.indexOf('=');
-			int end   = value.indexOf("UserId");
+			String token[] = value.split(DataMan.COMMON_TOKEN); 
 
-			if (start >= 0 && end > start && value.substring(start + 1, end).equals("TRUE")) {
+			if (token != null && token.length == 5) {
 				
 				if (!ParseUserInfo(user)) {
 					// 登录失败
@@ -156,26 +152,20 @@ public class UserMan {
 			
 			returnString = r.readLine();
 			
-			Debug.Log("ret=" + returnString);
 			Debug.Log("fileName=" + fileName);
 
-			if (returnString.equals("Result=TRUE"))
+			String token[] = returnString.split(DataMan.COMMON_TOKEN);
+			if (token != null && token.length == 5/*returnString.equals("Result=TRUE")*/) {
 				osw = new OutputStreamWriter(new FileOutputStream(DataMan.DataFile(fileName)), "gb2312"); 
 			
-			String text;
-
-			while((text = r.readLine()) != null)
-			{
-				returnString += text;
+				if (osw != null)
+					osw.write(returnString);
 
 				if (osw != null)
-					osw.write(text + "\n");
+					osw.close(); 
 			}
 
-			if (osw != null)
-				osw.close();  
 			r.close(); 
-
 		}
 		
 		return returnString;
@@ -192,30 +182,17 @@ public class UserMan {
         try {
             BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(fileName), "gb2312"));
 
-            int start;
-            String key[] = {"UserId=", "Password=", "MobileNumber=", "AddressId=", "MajorId=", 
-                    "BirthDate=", "sex=", "CunName=", "UserName=", "Postalcode=", 
-                    "PostalAddr=", "ServerStat=", "ManageInfo="};
-
-            String line;
-            String value[] = new String[key.length];
+            String line = br.readLine();
             
-            for (int i= 0; i < key.length; ++i) {
-                line = br.readLine();
-                if (line == null || line.length() < 1) break;
-                start = line.indexOf(key[i]);
-                if (start < 0) {
-                	value[i] = "";
-                	continue;
-                }
-                else value[i] = line.substring(start + key[i].length());
+            if (line != null) {
+            	String token[] = line.split(DataMan.COMMON_TOKEN);
+            	if (token != null && token.length == 5) {
+                    SetUserInfo(token[0], token[0], token[2], token[3], token[4]);
+            	}
             }
             
             br.close();
             
-            // TODO interface 暂无详细地址
-            SetUserInfo(key[0], key[1], key[3], null, key[2]);
-
             return true;
         } catch (FileNotFoundException e) {
             e.printStackTrace();

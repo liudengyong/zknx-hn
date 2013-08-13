@@ -28,6 +28,7 @@ import com.zknx.hn.common.Debug;
 import com.zknx.hn.common.Restraint;
 import com.zknx.hn.common.UIConst;
 import com.zknx.hn.functions.ais.AisDoc;
+import com.zknx.hn.functions.common.ProductListAdapter;
 import com.zknx.hn.functions.common.ProductPriceInfo;
 
 @SuppressLint("SimpleDateFormat")
@@ -348,21 +349,33 @@ public class DataMan extends DataInterface {
 	 * @return
 	 */
 	public static List<ListItemMap> GetProductList(int market_id) {
-		return GetProductList(market_id, false);
+		return GetProductList(null, market_id, false);
 	}
 	
 	public static List<ListItemMap> GenProductList(int market_id) {
-		return GetProductList(market_id, true);
+		return GetProductList(null, market_id, true);
 	}
 
-	private static List<ListItemMap> GetProductList(int market_id, boolean justGen) {
+	/**
+	 * null日期表示当天
+	 * @param date
+	 * @param market_id
+	 * @param justGen
+	 * @return
+	 */
+	private static List<ListItemMap> GetProductList(Date date, int market_id, boolean justGen) {
 
         ArrayList<ListItemMap> list = new ArrayList<ListItemMap>();
         if (market_id == INVALID_ID)
         	return list;
         
         List<String> lines;
-        String marketProductsFileName = "market_" + market_id + "_products.txt";
+
+        String dateString = "";
+        if (date != null)
+        	dateString = mDateFormater.format(date) + "/";
+
+        String marketProductsFileName = dateString + "market_" + market_id + "_products.txt";
 
         // 优化
         if (FileUtils.IsFileExist(DataFile(marketProductsFileName, false))) {
@@ -452,7 +465,7 @@ public class DataMan extends DataInterface {
 	private static void AddProductList(ArrayList<ListItemMap> list, String productId, 
 			String product_name, String minPrice, String maxPrice, 
 			String averagePrice, String hostPrice, String unit, boolean isMyProduct) {
-		list.add(new ProductListItemMap(DataMan.KEY_PRODUCT_ID, productId, product_name, minPrice, maxPrice, averagePrice, hostPrice, unit, isMyProduct));
+		list.add(new ProductListItemMap(KEY_PRODUCT_ID, productId, product_name, minPrice, maxPrice, averagePrice, hostPrice, unit, isMyProduct));
 	}
 
 	/**
@@ -656,7 +669,7 @@ public class DataMan extends DataInterface {
         return list;
 	}
 	
-	static Float randomPrice() {
+	private static Float randomPrice() {
 		long time = System.currentTimeMillis();
 		return 4.0F + (time % 4);
 	}
@@ -678,19 +691,9 @@ public class DataMan extends DataInterface {
 		if (market_id == null || product_id == null)
 			return null;
 		
-		// TODO 历史价格待删除
+		/* 测试用数据
 		
 		ProductPriceInfo info = new ProductPriceInfo();
-		
-		/*
-		info.add("2013-07-10", randomPrice());
-		info.add("2013-07-11", randomPrice());
-		info.add("2013-07-12", randomPrice());
-		info.add("2013-07-13", randomPrice());
-		info.add("2013-07-14", randomPrice());
-		info.add("2013-07-15", randomPrice());
-		info.add("2013-07-16", randomPrice());
-		*/
 		
 		// 日期格式（月.日）
 		SimpleDateFormat simpleDate = new SimpleDateFormat("M.d", Locale.CHINA);
@@ -710,8 +713,9 @@ public class DataMan extends DataInterface {
 		
 		return info;
 		
-		/*
-
+		*/
+		
+		/* 服务器生成数据
 		// 获取某市场历史价格
 		String fileName = "history_price/" + market_id + ".txt";
 		List<String> lines = ReadLines(fileName);
@@ -731,9 +735,53 @@ public class DataMan extends DataInterface {
 			
 			return CreatePriceInfo(line);
 		}
-
-		return null;
+		
 		*/
+		
+		// 循环查找近30天历史价格
+		ProductPriceInfo info = new ProductPriceInfo();
+		
+		// 日期格式（月.日）
+		SimpleDateFormat simpleDate = new SimpleDateFormat("M.d", Locale.CHINA);
+		// 向前减去7天
+		long today = System.currentTimeMillis();
+		for (int i = 0; i < 7; ++i) {
+
+			Date date = new Date(today);
+			// 获取当天价格
+			Float price = GetProductPrice(date, market_id, product_id);//randomPrice();
+			// 添加当天的价格
+			if (price != 0F)
+				info.add(simpleDate.format(date), price);
+
+			today -= MILLIS_ONE_DAY;
+		}
+		
+		return info;
+	}
+	
+	/*
+	 * 获取价格
+	 * */
+	private static Float GetProductPrice(Date date, String market_id, String product_id) {
+		
+		List<ListItemMap> products = GetProductList(date, DataMan.ParseInt(market_id), false);
+		
+		for (ListItemMap product : products) {
+			if (product_id.equals(product.getString(KEY_PRODUCT_ID))) {
+				String strPrice = product.getString(ProductListAdapter.KEY_PRICE_AVERAGE);
+				Float price = 0F;
+				try {
+					price = Float.parseFloat(strPrice);
+				} catch (Exception e) {
+					Debug.Log("解析Float价格错误");
+				}
+				
+				return price;
+			}
+		}
+		
+		return 0F;
 	}
 	
 	/**
@@ -1936,7 +1984,7 @@ public class DataMan extends DataInterface {
 			params = "type=" + info.type + 
 				"&title=" + URLEncoder.encode(info.title, "UTF-8") + 
 				"&userid=" + UserMan.GetUserId() + 
-				"&addressid=" + UserMan.GetUserAddressId() +
+				"&addressid=" + /*TODO 发布供求无地址id UserMan.GetUserAddressId()*/ "" +
 				"&commodityid=" + info.commodityid + 
 				"&count=" + URLEncoder.encode(info.count, "UTF-8") +
 				"&price=" + URLEncoder.encode(info.price, "UTF-8") + 
