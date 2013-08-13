@@ -54,7 +54,7 @@ public class Function extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         
-        // TODO µ÷ÊÔÓÃ»§µÇÓÂ
+        /*
         List<String> lines = DataMan.ReadLines("fake_user.txt");
 
         String user = "dengyong";
@@ -72,6 +72,7 @@ public class Function extends Activity {
         }
 
         UserMan.SetUserInfo(user, name, addressId, address, phone);
+        */
         
         //checkServiceRunning();
         

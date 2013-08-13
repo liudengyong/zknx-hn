@@ -5,6 +5,7 @@ import com.zknx.hn.common.Debug;
 import com.zknx.hn.functions.ais.AisDoc.AisHeader;
 import com.zknx.hn.functions.ais.AisDoc.AisItem;
 
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.webkit.WebView;
@@ -50,14 +51,14 @@ public class AisParser {
 	 * @param context
 	 * @return
 	 */
-	public AisLayout GetAisLayout(String aisFileName, LayoutInflater inflater, Object jsInterface) {
+	public AisLayout GetAisLayout(String date, String aisFileName, LayoutInflater inflater, Object jsInterface) {
 		
 		LinearLayout aisLayout = (LinearLayout) inflater.inflate(R.layout.ais_view, null);
 
 		// Ais内容滚动视图
 		LinearLayout contentLayout = (LinearLayout) aisLayout.findViewById(R.id.ais_content_view);
 
-		AisHeader header = parseAis(aisFileName, contentLayout, jsInterface);
+		AisHeader header = parseAis(inflater.getContext(), date, aisFileName, contentLayout, jsInterface);
 
 		if (header == null) {
 			Debug.Log("严重错误：AIS parse错误");
@@ -107,9 +108,9 @@ public class AisParser {
 	 * @param root
 	 * @return
 	 */
-	private AisHeader parseAis(String aisFileName, LinearLayout contentLayout, Object jsInterface) {
+	private AisHeader parseAis(Context context, String date, String aisFileName, LinearLayout contentLayout, Object jsInterface) {
 		// 获取解析后的ais文档
-		AisDoc aisDoc = new AisDoc(aisFileName, false);
+		AisDoc aisDoc = new AisDoc(context, aisFileName, false, date);
 		
 		// 初始化音视频图标监听
 		mAudioItem = aisDoc.getAudioItem();

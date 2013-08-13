@@ -1532,7 +1532,7 @@ public class DataMan extends DataInterface {
 			return false;
 		}
 	}
-	
+
 	/**
 	 * 获取AIS第一级分类列表
 	 * 如果function_id为0则返回一级分类，否则返回function_id对应的子级分类
@@ -1544,18 +1544,15 @@ public class DataMan extends DataInterface {
 		List<ListItemMap> list = new ArrayList<ListItemMap>();
 		Map<String, String> map = new HashMap<String, String>();
 
-		// 日期格式（月.日）
-		SimpleDateFormat simpleDate = new SimpleDateFormat("yyyyMMdd", Locale.CHINA);
-
 		// 向前减去30天
 		long today = System.currentTimeMillis();
 		for (int i = 0; i < 30; ++i, today -= MILLIS_ONE_DAY) {
 
-			String date = simpleDate.format(new Date(today)) + "/";
+			String date = mDateFormater.format(new Date(today)) + "/";
 
 			GenAisList(date);
 			
-			List<String> lines = ReadLinesWithEncoding(date + FILE_NAME_GEN_AIS_LIST, "UTF-8", false);
+			List<String> lines = ReadLinesWithEncoding(date + FILE_NAME_GEN_AIS_LIST, "UTF-8", true);
 			
 			String[] token;
 			for (String line : lines) {
@@ -1603,12 +1600,12 @@ public class DataMan extends DataInterface {
 	 * 生成ais list
 	 */
 	private static void GenAisList(String date) {
-		String genFileName = DataFile(date + FILE_NAME_GEN_AIS_LIST);
+		String genFileName = DataFile(date + FILE_NAME_GEN_AIS_LIST, true);
 		if (FileUtils.IsFileExist(genFileName))
 			return;
 
-		List<String> lines = ReadLines(date + FILE_NAME_AIS_LIST);
-		
+		List<String> lines = ReadLines(date + FILE_NAME_AIS_LIST, true);
+
 		if (lines.size() == 0)
 			return;
 		
@@ -1627,7 +1624,7 @@ public class DataMan extends DataInterface {
 				String name = token[2];
 				String fileName = name + ".ais";
 				
-				AisDoc aisDoc = new AisDoc(date + fileName, true);
+				AisDoc aisDoc = new AisDoc(null, fileName, true, date);
 				String child = aisDoc.getAisChildColumn();
 				
 				// 重新生成list
@@ -1659,18 +1656,15 @@ public class DataMan extends DataInterface {
 		if (childColumn == null)
 			return list;
 		
-		// 日期格式（月.日）
-		SimpleDateFormat simpleDate = new SimpleDateFormat("yyyyMMdd", Locale.CHINA);
-
 		// 向前减去30天
 		long today = System.currentTimeMillis();
 		for (int i = 0; i < 30; ++i, today -= MILLIS_ONE_DAY) {
 
-			String date = simpleDate.format(new Date(today)) + "/";
+			String date = mDateFormater.format(new Date(today)) + "/";
 
 			GenAisList(date);
 			
-			List<String> lines = ReadLinesWithEncoding(date + FILE_NAME_GEN_AIS_LIST, "UTF-8", false);
+			List<String> lines = ReadLinesWithEncoding(date + FILE_NAME_GEN_AIS_LIST, "UTF-8", true);
 
 			String[] token;
 			for (String line : lines) {

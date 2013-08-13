@@ -6,7 +6,10 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.content.Context;
+
 import com.zknx.hn.common.Debug;
+import com.zknx.hn.common.widget.Dialog;
 import com.zknx.hn.data.DataMan;
 import com.zknx.hn.data.FileUtils;
 import com.zknx.hn.functions.AisView;
@@ -136,8 +139,8 @@ CString column_child16[]={"生产类","生活类","医疗类","教育类"};
 	 * 通过ais_id构造AisDoc
 	 * @param ais_id
 	 */
-	public AisDoc(String aisFileName, boolean parseHeader) {
-		parseAisDoc(aisFileName, parseHeader);
+	public AisDoc(Context context, String aisFileName, boolean parseHeader, String strDate) {
+		parseAisDoc(context, aisFileName, parseHeader, strDate);
 	}
 
 	/**
@@ -222,13 +225,13 @@ CString column_child16[]={"生产类","生活类","医疗类","教育类"};
 	 * @param ais_id
 	 * @return
 	 */
-	private boolean parseAisDoc(String aisFileName, boolean parseHeader) {
+	private boolean parseAisDoc(Context context, String aisFileName, boolean parseHeader, String strDate) {
 		if (aisFileName == null || aisFileName.length() == 0) {
 			Debug.Log("严重错误：parseAisDoc，ais_file为空");
 			return false;
 		}
 
-		String filePathName = DataMan.DataFile(aisFileName);
+		String filePathName = DataMan.DataFile(strDate + aisFileName, true);
 		
 		if (!FileUtils.IsFileExist(filePathName)) {
 			Debug.Log("Ais文件没找到：" + filePathName);
@@ -292,6 +295,8 @@ CString column_child16[]={"生产类","生活类","医疗类","教育类"};
 					data = new byte[length];
 				} catch (Throwable e) {
 					Debug.Log("严重错误：内存不足，parseAisDoc");
+					if (context != null)
+						Dialog.Toast(context, "解析AIS内存不足：" + (length / 1024) + "K");
 					return false;
 				}
 
