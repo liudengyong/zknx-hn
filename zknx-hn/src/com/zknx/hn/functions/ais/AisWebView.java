@@ -79,7 +79,7 @@ public class AisWebView {
 			}
 		}
 		
-		String mediaTags = genMediaIconTags(aisDoc);
+		String mediaTags = "";//genMediaIconTags(aisDoc);
 
 		String htmlStirng = mediaTags +
 				"<div style=\"margin-top:8px;font-size:20px;color:white;\">" +
