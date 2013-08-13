@@ -16,7 +16,7 @@
         android:textIsSelectable="true"
         android:background="@drawable/tab_button"
         style="@style/TitleText"
-        android:focusable="true">
+        android:focusable="false">
 	</TextView>
 
     <LinearLayout

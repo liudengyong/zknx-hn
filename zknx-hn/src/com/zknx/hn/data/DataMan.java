@@ -23,7 +23,6 @@ import org.apache.http.message.BasicNameValuePair;
 import android.annotation.SuppressLint;
 import android.os.Environment;
 
-import com.zknx.hn.App;
 import com.zknx.hn.common.Debug;
 import com.zknx.hn.common.Restraint;
 import com.zknx.hn.common.UIConst;
@@ -275,7 +274,7 @@ public class DataMan extends DataInterface {
 	    	return ReadCommonIdName(FILE_NAME_ADDRESS_PROVINCE, KEY_ADDRESS_ID, true);
 
 	    String provinceLines = "";
-        List<String> lines = ReadLines(FILE_NAME_ADDRESS);
+        List<String> lines = ReadLines(FILE_NAME_ADDRESS, true);
         
         for (String line : lines) {
         	// id,名字
@@ -309,7 +308,7 @@ public class DataMan extends DataInterface {
 	 */
 	public static List<ListItemMap> GetMarketListByArea(int address_id) {
 
-		String marketCacheFileName = "market_" + address_id + ".txt";
+		String marketCacheFileName = "markets/market_" + address_id + ".txt";
         ArrayList<ListItemMap> list = new ArrayList<ListItemMap>();
         
         // 优化效率
@@ -349,11 +348,13 @@ public class DataMan extends DataInterface {
 	 * @return
 	 */
 	public static List<ListItemMap> GetProductList(int market_id) {
-		return GetProductList(null, market_id, false);
+		// 获取今天的产品列表
+		return GetProductList(new Date(), market_id, false);
 	}
 	
 	public static List<ListItemMap> GenProductList(int market_id) {
-		return GetProductList(null, market_id, true);
+		// 生成今天的产品列表
+		return GetProductList(new Date(), market_id, true);
 	}
 
 	/**
@@ -369,16 +370,20 @@ public class DataMan extends DataInterface {
         if (market_id == INVALID_ID)
         	return list;
         
+        List<ListItemMap> myProducts = null;
+        if (!justGen)
+        	myProducts = GetMyProductList();
+        
         List<String> lines;
 
         String dateString = "";
         if (date != null)
         	dateString = mDateFormater.format(date) + "/";
 
-        String marketProductsFileName = dateString + "market_" + market_id + "_products.txt";
+        String marketProductsFileName = dateString + "products/" + market_id + "_products.txt";
 
         // 优化
-        if (FileUtils.IsFileExist(DataFile(marketProductsFileName, false))) {
+        if (FileUtils.IsFileExist(DataFile(marketProductsFileName, true))) {
         	lines = ReadLines(marketProductsFileName, true);
         	for (String line : lines)
             {
@@ -399,7 +404,7 @@ public class DataMan extends DataInterface {
 
         		// 生成时不用关心是否自选
         		if (!justGen)
-        			isMyProduct = IsMyProduct(product_id); /* 添加自选按钮状态 */
+        			isMyProduct = IsMyProduct(myProducts, product_id); /* 添加自选按钮状态 */
 
         		AddProductList(list, productId, product_name, minPrice, maxPrice, averagePrice, hostPrice, unit, isMyProduct);
             }
@@ -408,7 +413,7 @@ public class DataMan extends DataInterface {
         }
 
         String marketProductLines = "";
-        lines = ReadLines(FILE_NAME_PRODUCTS_PRICE, false);
+        lines = ReadLines(dateString + FILE_NAME_PRODUCTS_PRICE, true);
         for (String line : lines)
         {
         	String[] token = GetToken(line);
@@ -438,7 +443,7 @@ public class DataMan extends DataInterface {
 
         		// 生成时不用关心是否自选
         		if (!justGen)
-        			isMyProduct = IsMyProduct(product_id); /* 添加自选按钮状态 */
+        			isMyProduct = IsMyProduct(myProducts, product_id); /* 添加自选按钮状态 */
         		
         		//list.add(new ProductListItemMap("名字", "最低价", "最高价", "平均价", "产地价", "单位", "添加"));
         		AddProductList(list, productId, product_name, minPrice, maxPrice, averagePrice, hostPrice, unit, isMyProduct);
@@ -454,7 +459,7 @@ public class DataMan extends DataInterface {
         }
 
         if (lines.size() > 0)
-        	FileUtils.WriteGB2312Text(false, marketProductsFileName, marketProductLines);
+        	FileUtils.WriteGB2312Text(true, marketProductsFileName, marketProductLines);
 
         return list;
 	}
@@ -473,9 +478,12 @@ public class DataMan extends DataInterface {
 	 * @param product_id
 	 * @return
 	 */
-	private static boolean IsMyProduct(int productId) {
-
-		List<ListItemMap> list = GetMyProductList();
+	private static boolean IsMyProduct(List<ListItemMap> list, int productId) {
+		
+		if (list == null) {
+			Debug.Log("IsMyProduct错误");
+			return false;
+		}
 
 		for (ListItemMap map : list) {
 			if (map.getInt(KEY_PRODUCT_ID) == productId)
@@ -1731,11 +1739,11 @@ public class DataMan extends DataInterface {
 	 */
 	private static String AppDataPath(boolean root) {
 		if (root)
-			return Environment.getExternalStorageDirectory() + "/zknx.hn";
+			return Environment.getExternalStorageDirectory() + "/zknx/broadcast";
 		else
-			return Environment.getExternalStorageDirectory() + "/zknx.hn/" + GetCurrentTime(false);
+			return Environment.getExternalStorageDirectory() + "/zknx/broadcast/" + GetCurrentTime(false);
 	}
-	
+
 	/**
 	 * 检查今天广播数据是否需要更新（时间戳不匹配并且数据文件存在）
 	 * @return

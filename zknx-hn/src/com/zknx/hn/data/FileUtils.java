@@ -48,7 +48,14 @@ public class FileUtils {
     {
     	createSDDir(path);
     	
-        File file = new File(path + fileName);   
+        File file = new File(path + fileName);
+
+        String realPath = file.getParent();
+        if (!FileUtils.IsFileExist(realPath)) {
+        	Debug.Log("´´½¨Ä¿Â¼£º" + realPath);
+        	FileUtils.MakeDirs(realPath);
+        }
+
         file.createNewFile();
         return file;   
     }
@@ -235,6 +242,7 @@ public class FileUtils {
      */
     public static String WriteGB2312Text(boolean rootPath, String fileName, String text) {
     	String path = DataMan.DataFile("", rootPath);
+
     	return WriteText(path, fileName, text, "GB2312");
     }
     
@@ -252,7 +260,7 @@ public class FileUtils {
         OutputStreamWriter writer = null;
         
         try {
-        	
+        	Debug.Log("WriteText:" + path + ", " + fileName);
             File file = createSDFile(path, fileName);
             
             outputStream = new FileOutputStream(file);
