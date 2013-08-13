@@ -1,6 +1,5 @@
 package com.zknx.hn;
 
-import com.zknx.hn.common.Debug;
 import com.zknx.hn.common.widget.Dialog;
 import com.zknx.hn.common.widget.WaitDialog;
 import com.zknx.hn.common.widget.WaitDialog.WaitListener;
@@ -291,7 +290,7 @@ public class Login extends Activity {
 		@Override
     	public boolean shouldOverrideUrlLoading(WebView webView, String url) {
 			
-			Debug.Log("loadUrl:" + url);
+			//Debug.Log("loadUrl:" + url);
 			
     		//view.loadUrl(url);
 

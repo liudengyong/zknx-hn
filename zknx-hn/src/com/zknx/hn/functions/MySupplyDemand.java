@@ -4,6 +4,8 @@ import java.util.List;
 
 import android.app.Activity;
 import android.content.DialogInterface;
+import android.os.Handler;
+import android.os.Message;
 import android.text.Editable;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -50,35 +52,62 @@ public class MySupplyDemand extends FunctionView {
 	public MySupplyDemand(LayoutInflater inflater, LinearLayout frameRoot, int frameResId) {
 		super(inflater, frameRoot, frameResId);
 		
-		initClassList();
+		loadProductClass();
+	}
+	
+	private void loadProductClass() {
+		WaitDialog.Show(mContext, new WaitDialog.Action() {
+			@Override
+			public String getMessage() {
+				return "正在加载产品分类";
+			}
+
+			@Override
+			public void waitAction() {
+				mAdapterClass = new CommonListAdapter(mContext, DataMan.GetProductClassList());
+				mHandler.sendEmptyMessage(MESSAGE_LOADED_PRODUCT_CLASS);
+			}
+		});
 	}
 
 	/**
 	 * 初始化供求信息分类
 	 */
-	void initClassList() {
+	private void initClassList() {
 		
 		LinearLayout createInfoBtn = initButton("发布新信息", mOnClickCreateInfo);
-		
-		mAdapterClass = new CommonListAdapter(mContext, DataMan.GetProductClassList());
 		
 		CommonListParams listParams = new CommonListParams(mInflater, mContentFrame[0], mAdapterClass, mOnClassClick);
 		
 		CommonList.Init(listParams, LEVEL1_TITLE, createInfoBtn);
 		
 		// 默认第一个产品对接信息
-		initPairList(0);
+		loadPairList(0);
+	}
+	
+	private void loadPairList(final int position) {
+		WaitDialog.Show(mContext, new WaitDialog.Action() {
+			@Override
+			public String getMessage() {
+				return "正在查找对接信息";
+			}
+
+			@Override
+			public void waitAction() {
+				// 产品分类
+				String product_class_id = mAdapterClass.getItemMapString(position, DataMan.KEY_PRODUCT_CLASS_ID);
+				
+				mAdapterPair = new CommonListAdapter(mContext, DataMan.GetSupplyDemandPairList(product_class_id));
+
+				mHandler.sendEmptyMessage(MESSAGE_LOADED_PAIR_INFO_LIST);
+			}
+		});
 	}
 
 	/**
 	 * 初始化供求信息
 	 */
-	void initPairList(int position) {
-		
-		// 产品分类
-		String product_class_id = mAdapterClass.getItemMapString(position, DataMan.KEY_PRODUCT_CLASS_ID);
-		
-		mAdapterPair = new CommonListAdapter(mContext, DataMan.GetSupplyDemandPairList(product_class_id));
+	void initPairList() {
 		
 		CommonListParams listParams = new CommonListParams(mInflater, mContentFrame[1], mAdapterPair, mOnClickPair);
 		
@@ -268,7 +297,7 @@ public class MySupplyDemand extends FunctionView {
         // 供求信息输入
         tableLayout.addView(GetTableRow("", mIsSupply), params);
         tableLayout.addView(GetTableRow("产品分类", mProductClass), params);
-        tableLayout.addView(GetTableRow("内容", mContent), params);
+        tableLayout.addView(GetTableRow("供求说明", mContent), params);
         tableLayout.addView(GetTableRow("有效期（天）", mValidDate), params);
         tableLayout.addView(GetTableRow("数量", mAmount), params);
         tableLayout.addView(GetTableRow("价格", mPrice), params);
@@ -331,7 +360,7 @@ public class MySupplyDemand extends FunctionView {
 		public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 			super.onItemClick(parent, view, position, id);
 			
-			initPairList(position);
+			loadPairList(position);
 		}
 	};
 	
@@ -348,6 +377,26 @@ public class MySupplyDemand extends FunctionView {
 		@Override
 		public void onClick(View view) {
 			createInfo();
+		}
+	};
+	
+	// 处理消息
+	private static final int MESSAGE_LOADED_PRODUCT_CLASS  = 1;
+	private static final int MESSAGE_LOADED_PAIR_INFO_LIST = 2;
+	
+	Handler mHandler = new Handler() {
+		@Override
+		public void handleMessage(Message msg){
+		   super.handleMessage(msg);
+		   
+		   switch (msg.what) {
+		   case MESSAGE_LOADED_PRODUCT_CLASS:
+			   initClassList();
+			   break;
+		   case MESSAGE_LOADED_PAIR_INFO_LIST:
+			   initPairList();
+			   break;
+		   }
 		}
 	};
 }

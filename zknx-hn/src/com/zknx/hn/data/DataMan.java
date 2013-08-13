@@ -648,7 +648,7 @@ public class DataMan extends DataInterface {
         		continue;
 
         	//int product_id_parsed = ParseInt(token[2]);
-    		if (!token[2].endsWith(product_id))
+    		if (!token[2].equals(product_id))
     			continue;
 
     		String marketId = token[0];
@@ -1038,6 +1038,8 @@ public class DataMan extends DataInterface {
 	public final static String SUPPLY_DEMAND_INFO_KEY_USER = "user";
 	// 标题
 	public final static String SUPPLY_DEMAND_INFO_KEY_TITLE = "title";
+	// 是否supply
+	public final static String SUPPLY_DEMAND_INFO_KEY_SUPPLY = "supply";
 	// 信息
 	public final static String SUPPLY_DEMAND_INFO_KEY_MESSAGE = "message";
 	// 发布日期
@@ -1106,6 +1108,7 @@ public class DataMan extends DataInterface {
 			map.put(SUPPLY_DEMAND_INFO_PRODUCT_CLASS,       ProductClassDecode(product_id));
 			map.put(SUPPLY_DEMAND_INFO_KEY_USER,            "TODO");
 			map.put(SUPPLY_DEMAND_INFO_KEY_TITLE,           title);
+			map.put(SUPPLY_DEMAND_INFO_KEY_SUPPLY,          token[2]);
 			map.put(SUPPLY_DEMAND_INFO_KEY_MESSAGE,         token[5]);
 			map.put(SUPPLY_DEMAND_INFO_KEY_POST_TIME,       token[6]);
 			map.put(SUPPLY_DEMAND_INFO_KEY_INVALIDATE_DATE, token[7]);
@@ -1121,6 +1124,27 @@ public class DataMan extends DataInterface {
 		
 		return map;
 	}
+	
+	/**
+	 * 是否对接信息
+	 * @return
+	 */
+	private static boolean IsPairTradeInfo(List<ListItemMap> mySDInfoList, String[] token) {
+		// 02,粮食作物,0,dengyong,qiu liangshi 100dun,,2013-7-22,2013-8-21,12,12345,东华门街道,,鍒樼櫥鍕?,18911939853,18911939853,beijng
+		for (ListItemMap item : mySDInfoList) {
+			boolean supply = ("0".equals(item.getString(SUPPLY_DEMAND_INFO_KEY_SUPPLY)));
+			if ((supply && token[2].equals("1")) ||
+				(!supply && token[2].equals("0"))) {
+				if (supply)
+					Debug.Log("对接信息：" + token[4] + ",我供应：" + item.getString(SUPPLY_DEMAND_INFO_KEY_TITLE));
+				else
+					Debug.Log("对接信息：" + token[4] + ",我求购：" + item.getString(SUPPLY_DEMAND_INFO_KEY_TITLE));
+				return true;
+			}
+		}
+
+		return false;
+	}
 
 	/**
 	 * 获取供求对接信息列表(不分供求)
@@ -1129,28 +1153,107 @@ public class DataMan extends DataInterface {
 	private static String pairLines = "";
 	public static List<ListItemMap> GetSupplyDemandPairList(String product_class_id) {
 		
+		// 首先处理数据
+		GenSupplyDemandList();
+		
 		List<ListItemMap> list = new ArrayList<ListItemMap>();
-
-		// 日期格式（月.日）
-		SimpleDateFormat simpleDate = new SimpleDateFormat("yyyyMMdd", Locale.CHINA);
-
+		
+		// 获取我发布的供求信息
+		List<ListItemMap> mySDInfoList = new ArrayList<ListItemMap>();
+		
 		// 向前减去30天
 		long today = System.currentTimeMillis();
 		for (int i = 0; i < 30; ++i, today -= MILLIS_ONE_DAY) {
 
-			String date = simpleDate.format(new Date(today)) + "/";
-			List<String> lines = ReadLines(date + "pair.txt");
-	
+			String date = mDateFormater.format(new Date(today)) + "/";
+
+			boolean supply = false;
+			String genFileName = GetGenSupplyDemandFileName(date, product_class_id, supply);
+			List<String> lines = ReadLinesWithEncoding(genFileName, "UTF-8", true);
+
 	        for (String line : lines) {
+	        	// 02,粮食作物,0,dengyong,qiu liangshi 100dun,,
 	        	// product_id,产品名,供求信息id(第一位编码0代表供应，1代表求购),user,标题,供求信息内容,发布时间,有效期,数量,单价,产地,产品特点,联系人名字,联系电话,手机号,详细地址
 	        	// 1003021000,果树苗,0,,供应各种果树苗、绿化苗,,2011-2-23,2011-3-22,,面议,北京市,,王敏,13521120562,13521120562,陆辛庄华源发苗木市场
 	        	String[] token = GetToken(line);
-	        	if (token.length != 16)
+	        	if (token.length != 16 ||
+	        		!token[3].equals(UserMan.GetUserId()))
 	        		continue;
-
+	        	
 	        	String productId = token[0];
-
+	        	
 	        	if (productId.startsWith(product_class_id))
+	        		mySDInfoList.add(GetSupplyDemandMap(token));  
+	        }
+	        
+	        supply = true;
+			genFileName = GetGenSupplyDemandFileName(date, product_class_id, supply);
+			lines = ReadLinesWithEncoding(genFileName, "UTF-8", true);
+
+	        for (String line : lines) {
+	        	// 02,粮食作物,0,dengyong,qiu liangshi 100dun,,
+	        	// product_id,产品名,供求信息id(第一位编码0代表供应，1代表求购),user,标题,供求信息内容,发布时间,有效期,数量,单价,产地,产品特点,联系人名字,联系电话,手机号,详细地址
+	        	// 1003021000,果树苗,0,,供应各种果树苗、绿化苗,,2011-2-23,2011-3-22,,面议,北京市,,王敏,13521120562,13521120562,陆辛庄华源发苗木市场
+	        	String[] token = GetToken(line);
+	        	if (token.length != 16 ||
+	        		!token[3].equals(UserMan.GetUserId()))
+	        		continue;
+	        	
+	        	String productId = token[0];
+	        	
+	        	if (productId.startsWith(product_class_id))
+	        		mySDInfoList.add(GetSupplyDemandMap(token));  
+	        }
+		}
+
+		if (mySDInfoList.size() == 0) {
+			Debug.Log("当前用户没有发布任何信息");
+			return list;
+		}
+
+		// 向前减去30天
+		today = System.currentTimeMillis();
+		for (int i = 0; i < 30; ++i, today -= MILLIS_ONE_DAY) {
+
+			String date = mDateFormater.format(new Date(today)) + "/";
+
+			boolean supply = false;
+			String genFileName = GetGenSupplyDemandFileName(date, product_class_id, supply);
+			List<String> lines = ReadLinesWithEncoding(genFileName, "UTF-8", true);
+
+	        for (String line : lines) {
+	        	// 02,粮食作物,0,dengyong,qiu liangshi 100dun,,
+	        	// product_id,产品名,供求信息id(第一位编码0代表供应，1代表求购),user,标题,供求信息内容,发布时间,有效期,数量,单价,产地,产品特点,联系人名字,联系电话,手机号,详细地址
+	        	// 1003021000,果树苗,0,,供应各种果树苗、绿化苗,,2011-2-23,2011-3-22,,面议,北京市,,王敏,13521120562,13521120562,陆辛庄华源发苗木市场
+	        	String[] token = GetToken(line);
+	        	if (token.length != 16 ||
+	        		token[3].equals(UserMan.GetUserId()))
+	        		continue;
+	        	
+	        	String productId = token[0];
+	        	
+	        	if (productId.startsWith(product_class_id) &&
+	        		IsPairTradeInfo(mySDInfoList, token))
+	        		list.add(GetSupplyDemandMap(token));  
+	        }
+	        
+	        supply = true;
+			genFileName = GetGenSupplyDemandFileName(date, product_class_id, supply);
+			lines = ReadLinesWithEncoding(genFileName, "UTF-8", true);
+
+	        for (String line : lines) {
+	        	// 02,粮食作物,0,dengyong,qiu liangshi 100dun,,
+	        	// product_id,产品名,供求信息id(第一位编码0代表供应，1代表求购),user,标题,供求信息内容,发布时间,有效期,数量,单价,产地,产品特点,联系人名字,联系电话,手机号,详细地址
+	        	// 1003021000,果树苗,0,,供应各种果树苗、绿化苗,,2011-2-23,2011-3-22,,面议,北京市,,王敏,13521120562,13521120562,陆辛庄华源发苗木市场
+	        	String[] token = GetToken(line);
+	        	if (token.length != 16 ||
+	        		token[3].equals(UserMan.GetUserId()))
+	        		continue;
+	        	
+	        	String productId = token[0];
+	        	
+	        	if (productId.startsWith(product_class_id) &&
+	        		IsPairTradeInfo(mySDInfoList, token))
 	        		list.add(GetSupplyDemandMap(token));  
 	        }
 		}
@@ -2132,7 +2235,7 @@ public class DataMan extends DataInterface {
         		String savedSubject  = token[1];
         		String savedQuestion = token[2];
         		
-        		if (savedExpertId.endsWith(expertId)) {
+        		if (savedExpertId.equals(expertId)) {
         			ListItemMap map = new ListItemMap(savedSubject, KEY_EXPERT_QUESTION_SUBJECT, savedSubject);
         			map.put(KEY_EXPERT_QUESTION_CONTENT, savedQuestion);
         			list.add(map);
