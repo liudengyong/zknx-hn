@@ -626,7 +626,7 @@ public class DataMan extends DataInterface {
 	    		String maxPrice = token[3];
 	    		String averagePrice = token[4];
 	    		String hostPrice = token[5];
-	    		String unit = token[5];
+	    		String unit = token[6];
 	    		boolean addToMyProduct = false; /* Òþ²Ø×ÔÑ¡°´Å¥ */
 	        	
 	        	list.add(new ProductListItemMap(DataMan.KEY_MARKET_ID, marketId, market_name, minPrice, maxPrice, averagePrice, hostPrice, unit, addToMyProduct));
