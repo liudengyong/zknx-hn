@@ -149,7 +149,8 @@ public class MyGroup extends FunctionView {
 				switch (view.getId()) {
 				case R.id.common_btn_pair_left:
 					// 切换为新建留言界面，传参我的留言组id（返回我的留言tab）
-					initNewMessageView(mCurFriendInfo.name, mCurFriendInfo.id, R.id.my_group_message_my_message);
+					if (mCurFriendInfo != null)
+						initNewMessageView(mCurFriendInfo.name, mCurFriendInfo.id, R.id.my_group_message_my_message);
 					break;
 				case R.id.common_btn_pair_right:
 					String friendId = "jun";

@@ -426,6 +426,9 @@ public class AisView extends FunctionView {
 				
 				switch (view.getId()) {
 				case ID_GRADE:
+					if (mAisHeader == null)
+						return;
+
 					String grades = DataMan.GetGrades(mAisHeader.getAisId());
 					if (grades == null || grades.length() == 0)
 						return;
