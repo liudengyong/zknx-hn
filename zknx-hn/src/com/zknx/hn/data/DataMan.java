@@ -602,7 +602,7 @@ public class DataMan extends DataInterface {
 
 		List<String> lines = null;
 		ArrayList<ListItemMap> list = new ArrayList<ListItemMap>();
-		String productMarketFileName = "product_" + product_id + "_markets.txt";
+		String productMarketFileName = "markets/product_" + product_id + "_markets.txt";
 
 		if (product_id == null || product_id.length() == 0)
 			return list;
@@ -648,7 +648,8 @@ public class DataMan extends DataInterface {
         		continue;
 
         	//int product_id_parsed = ParseInt(token[2]);
-    		if (!token[2].equals(product_id))
+        	// product_id 是没有0开头的格式
+    		if (!token[2].endsWith(product_id))
     			continue;
 
     		String marketId = token[0];
