@@ -22,7 +22,6 @@ import com.zknx.hn.common.Debug;
 import com.zknx.hn.common.UIConst;
 import com.zknx.hn.common.UIConst.L_LAYOUT_TYPE;
 import com.zknx.hn.common.widget.WaitDialog;
-import com.zknx.hn.common.widget.WaitDialog.WaitListener;
 import com.zknx.hn.data.DataMan;
 import com.zknx.hn.data.ListItemMap;
 import com.zknx.hn.functions.common.CommonList;
@@ -45,14 +44,28 @@ public class SupplyDemand extends FunctionView {
 	public SupplyDemand(LayoutInflater inflater, LinearLayout frameRoot, int frameResId) {
 		super(inflater, frameRoot, frameResId);
 		
-		initProductClassList();
+		loadProductClass();
+	}
+	
+	private void loadProductClass() {
+		WaitDialog.Show(mContext, new WaitDialog.Action() {
+			@Override
+			public String getMessage() {
+				return "正在加载产品分类";
+			}
+
+			@Override
+			public void waitAction() {
+				mAdapterProductClass = new CommonListAdapter(mContext, DataMan.GetProductClassList());
+				mHandler.sendEmptyMessage(MESSAGE_LOADED_PRODUCT_CLASS);
+			}
+		});
 	}
 	
 	/**
 	 * 初始化产品分类
 	 */
 	void initProductClassList() {
-		mAdapterProductClass = new CommonListAdapter(mContext, DataMan.GetProductClassList());
 		
 		CommonListParams listParams = new CommonListParams(mInflater, mContentFrame[0], mAdapterProductClass, mOnProductClassClick);
 		
@@ -129,47 +142,12 @@ public class SupplyDemand extends FunctionView {
 	
 	private int mCurrentProductClassPosition = 0;
 	private boolean mIsCurrentSuply = true;
-	
-	/**
-	 * 等待更新数据
-	 * @author John
-	 *
-	 */
-	private class GetSupplyDemandListListener implements WaitListener {
-		@Override
-		public void startWait() {
-			String product_class_id = mAdapterProductClass.getItemMapString(position, DataMan.KEY_PRODUCT_CLASS_ID);
 
-			mAdapterInfo = new CommonListAdapter(mContext, DataMan.GetSupplyDemandList(product_class_id, supply));
-		}
-
-		int position;
-		boolean supply;
-	}
-	
-	// 等待更新数据
-	private GetSupplyDemandListListener mGetSupplyDemandListListener = new GetSupplyDemandListListener();
-	
-	// 处理消息
-	private static final int REFRESH_INFO_LIST = 0;
-	
-	Handler mHandler = new Handler() {
-		@Override
-		public void handleMessage(Message msg){
-		   super.handleMessage(msg);
-
-		   //WaitDialog.finish(msg.what);
-		   
-		   if (msg.what == REFRESH_INFO_LIST)
-			   refreshInfoList();
-		}
-	};
-	
 	/**
 	 * 属性供求信息列表
 	 */
 	private void refreshInfoList() {
-		boolean supply = mGetSupplyDemandListListener.supply;
+		boolean supply = mIsCurrentSuply;
    
 		mListViewInfo.setAdapter(mAdapterInfo);
 			
@@ -184,12 +162,23 @@ public class SupplyDemand extends FunctionView {
 	 * 初始化供应或者求购信息
 	 * @param suppy
 	 */
-	void initInfoList(int position, boolean supply) {
+	void initInfoList(final int position, final boolean supply) {
 		
-		mGetSupplyDemandListListener.position = position;
-		mGetSupplyDemandListListener.supply = supply;
-		
-		WaitDialog.Show(mContext, mHandler, REFRESH_INFO_LIST, "读取供求数据", mGetSupplyDemandListListener);
+		WaitDialog.Show(mContext, new WaitDialog.Action() {
+			@Override
+			public String getMessage() {
+				return "正在加载供求数据";
+			}
+
+			@Override
+			public void waitAction() {
+				String product_class_id = mAdapterProductClass.getItemMapString(position, DataMan.KEY_PRODUCT_CLASS_ID);
+
+				mAdapterInfo = new CommonListAdapter(mContext, DataMan.GetSupplyDemandList(product_class_id, supply));
+
+				mHandler.sendEmptyMessage(MESSAGE_LOADED_INFO_LIST);
+			}
+		});
 	}
 	
 	void initSupplyDemandView(int position, boolean supply) {
@@ -273,4 +262,24 @@ public class SupplyDemand extends FunctionView {
         
         return tableRow;
 	}
+	
+	// 处理消息
+	private static final int MESSAGE_LOADED_PRODUCT_CLASS = 1;
+	private static final int MESSAGE_LOADED_INFO_LIST     = 2;
+	
+	Handler mHandler = new Handler() {
+		@Override
+		public void handleMessage(Message msg){
+		   super.handleMessage(msg);
+		   
+		   switch (msg.what) {
+		   case MESSAGE_LOADED_PRODUCT_CLASS:
+			   initProductClassList();
+			   break;
+		   case MESSAGE_LOADED_INFO_LIST:
+			   refreshInfoList();
+			   break;
+		   }
+		}
+	};
 }

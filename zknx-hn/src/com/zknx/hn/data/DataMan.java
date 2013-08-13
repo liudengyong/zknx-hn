@@ -838,16 +838,15 @@ public class DataMan extends DataInterface {
 	 * @return
 	 */
 	public static List<ListItemMap> GetProductClassList() {
-		//return ReadCommonIdName(FILE_NAME_PRODUCT_CLASS, KEY_PRODUCT_CLASS_ID);
-		
-		// 优化效率 省级地址
+
+		// 优化效率 产品分类
 		String productClassCacheFileName = "productClass.txt";
 	    if (FileUtils.IsFileExist(DataFile(productClassCacheFileName, true)))
-	    	return ReadCommonIdName(productClassCacheFileName, KEY_PRODUCT_CLASS_ID);
-		
+	    	return ReadCommonIdName(productClassCacheFileName, KEY_PRODUCT_CLASS_ID, true);
+
 	    String productClassLines = "";
 		ArrayList<ListItemMap> list = new ArrayList<ListItemMap>();
-        List<String> lines = ReadLines(FILE_NAME_COMMODITY);
+        List<String> lines = ReadLines(FILE_NAME_COMMODITY, true);
         
         for (String line : lines)  
         {
@@ -920,27 +919,26 @@ public class DataMan extends DataInterface {
 	 * 获取供求信息列表
 	 * @return
 	 */
-	private static String supplyDemandClassLines = "";
 	public static List<ListItemMap> GetSupplyDemandList(String product_class_id, boolean supply) {
-		GenSupplyDemandList();
+		//GenSupplyDemandList();
 		
 		List<ListItemMap> list = new ArrayList<ListItemMap>();
 		
-		// 日期格式（月.日）
-		SimpleDateFormat simpleDate = new SimpleDateFormat("yyyyMMdd", Locale.CHINA);
 		// 向前减去30天
 		long today = System.currentTimeMillis();
 		for (int i = 0; i < 30; ++i, today -= MILLIS_ONE_DAY) {
 
-			String date = simpleDate.format(new Date(today)) + "/";
+			Date date = new Date(today);
+			String strDate = mDateFormater.format(date) + "/";
 
 			// 判断当天的是否已经处理过
 			String stampFileName = DataFile(date + "processedSDInfo.txt");
-			if (!FileUtils.IsFileExist(stampFileName))
-				continue;
+			if (!FileUtils.IsFileExist(stampFileName)) {
+				ProcessSupplyDemandInfo(date);
+			}
 
-			String genFileName = GetGenSupplyDemandFileName(date, product_class_id, supply);
-			List<String> lines = ReadLinesWithEncoding(genFileName, "UTF-8", false);
+			String genFileName = GetGenSupplyDemandFileName(strDate, product_class_id, supply);
+			List<String> lines = ReadLinesWithEncoding(genFileName, "UTF-8", true);
 
 			// 当天没有供求
 			if (lines.size() == 0)
@@ -970,9 +968,9 @@ public class DataMan extends DataInterface {
 		// 按商品分类+供/求保存生成文件
     	String genFileName = "";
     	if (supply)
-    		genFileName = date + productClass + "_supply";
+    		genFileName = date + "tradinfo/" +productClass + "_supply";
     	else
-    		genFileName = date + productClass + "_demand";
+    		genFileName = date + "tradinfo/" + productClass + "_demand";
     	
     	return genFileName;
 	}
@@ -983,52 +981,55 @@ public class DataMan extends DataInterface {
 	 * @param supply
 	 */
 	private static void GenSupplyDemandList() {
-		//GetSupplyDemandList(product_class_id, supply, true);
 		
 		List<ListItemMap> productClass = GetProductClassList();
 		
 		if (productClass == null || productClass.size() == 0) {
 			return;
 		}
-		
-		// 日期格式（月.日）
-		SimpleDateFormat simpleDate = new SimpleDateFormat("yyyyMMdd", Locale.CHINA);
 
 		// 向前减去30天
 		long today = System.currentTimeMillis();
 		for (int i = 0; i < 30; ++i, today -= MILLIS_ONE_DAY) {
-
-			String date = simpleDate.format(new Date(today)) + "/";
-			
-			// 判断当天的是否已经处理过
-			String stampFileName = DataFile(date + "processedSDInfo.txt");
-			if (FileUtils.IsFileExist(stampFileName))
-				continue;
-
-			List<String> lines = ReadLines(date + FILE_NAME_SUPPLY_DEMAND_INFO, false);
-			
-			// 当天没有供求
-			if (lines.size() == 0)
-				continue;
-			
-			for (String line : lines) {
-				String[] token = GetToken(line);
-	        	if (token.length != 16)
-	        		continue;
-	        	
-	        	String productId = token[0];
-	        	String supplyOrDemand = token[2];
-	        	
-	        	String genFileName = GetGenSupplyDemandFileName(date, productId.substring(0, 2), 
-	        			supplyOrDemand.equals("0"));
-	        	
-	        	// 附加
-	        	FileUtils.AppendLine(DataFile(genFileName), line);
-			}
-
-			// 写时间戳用于判断是否已经处理过
-			FileUtils.WriteText(stampFileName, date);
+			ProcessSupplyDemandInfo(new Date(today));
 		}
+	}
+
+	private static void ProcessSupplyDemandInfo(Date date) {
+		
+		String strDate = mDateFormater.format(date) + "/";
+		
+		// 判断当天的是否已经处理过
+		String stampFileName = DataFile(strDate + "processedSDInfo.txt", true);
+		if (FileUtils.IsFileExist(stampFileName))
+			return;
+		
+		List<String> lines = ReadLines(strDate + FILE_NAME_SUPPLY_DEMAND_INFO, true);
+		
+		// 当天没有供求
+		if (lines.size() == 0)
+			return;
+
+		int count = 1;
+		for (String line : lines) {
+			String[] token = GetToken(line);
+			if (token.length != 16)
+				continue;
+
+			String productId = token[0];
+			String supplyOrDemand = token[2];
+			
+			String genFileName = GetGenSupplyDemandFileName(strDate, productId.substring(0, 2), 
+					supplyOrDemand.equals("0"));
+
+			Debug.Log(strDate + FILE_NAME_SUPPLY_DEMAND_INFO + "：第" + count++ + "行");
+
+			// 附加
+			FileUtils.AppendLine(DataFile(genFileName, true), line);
+		}
+
+		// 写时间戳用于判断是否已经处理过
+		FileUtils.WriteText(stampFileName, strDate);
 	}
 
 	// 产品分类id
