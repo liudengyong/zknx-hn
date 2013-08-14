@@ -351,12 +351,12 @@ public class DataMan extends DataInterface {
 	 */
 	public static List<ListItemMap> GetProductList(int market_id) {
 		// 获取今天的产品列表
-		return GetProductList(new Date(), market_id, false);
+		return GetProductList(new Date(), market_id + "", false);
 	}
 	
 	public static List<ListItemMap> GenProductList(int market_id) {
 		// 生成今天的产品列表
-		return GetProductList(new Date(), market_id, true);
+		return GetProductList(new Date(), market_id + "", true);
 	}
 
 	/**
@@ -366,10 +366,10 @@ public class DataMan extends DataInterface {
 	 * @param justGen
 	 * @return
 	 */
-	private static List<ListItemMap> GetProductList(Date date, int market_id, boolean justGen) {
+	private static List<ListItemMap> GetProductList(Date date, String market_id, boolean justGen) {
 
         ArrayList<ListItemMap> list = new ArrayList<ListItemMap>();
-        if (market_id == INVALID_ID)
+        if (market_id == null)
         	return list;
         
         List<ListItemMap> myProducts = null;
@@ -424,7 +424,7 @@ public class DataMan extends DataInterface {
         		// market_id,市场名字,product_id,产品名,最低价,最高价,平均价,产地价,价格单位
         		// 1506901,山东寿光批发市场,0101001000,花生,3.23,元/公斤
         		int market_id_parsed = ParseInt(token[0]);
-        		if (market_id_parsed != market_id)
+        		if (market_id_parsed != ParseInt(market_id))
         			continue;
 
         		// 暂不需要市场名字
@@ -776,12 +776,15 @@ public class DataMan extends DataInterface {
 	 * */
 	private static Float GetProductPrice(Date date, String market_id, String product_id) {
 		
-		List<ListItemMap> products = GetProductList(date, DataMan.ParseInt(market_id), false);
+		List<ListItemMap> products = GetProductList(date, market_id, false);
+		
+		int intProductId = ParseInt(product_id);
 		
 		for (ListItemMap product : products) {
-			if (product_id.equals(product.getString(KEY_PRODUCT_ID))) {
-				String strPrice = product.getString(ProductListAdapter.KEY_PRICE_AVERAGE);
+			String id = product.getString(KEY_PRODUCT_ID);
+			if (intProductId == ParseInt(id)) {
 				Float price = 0F;
+				String strPrice = product.getString(ProductListAdapter.KEY_PRICE_AVERAGE);
 				try {
 					price = Float.parseFloat(strPrice);
 				} catch (Exception e) {
