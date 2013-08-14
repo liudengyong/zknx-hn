@@ -229,12 +229,12 @@ public class Login extends Activity {
 				 */
 				@Override
 				public void startWait() {
+					//UserMan.SetUserInfo("dengyong", "dengyong", "01", "北京市双惠小区", "18911939853");
 					mWaitRet = UserMan.Login(mJsInterface.getUser(), mJsInterface.getPasswd());
-					// TODO DataMan.CheckBroadcastData();
 					mHandler.sendEmptyMessage(MESSAGE_LOGIN);
 				}
 			};
-			
+
 			// 创建等待进度条
 			mWaitDialog = WaitDialog.Show(Login.this, null, "正在登录", loginThread);
 		}

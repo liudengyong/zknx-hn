@@ -97,7 +97,7 @@ public class UserMan {
 		mUserInfo.userName = userName;
 		mUserInfo.major = major;
 		mUserInfo.address = address;
-		mUserInfo.address = addressId;
+		mUserInfo.addressId = addressId;
 		mUserInfo.phone= phone;
 		
 		/*
@@ -111,7 +111,7 @@ public class UserMan {
 	public static String Login(String user, String passwd) {
 
 		String ret = null;
-		
+
 		try {
 			String param = "?userid=" + user + "&password=" + passwd;
 
@@ -119,13 +119,13 @@ public class UserMan {
 
 			String token[] = value.split(DataMan.COMMON_TOKEN); 
 
-			if (token != null && token.length == 5) {
+			if (token != null && token.length == 6) {
 				
 				if (!ParseUserInfo(user)) {
 					// µÇÂ¼Ê§°Ü
 					return "µÇÂ¼´íÎó£º" + ret;
 				}
-				
+
 				return null;
 			} else {
 				return "ÓÃ»§Ãû»òÃÜÂë´íÎó£¡";
@@ -160,7 +160,7 @@ public class UserMan {
 
 			String token[] = returnString.split(DataMan.COMMON_TOKEN);
 			// name,passwd,addressId,vlilage,phone; 
-			if (token != null && token.length == 5/*returnString.equals("Result=TRUE")*/) {
+			if (token != null && token.length == 6) {
 				osw = new OutputStreamWriter(new FileOutputStream(DataMan.DataFile(fileName, true)), "gb2312"); 
 			
 				if (osw != null)
@@ -188,15 +188,23 @@ public class UserMan {
             BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(fileName), "gb2312"));
 
             String line = br.readLine();
-            
+
             if (line != null) {
             	String token[] = line.split(DataMan.COMMON_TOKEN);
-            	if (token != null && token.length == 5) {
-            		// TODO µØÖ·id
-                    SetUserInfo(token[0], token[0], token[2], token[3], "TODO", token[4]);
+            	if (token != null && token.length == 6) {
+            		// ffddf,123456,04,1,dsdfs,13426180733;
+            		String name = token[0];
+            		String major = token[3];
+            		String addressId = token[2];
+            		String addressVillige = token[4];
+            		String phone = token[5];
+            		// É¾³ý×îºóµÄ;·ûºÅ
+            		phone = phone.replace(";", "");
+
+                    SetUserInfo(user, name, major, addressVillige, addressId, phone);
             	}
             }
-            
+
             br.close();
             
             return true;
