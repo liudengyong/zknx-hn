@@ -7,6 +7,7 @@ public class DataInterface {
 	public static final String URL_SERVER = "http://218.106.254.101:8077/";
 	public static final String URL_LOGIN = URL_SERVER + "login.aspx";
 	public static final String URL_POST_GRADE = URL_SERVER + "post_grade.aspx";
+	public static final String URLT_GET_FRIENDS = URL_SERVER + "get_my_friend.aspx";
 	public final static String RTMP_SERVER = "rtmp://192.168.0.101/zknx-hn";
 	
 	// 省级地址列表文件名
@@ -29,6 +30,8 @@ public class DataInterface {
 	//protected static final String FILE_NAME_MY_FRIEND = "my_friend.txt";
 	// 用户列表
 	protected static final String FILE_NAME_USERS = "users.txt";
+	// 商友列表
+	protected static final String FILE_NAME_FRIEND = "friends.txt";
 	// 所有商友留言文件名
 	protected static final String FILE_NAME_MY_GROUP_MESSAGE = "my_group_message.txt";
 	// 专家问答
@@ -172,6 +175,6 @@ public class DataInterface {
 			return "惠农专家";
 		}
 		
-		return "未知专业";
+		return "种植专家";// TODO 未知专业
 	}
 }

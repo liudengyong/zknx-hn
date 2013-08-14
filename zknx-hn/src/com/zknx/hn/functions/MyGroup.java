@@ -2,6 +2,8 @@ package com.zknx.hn.functions;
 
 import android.app.Activity;
 import android.content.DialogInterface;
+import android.os.Handler;
+import android.os.Message;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -111,19 +113,37 @@ public class MyGroup extends FunctionView {
 		mFriendListView = CommonList.Init(listParams, "我的商友", layout);
 
 		// INVALID_ID 表示全部商友
-		initFriendListView(DataMan.INVALID_ID);
+		loadFriendList(DataMan.INVALID_ID);
 	}
 	
 	/**
 	 * 初始化商友列表（商友分类：全部，种植大户……）
 	 * @param invalidId
 	 */
-	private void initFriendListView(int majorId) {
-		mAdapterFriend = new CommonListAdapter(mContext, DataMan.GetMyGroupFriendList(majorId, true));
+	private void initFriendListView() {
 		mFriendListView.setAdapter(mAdapterFriend);
 		
 		// 默认第一个商友信息
 		initGroupFriendInfo(0);
+	}
+	
+	/**
+	 * 初始化商友列表（商友分类：全部，种植大户……）
+	 * @param invalidId
+	 */
+	private void loadFriendList(final int majorId) {
+		WaitDialog.Show(mContext, new WaitDialog.Action() {
+			@Override
+			public String getMessage() {
+				return "正在加载商友列表";
+			}
+
+			@Override
+			public void waitAction() {
+				mAdapterFriend = new CommonListAdapter(mContext, DataMan.GetMyGroupFriendList(majorId, true));
+				mHandler.sendEmptyMessage(MESSAGE_LOADED_FRIEND_LIST);
+			}
+		});
 	}
 
 	/**
@@ -248,7 +268,7 @@ public class MyGroup extends FunctionView {
 				break;
 			}
 
-			initFriendListView(friend_class_id);
+			loadFriendList(friend_class_id);
 		}
 	};
 	
@@ -265,10 +285,10 @@ public class MyGroup extends FunctionView {
 		
 		switch (messageButtonId) {
 		case R.id.my_group_message_my_message:
-			initMyMessageView();
+			loadMyMessage();
 			break;
 		case R.id.my_group_message_friend_message:
-			initFriendMessage();
+			loadFriendMessage();
 			break;
 		case R.id.my_group_message_group:
 			// 所有专业传参null
@@ -283,15 +303,30 @@ public class MyGroup extends FunctionView {
 		mCurMessageButtonId = messageButtonId;
 	}
 	
+	private void loadMyMessage() {
+		WaitDialog.Show(mContext, new WaitDialog.Action() {
+			@Override
+			public String getMessage() {
+				return "正在加载我的留言";
+			}
+
+			@Override
+			public void waitAction() {
+				mAdapterMyMessage = new CommonListAdapter(mContext, DataMan.GetMyGroupMessageList(UserMan.GetUserId()));
+				mHandler.sendEmptyMessage(MESSAGE_LOADED_MY_FRIEND_MESSAGE);
+			}
+		});
+	}
+	
 	/**
 	 * 初始化我的留言视图
 	 */
 	private CommonListAdapter mAdapterMyMessage;
 	private void initMyMessageView() {
+
 		RelativeLayout myMessageLayout = (RelativeLayout) mInflater.inflate(R.layout.group_my_message, null);
 		LinearLayout listViewLayout = (LinearLayout) myMessageLayout.findViewById(R.id.my_group_my_message_listview);
 		
-		mAdapterMyMessage = new CommonListAdapter(mContext, DataMan.GetMyGroupMessageList(UserMan.GetUserId()));
 		CommonListParams listParams = new CommonListParams(mInflater, listViewLayout, mAdapterMyMessage, new OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> adapter, View view, int position, long id) {
@@ -321,15 +356,28 @@ public class MyGroup extends FunctionView {
 	/**
 	 * 初始化当前商友留言
 	 */
-	private void initFriendMessage() {
-		
-		String friendId = null;
-		
-		if (mCurFriendInfo != null)
-			friendId = mCurFriendInfo.id;
+	private void loadFriendMessage() {
+		WaitDialog.Show(mContext, new WaitDialog.Action() {
+			@Override
+			public String getMessage() {
+				return "正在加载商友留言";
+			}
 
-		mAdapterFriendMessage = new CommonListAdapter(mContext, DataMan.GetMyGroupMessageList(friendId));
-		
+			@Override
+			public void waitAction() {
+				String friendId = null;
+				
+				if (mCurFriendInfo != null)
+					friendId = mCurFriendInfo.id;
+
+				mAdapterFriendMessage = new CommonListAdapter(mContext, DataMan.GetMyGroupMessageList(friendId));
+
+				mHandler.sendEmptyMessage(MESSAGE_LOADED_FRIEND_MESSAGE);
+			}
+		});
+	}
+	
+	private void initFriendMessageView() {
 		CommonListParams listParams = new CommonListParams(mInflater, mMessageContent, mAdapterFriendMessage, new ListItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -491,4 +539,27 @@ public class MyGroup extends FunctionView {
 			initMessageTab(mCurMessageButtonId);
 		}
 	}
+
+	private final static int MESSAGE_LOADED_FRIEND_LIST    = 1;
+	private final static int MESSAGE_LOADED_MY_FRIEND_MESSAGE = 2;
+	private final static int MESSAGE_LOADED_FRIEND_MESSAGE = 3;
+
+	Handler mHandler = new Handler() {
+		@Override
+		public void handleMessage(Message msg){
+		   super.handleMessage(msg);
+
+		   switch (msg.what) {
+		   case MESSAGE_LOADED_FRIEND_LIST:
+			   initFriendListView();
+			   break;
+		   case MESSAGE_LOADED_MY_FRIEND_MESSAGE:
+			   initMyMessageView();
+			   break;
+		   case MESSAGE_LOADED_FRIEND_MESSAGE:
+			   initFriendMessageView();
+			   break;
+		   }
+		}
+	};
 }

@@ -1373,8 +1373,13 @@ public class DataMan extends DataInterface {
 	 */
 	public static List<ListItemMap> GetMyGroupFriendList(int majorIid, boolean myFriend) {
 		
+		// 从网络下载商友列表
+		Downloader.DownFile(URLT_GET_FRIENDS + "?userid=" + UserMan.GetUserId() +
+				"&after=" + "1970-01-01"
+				, DataFile(""), FILE_NAME_FRIEND);
+		
         ArrayList<ListItemMap> list = new ArrayList<ListItemMap>();  
-        List<String> lines = ReadLines(FILE_NAME_USERS);
+        List<String> lines = ReadLines(FILE_NAME_FRIEND, true);
         
         for (String line : lines)  
         {
@@ -1457,7 +1462,12 @@ public class DataMan extends DataInterface {
 		if (fiend_id == null)
 			return list;
 		
-		List<String> lines = ReadLines(FILE_NAME_NEW_MESSAGE);
+		// 从网络下载我的留言
+		Downloader.DownFile(URL_GET_MESSAGE + "?userid=" + UserMan.GetUserId() +
+				"&after=" + "1970-01-01",
+				DataFile(""), FILE_NAME_NEW_MESSAGE);
+		
+		List<String> lines = ReadLines(FILE_NAME_NEW_MESSAGE, true);
 		for (String line : lines) {
 			String[] token = GetToken(line);
 			// dengyong,test,ni hao a ge men, henhao ,0,201307222129
