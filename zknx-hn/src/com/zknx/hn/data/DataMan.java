@@ -2154,7 +2154,7 @@ public class DataMan extends DataInterface {
 	 */
 	public static List<ListItemMap> GetExpertList() {
 		// TODO ×¨¼ÒÄ¿Â¼
-		List<String> lines = ReadLines("expert/" + FILE_NAME_EXPERTS);
+		List<String> lines = ReadLines("expert/" + FILE_NAME_EXPERTS, true);
 		//return ReadCommonIdName(, KEY_EXPERT_ID);
 		
 		List<ListItemMap> list = new ArrayList<ListItemMap>();

@@ -12,7 +12,6 @@ import com.zknx.hn.common.Debug;
 import com.zknx.hn.common.widget.Dialog;
 import com.zknx.hn.data.DataMan;
 import com.zknx.hn.data.FileUtils;
-import com.zknx.hn.functions.AisView;
 
 public class AisDoc {
 
@@ -555,13 +554,7 @@ CString column_child16[]={"生产类","生活类","医疗类","教育类"};
 		size = 1;
 		header.column = buffer[offset];
 		offset += size;
-		
-		// TODO 测试文件中农业技术column错误
-		if (AisView.nongye_jishu_ais)
-			header.column = 5;
-		
-		Debug.Log("column = " + header.column);
-		
+
 		// 子栏目名
 		header.childColumn = readText(buffer, offset, size = 20);//new String(buffer, offset, size = 20);
 		offset += size;

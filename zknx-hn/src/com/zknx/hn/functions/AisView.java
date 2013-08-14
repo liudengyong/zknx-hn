@@ -65,8 +65,6 @@ public class AisView extends FunctionView {
 			mPlayer.stop();
 		}
 	}
-	
-	public static boolean nongye_jishu_ais = false;
 
 	// ½âÎöÆ÷
 	AisParser mAisParser;
@@ -91,11 +89,6 @@ public class AisView extends FunctionView {
 		mFrameResId = frameResId;
 		
 		mFunctionId = function_id;
-		
-		if (mFunctionId == UIConst.FUNCTION_ID_ARGRI_TECH)
-			nongye_jishu_ais = true;
-		else
-			nongye_jishu_ais = false;
 		
 		mTitle = getTitle(mFunctionId);
 		
