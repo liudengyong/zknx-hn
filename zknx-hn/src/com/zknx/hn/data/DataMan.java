@@ -794,7 +794,7 @@ public class DataMan extends DataInterface {
 				return price;
 			}
 		}
-		
+
 		return 0F;
 	}
 	
@@ -2151,11 +2151,27 @@ public class DataMan extends DataInterface {
 	 */
 	public static boolean AskExpert(String userId, String expertId, String subject, String question) {
 		// TODO interface 提问参数需调整? encoding?
-		String params = "user=" + userId + ",expert=" + expertId + ",subject=" + subject + ",question=" + question;
+		String params = "user=" + userId +
+				"&expert=" + expertId +
+				"&subject=" + subject +
+				"&question=" + question;
+		/*
+		try {
+			params = "user=" + userId +
+					"&expert=" + expertId +
+					"&subject=" + URLEncoder.encode(subject, "UTF-8") +
+					"&question=" + URLEncoder.encode(question, "UTF-8");
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		}
+		*/
 
 		String ret = Downloader.PostUrl(URL_ASK_EXPERT, params);
+		
+		// TODO 测试后待删除
+		ret = "0";
 
-		if (ret.equals("TRUE")) {
+		if (ret.equals("0")) {
 			SaveTodayLocalQuestion(expertId, subject, question);
 			return true;
 		}
@@ -2240,7 +2256,7 @@ public class DataMan extends DataInterface {
 		List<ListItemMap> list = new ArrayList<ListItemMap>();
 		
 		// 读取广播问题列表
-		List<String> lines = ReadLines("expert/" + expertId + "/anwsers_list.txt");
+		List<String> lines = ReadLines("expert/" + expertId + "/anwsers_list.txt", true);
 		// 读取本地问题列表
 		List<String> localLines = ReadLines(LOCAL_QUESTION);
 		lines.addAll(localLines);

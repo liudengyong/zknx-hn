@@ -204,7 +204,7 @@ public class Expert extends AisView {
 				final String subject = mAskSubject.getEditableText().toString();
 				final String question = mAskQuestion.getEditableText().toString();
 				
-				if (subject.length() < 10 || question.length() < 10) {
+				if (subject.length() < 5 || question.length() < 5) {
 					Toast.makeText(mContext, R.string.input_too_short, Toast.LENGTH_LONG).show();
 					return;
 				}
