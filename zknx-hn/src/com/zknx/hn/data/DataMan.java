@@ -23,7 +23,6 @@ import org.apache.http.message.BasicNameValuePair;
 import android.annotation.SuppressLint;
 import android.os.Environment;
 
-import com.zknx.hn.DataService;
 import com.zknx.hn.common.Debug;
 import com.zknx.hn.common.Restraint;
 import com.zknx.hn.common.UIConst;
@@ -257,10 +256,6 @@ public class DataMan extends DataInterface {
         }
 
         return list;
-	}
-	
-	private static List<ListItemMap> ReadCommonIdName(String fileName, String key) {
-		return ReadCommonIdName(fileName, key, false);
 	}
 
 	/**
@@ -679,18 +674,19 @@ public class DataMan extends DataInterface {
 
         return list;
 	}
-	
+
+	/*
 	private static Float randomPrice() {
 		long time = System.currentTimeMillis();
 		return 4.0F + (time % 4);
 	}
-	
+	*/
+
 	// 一天的毫秒数： 1天=24*60*60*1000=86400000毫秒
 	//private static final long MILLIS_ONE_DAY = 86400000;
 	
 	/**
 	 * 获取最近30天价格信息 HISTORY_PRICE_DAYS
-	 * TODO interface 获取历史价格，周期？
 	 * @param product_id
 	 * @param market_id
 	 * @return
@@ -805,6 +801,7 @@ public class DataMan extends DataInterface {
 	 * @param dateUnit
 	 * @return
 	 */
+	/*
 	private static ProductPriceInfo CreatePriceInfo(String line) {
 		ProductPriceInfo info = new ProductPriceInfo();
 
@@ -838,6 +835,7 @@ public class DataMan extends DataInterface {
 				
 		return info;
 	}
+	*/
 
 	/**
 	 * 获取产品分类
@@ -877,46 +875,6 @@ public class DataMan extends DataInterface {
 
         if (lines.size() > 0)
         	FileUtils.WriteGB2312Text(true, productClassCacheFileName, productClassLines);
-
-        return list;
-	}
-
-	/**
-	 * 根据产品分类获取供求信息列表
-	 * @return
-	 */
-	interface SupplyDemandListener {
-		boolean meetCondition(String[] token, String line/* FIXME 临时的*/);
-	}
-	private static List<String> GetSupplyDemandLinesCache = null;
-	private static List<ListItemMap> GetSupplyDemandList(SupplyDemandListener listener) {
-		
-		List<ListItemMap> list = new ArrayList<ListItemMap>();
-		
-		if (GetSupplyDemandLinesCache == null)
-			GetSupplyDemandLinesCache = ReadLines(FILE_NAME_SUPPLY_DEMAND_INFO, false);
-
-        for (String line : GetSupplyDemandLinesCache)
-        {
-        	// product_id,产品名,供求信息id(第一位编码0代表供应，1代表求购),user,标题,供求信息内容,发布时间,有效期,数量,单价,产地,产品特点,联系人名字,联系电话,手机号,详细地址
-        	// 1003021000,果树苗,0,,供应各种果树苗、绿化苗,,2011-2-23,2011-3-22,,面议,北京市,,王敏,13521120562,13521120562,陆辛庄华源发苗木市场
-        	String[] token = GetToken(line);
-        	if (token.length != 16)
-        		continue;
-
-        	/*
-        	int product_id = ParseInt(token[0]);
-    		if (!ProductClassMatch(product_class_id, product_id))
-    			continue;
-
-    		int supply_demand_id = ParseInt(token[2]);
-    		if (supply_demand_id == INVALID_ID)
-    			continue;
-    		*/
-    		
-    		if (listener.meetCondition(token, line))
-    			list.add(GetSupplyDemandMap(token));  
-        }
 
         return list;
 	}
@@ -1156,7 +1114,6 @@ public class DataMan extends DataInterface {
 	 * 获取供求对接信息列表(不分供求)
 	 * @return
 	 */
-	private static String pairLines = "";
 	public static List<ListItemMap> GetSupplyDemandPairList(String product_class_id) {
 		
 		// 首先处理数据
@@ -1266,11 +1223,8 @@ public class DataMan extends DataInterface {
         
         return list;
 	}
-	
-	private static void GenSupplyDemandPairList(String product_class_id) {
-		GetSupplyDemandPairList(product_class_id, true);
-	}
-	
+
+	/*
 	private static List<ListItemMap> GetSupplyDemandPairList(final String product_class_id, boolean justGen) {
 		
 		final String curUserId = UserMan.GetUserId();
@@ -1368,6 +1322,7 @@ public class DataMan extends DataInterface {
 		
 		return list;
 	}
+	*/
 
 	/**
 	 * 获取我的商圈朋友列表
@@ -2086,7 +2041,6 @@ public class DataMan extends DataInterface {
 
 	/**
 	 * 发布供求信息
-	 * TODO 待测试 完善发布供求信息：完善参数，功能
 	 * @param product_id
 	 * @return
 	 */
@@ -2147,7 +2101,6 @@ public class DataMan extends DataInterface {
 	}
 	
 	/**
-	 * TODO interface 向专家提问
 	 * @return
 	 */
 	public static boolean AskExpert(String userId, String expertId, String subject, String question) {
