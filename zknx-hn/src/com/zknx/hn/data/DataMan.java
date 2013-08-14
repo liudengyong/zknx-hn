@@ -1382,7 +1382,7 @@ public class DataMan extends DataInterface {
 		if (myFriend) {
 			Downloader.DownFile(URLT_GET_FRIENDS + "?userid=" + UserMan.GetUserId() +
 					"&after=" + "1970-01-01",
-					DataFile(""), FILE_NAME_FRIEND);
+					DataFile("", true), FILE_NAME_FRIEND);
 		}
 
         String fileName = (myFriend) ? FILE_NAME_FRIEND : FILE_NAME_USERS;
@@ -1402,7 +1402,8 @@ public class DataMan extends DataInterface {
     			int major_id = ParseInt(token[1]);
     			String major = "未知专业";
     			
-    			if (major_id < MAJOR.length)
+    			if (major_id >= 0 &&
+    				major_id < MAJOR.length)
     				major = MAJOR[major_id];
     			else
     				Debug.Log("严重错误：未知专业，" + major_id);
@@ -1473,7 +1474,7 @@ public class DataMan extends DataInterface {
 		// 从网络下载我的留言
 		Downloader.DownFile(URL_GET_MESSAGE + "?userid=" + UserMan.GetUserId() +
 				"&after=" + "1970-01-01",
-				DataFile(""), FILE_NAME_NEW_MESSAGE);
+				DataFile("", true), FILE_NAME_NEW_MESSAGE);
 		
 		List<String> lines = ReadLines(FILE_NAME_NEW_MESSAGE, true);
 		for (String line : lines) {

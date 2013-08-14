@@ -140,10 +140,10 @@ body {
 				text-transform: uppercase;
 				width: 200px;
 				color: black;
-                                font-size: 26px;
+                font-size: 26px;
 				}
 					
 				form#payment button:hover {
-					background: #1e2506;
+					#background: #1e2506;
 					cursor: pointer;
 					}

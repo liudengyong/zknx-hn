@@ -32,7 +32,7 @@
     
     <!-- 我的供求 -->
     <string name="create_supply_demand">发布新供求</string>
-    <string name="create_supply_demand_help">发布供求需要注意的事项：\n1.需要注意\n2.需要注意</string>
+    <string name="create_supply_demand_help">发布供求需要注意的事项：\n1.请在供求说明中填写发布或者供应的简要说明；\n2.用户信息会自动填写</string>
     <string name="post">发布</string>
     <string name="confirm_post_supply_demand_info">确认发布供求信息吗？</string>
 

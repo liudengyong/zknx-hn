@@ -7,7 +7,7 @@ public class DataInterface {
 	public static final String URL_SERVER = "http://218.106.254.101:8077/";
 	public static final String URL_LOGIN = URL_SERVER + "login.aspx";
 	public static final String URL_POST_GRADE = URL_SERVER + "post_grade.aspx";
-	public static final String URLT_GET_FRIENDS = URL_SERVER + "get_my_friend.aspx";
+	public static final String URLT_GET_FRIENDS = "get_my_friend.aspx";
 	public final static String RTMP_SERVER = "rtmp://192.168.0.101/zknx-hn";
 	
 	// 省级地址列表文件名
