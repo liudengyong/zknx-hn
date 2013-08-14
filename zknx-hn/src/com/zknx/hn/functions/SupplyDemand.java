@@ -17,6 +17,7 @@ import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 
+import com.zknx.hn.DataService;
 import com.zknx.hn.R;
 import com.zknx.hn.common.Debug;
 import com.zknx.hn.common.UIConst;
@@ -38,7 +39,7 @@ public class SupplyDemand extends FunctionView {
 	ListView mListViewInfo;
 	Button mBtnSupply;
 	Button mBtnDemand;
-	
+
 	private static final String LEVEL1_TITLE = "供求分类";
 
 	public SupplyDemand(LayoutInflater inflater, LinearLayout frameRoot, int frameResId) {
@@ -167,11 +168,33 @@ public class SupplyDemand extends FunctionView {
 		WaitDialog.Show(mContext, new WaitDialog.Action() {
 			@Override
 			public String getMessage() {
-				return "正在加载供求数据";
+				if (DataService.IsProcessingSupply())
+					return "正在加载供求数据(处理历史数据中)";
+				else
+					return "正在加载供求数据";
 			}
 
 			@Override
 			public void waitAction() {
+
+				if (DataService.IsProcessingSupply()) {
+					while (DataService.IsProcessingSupply()) {
+						try {
+							Debug.Log("等待处理供求数据……");
+							Object o = new Object(); 
+					        synchronized (o) { 
+					            o.wait(2000); 
+					        } 
+						} catch (InterruptedException e) {
+							e.printStackTrace();
+						}
+					}
+				} else {
+					DataService.SetProcessingSupply(true);
+					DataMan.GenSupplyDemandList();
+					DataService.SetProcessingSupply(false);
+				}
+
 				String product_class_id = mAdapterProductClass.getItemMapString(position, DataMan.KEY_PRODUCT_CLASS_ID);
 
 				mAdapterInfo = new CommonListAdapter(mContext, DataMan.GetSupplyDemandList(product_class_id, supply));

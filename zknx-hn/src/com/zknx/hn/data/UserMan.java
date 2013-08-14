@@ -27,6 +27,7 @@ public class UserMan {
 		String userName; // 用户注册名字
 		String major; // 用户注册专业
 		String address; // 用户注册地址
+		String addressId; // 用户注册地址
 		String phone; // 电话
 	}
 	
@@ -69,6 +70,10 @@ public class UserMan {
 		return (mUserInfo != null) ? mUserInfo.address : null;
 	}
 	
+	public static String GetUserAddressId() {
+		return (mUserInfo != null) ? mUserInfo.addressId : "";
+	}
+	
 	/**
 	 * 获取当前用户电话
 	 * @return
@@ -84,7 +89,7 @@ public class UserMan {
 	 * @param addressId
 	 * @param phone
 	 */
-	public static void SetUserInfo(String userId, String userName, String major, String address, String phone) {
+	public static void SetUserInfo(String userId, String userName, String major, String address, String addressId, String phone) {
 		if (mUserInfo == null)
 			mUserInfo = new UserInfo();
 		
@@ -92,6 +97,7 @@ public class UserMan {
 		mUserInfo.userName = userName;
 		mUserInfo.major = major;
 		mUserInfo.address = address;
+		mUserInfo.address = addressId;
 		mUserInfo.phone= phone;
 		
 		/*
@@ -151,12 +157,11 @@ public class UserMan {
 			OutputStreamWriter osw = null;
 			
 			returnString = r.readLine();
-			
-			Debug.Log("fileName=" + fileName);
 
 			String token[] = returnString.split(DataMan.COMMON_TOKEN);
+			// name,passwd,addressId,vlilage,phone; 
 			if (token != null && token.length == 5/*returnString.equals("Result=TRUE")*/) {
-				osw = new OutputStreamWriter(new FileOutputStream(DataMan.DataFile(fileName)), "gb2312"); 
+				osw = new OutputStreamWriter(new FileOutputStream(DataMan.DataFile(fileName, true)), "gb2312"); 
 			
 				if (osw != null)
 					osw.write(returnString);
@@ -177,7 +182,7 @@ public class UserMan {
 	 */
 	private static boolean ParseUserInfo(String user)
     {
-		String fileName = DataMan.DataFile(USER_INFO_FILE_NMAE + "." + user);
+		String fileName = DataMan.DataFile(USER_INFO_FILE_NMAE + "." + user, true);
 		
         try {
             BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(fileName), "gb2312"));
@@ -187,7 +192,8 @@ public class UserMan {
             if (line != null) {
             	String token[] = line.split(DataMan.COMMON_TOKEN);
             	if (token != null && token.length == 5) {
-                    SetUserInfo(token[0], token[0], token[2], token[3], token[4]);
+            		// TODO 地址id
+                    SetUserInfo(token[0], token[0], token[2], token[3], "TODO", token[4]);
             	}
             }
             

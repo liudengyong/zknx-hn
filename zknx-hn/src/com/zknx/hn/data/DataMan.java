@@ -23,6 +23,7 @@ import org.apache.http.message.BasicNameValuePair;
 import android.annotation.SuppressLint;
 import android.os.Environment;
 
+import com.zknx.hn.DataService;
 import com.zknx.hn.common.Debug;
 import com.zknx.hn.common.Restraint;
 import com.zknx.hn.common.UIConst;
@@ -78,6 +79,7 @@ public class DataMan extends DataInterface {
 	public static final String KEY_EXPERT_INTRODUCE = "expert_introduce";
 	public static final String KEY_EXPERT_QUESTION_SUBJECT = "expert_question_subject";
 	public static final String KEY_EXPERT_QUESTION_CONTENT = "expert_question_content";
+	public static final String KEY_EXPERT_QUESTION_ANWSER = "expert_question_anwser";
 
 	// 临时文件名
 	public static final String FILE_NAME_TMP = "tmp.txt";
@@ -981,8 +983,8 @@ public class DataMan extends DataInterface {
 	 * @param product_class_id
 	 * @param supply
 	 */
-	private static void GenSupplyDemandList() {
-		
+	public static void GenSupplyDemandList() {
+
 		List<ListItemMap> productClass = GetProductClassList();
 		
 		if (productClass == null || productClass.size() == 0) {
@@ -1372,17 +1374,21 @@ public class DataMan extends DataInterface {
 	 * myFriend：是否查询我的好友
 	 */
 	public static List<ListItemMap> GetMyGroupFriendList(int majorIid, boolean myFriend) {
-		
+
 		// 从网络下载商友列表
-		Downloader.DownFile(URLT_GET_FRIENDS + "?userid=" + UserMan.GetUserId() +
-				"&after=" + "1970-01-01"
-				, DataFile(""), FILE_NAME_FRIEND);
-		
-        ArrayList<ListItemMap> list = new ArrayList<ListItemMap>();  
-        List<String> lines = ReadLines(FILE_NAME_FRIEND, true);
-        
+		if (myFriend) {
+			Downloader.DownFile(URLT_GET_FRIENDS + "?userid=" + UserMan.GetUserId() +
+					"&after=" + "1970-01-01",
+					DataFile(""), FILE_NAME_FRIEND);
+		}
+
+        String fileName = (myFriend) ? FILE_NAME_FRIEND : FILE_NAME_USERS;
+        ArrayList<ListItemMap> list = new ArrayList<ListItemMap>();
+        List<String> lines = ReadLines(fileName, true);
+
         for (String line : lines)  
         {
+        	// TODO users.txt和friends.txt格式不同
         	// user,名字,专业,联系地址,联系电话
         	//0,zhangsan,张三,专业1,北京通州,13812341234,自我介绍
         	String[] token = GetToken(line);
@@ -1390,7 +1396,6 @@ public class DataMan extends DataInterface {
 
         		String id = token[0];
         			
-    			// XXX 待优化：从cache中取出，然后匹配
     			int major_id = ParseInt(token[1]);
     			String major = "未知专业";
     			
@@ -1903,9 +1908,6 @@ public class DataMan extends DataInterface {
 		
 		GenAisList();
 
-		//  处理供求信息
-		GenSupplyDemandList();
-
 		// 处理商品信息
 		List<ListItemMap> province = GetAddressList();
 		
@@ -1960,8 +1962,10 @@ public class DataMan extends DataInterface {
 	private static final String FILE_STAMP_LAST_MESSAGE = "lastMessage.txt";
 	public static String GetNewMessages() {
 
-		int ret = Downloader.DownFile(URL_GET_MESSAGE + "?userid=" + UserMan.GetUserId(), DataFile("", true), FILE_NAME_NEW_MESSAGE);
-		
+		int ret = Downloader.DownFile(URL_GET_MESSAGE + "?userid=" + UserMan.GetUserId()
+				+ "&after=" + "1970-01-01",
+				DataFile("", true), FILE_NAME_NEW_MESSAGE);
+
 		// 下载错误
 		if (ret != 0)
 			return null;
@@ -2101,7 +2105,7 @@ public class DataMan extends DataInterface {
 			params = "type=" + info.type + 
 				"&title=" + URLEncoder.encode(info.title, "UTF-8") + 
 				"&userid=" + UserMan.GetUserId() + 
-				"&addressid=" + /*TODO 发布供求无地址id UserMan.GetUserAddressId()*/ "" +
+				"&addressid=" + UserMan.GetUserAddressId() +
 				"&commodityid=" + info.commodityid + 
 				"&count=" + URLEncoder.encode(info.count, "UTF-8") +
 				"&price=" + URLEncoder.encode(info.price, "UTF-8") + 
@@ -2163,7 +2167,6 @@ public class DataMan extends DataInterface {
 	 * @return
 	 */
 	public static List<ListItemMap> GetExpertList() {
-		// TODO 专家目录
 		List<String> lines = ReadLines("expert/" + FILE_NAME_EXPERTS, true);
 		//return ReadCommonIdName(, KEY_EXPERT_ID);
 		
@@ -2201,14 +2204,14 @@ public class DataMan extends DataInterface {
 	private static String LOCAL_QUESTION = "local_questions.txt";
 	private static void SaveTodayLocalQuestion(String expertId, String subject,	String question) {
 		// 在列表的第一个
-		String questionLines = expertId + COMMON_TOKEN + subject + COMMON_TOKEN + question + "\n";
+		String questionLines = expertId + COMMON_TOKEN + subject + COMMON_TOKEN + question + ",0\n";
         List<String> lines = ReadLines(LOCAL_QUESTION);
         boolean duplicated = false;
         
         for (String line : lines) {
-        	// id,名字
+        	//专家id,问题主题,问题内容,0
         	String[] token = GetToken(line);
-        	if (token.length == 3) {
+        	if (token.length == 4) {
 
         		String savedExpertId = token[0];
         		String savedSubject  = token[1];
@@ -2233,28 +2236,32 @@ public class DataMan extends DataInterface {
 	public static List<ListItemMap> GetExpertAnwserList(String expertId) {
 		List<ListItemMap> list = new ArrayList<ListItemMap>();
 		
-		// TODO
+		// 读取广播问题列表
+		List<String> lines = ReadLines("expert/" + expertId + "/anwsers_list.txt");
 		// 读取本地问题列表
-		List<String> lines = ReadLines(/*LOCAL_QUESTION*/"expert/" + expertId + "/anwsers.txt");
+		List<String> localLines = ReadLines(LOCAL_QUESTION);
+		lines.addAll(localLines);
 		
 		for (String line : lines) {
-        	// id,名字
+			//专家id,问题主题,问题内容,答案.ais
         	String[] token = GetToken(line);
-        	if (token.length == 3) {
+        	if (token.length == 4) {
 
         		String savedExpertId = token[0];
         		String savedSubject  = token[1];
         		String savedQuestion = token[2];
+        		String savedAnwser   = token[3];
         		
         		if (savedExpertId.equals(expertId)) {
         			ListItemMap map = new ListItemMap(savedSubject, KEY_EXPERT_QUESTION_SUBJECT, savedSubject);
         			map.put(KEY_EXPERT_QUESTION_CONTENT, savedQuestion);
+        			map.put(KEY_EXPERT_QUESTION_ANWSER, savedAnwser);
+        			map.put(KEY_AIS_FILE_NAME, savedAnwser);
+        			map.put(KEY_AIS_DATE, "expert/" + expertId + "/");
         			list.add(map);
         		}
         	}
 		}
-		
-		// TODO GetExpertAnwserList
 		
 		return list;
 	}

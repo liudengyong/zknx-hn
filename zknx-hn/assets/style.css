@@ -8,6 +8,7 @@ body {
 	color: #111111;
 	font-family: Georgia, "Times New Roman", Times, serif;
 	padding: 10px;
+        font-size: 26px;
 	}
 
 	h1 {
@@ -139,6 +140,7 @@ body {
 				text-transform: uppercase;
 				width: 200px;
 				color: black;
+                                font-size: 26px;
 				}
 					
 				form#payment button:hover {

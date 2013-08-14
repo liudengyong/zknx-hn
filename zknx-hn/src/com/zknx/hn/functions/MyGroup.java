@@ -212,7 +212,7 @@ public class MyGroup extends FunctionView {
 	 * 初始化我的商圈留言
 	 */
 	void initGroupMessaage() {
-		
+
 		// 留言视图
 		if (mMessageLayout == null) {
 			mMessageLayout = (LinearLayout)mInflater.inflate(R.layout.group_message, null);

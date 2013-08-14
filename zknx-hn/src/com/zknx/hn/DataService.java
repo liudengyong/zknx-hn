@@ -23,6 +23,25 @@ public class DataService extends Service {
 	// 有新留言
 	public static final int MESSAGE_NEW_MESSAGE = 3;
 	
+	// 处理供求
+	static private boolean mProcessingSupply = false;
+	
+	/**
+	 * 是否正在处理供求
+	 */
+	public static synchronized boolean IsProcessingSupply() {
+		return mProcessingSupply;
+	}
+	
+	/**
+	 * 设置是否正在处理供求
+	 * @param processing
+	 */
+	public static synchronized void SetProcessingSupply(boolean processing) {
+		mProcessingSupply = processing;
+	}
+	
+	
 	// 获取服务实例
 	public class DataBinder extends Binder {
 		DataService getService(Handler handler) {
@@ -64,13 +83,19 @@ public class DataService extends Service {
 	private Runnable mProcessDataRunnable = new Runnable() {    
         public void run() {
 
-        	// 每1分钟检查新数据
+        	// 每5分钟检查新数据
         	/*
          	if (DataMan.ProcessBroadcastData())
          		mHandler.sendEmptyMessage(MESSAGE_NEW_DATA);
          		*/
 
-        	mHandler.postDelayed(this, 60 * SECOND);
+        	if (!IsProcessingSupply()) {
+        		SetProcessingSupply(true);
+        		DataMan.GenSupplyDemandList(); // 处理供求
+        		SetProcessingSupply(false);
+        	}
+
+        	mHandler.postDelayed(this, 300 * SECOND);
         }
     };
     
@@ -79,11 +104,10 @@ public class DataService extends Service {
          public void run() {
 
         	// 每5秒检查新留言
-        	/* TODO
+
          	String message = DataMan.GetNewMessages();
          	if (message != null)
          		mHandler.sendEmptyMessage(MESSAGE_NEW_MESSAGE);
-         	*/
 
          	mHandler.postDelayed(this, 5 * SECOND);
          }

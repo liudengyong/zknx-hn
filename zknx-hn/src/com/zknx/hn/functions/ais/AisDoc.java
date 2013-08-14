@@ -230,6 +230,9 @@ CString column_child16[]={"生产类","生活类","医疗类","教育类"};
 			return false;
 		}
 
+		if (strDate == null)
+			strDate = "";
+
 		String filePathName = DataMan.DataFile(strDate + aisFileName, true);
 		
 		if (!FileUtils.IsFileExist(filePathName)) {
