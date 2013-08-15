@@ -1353,10 +1353,10 @@ public class DataMan extends DataInterface {
         	if (token.length == 5) {
 
         		String id = token[0];
-        			
+
     			int major_id = ParseInt(token[1]);
-    			String major = "未知专业";
-    			
+    			String major = "种植大户";
+
     			if (major_id >= 0 &&
     				major_id < MAJOR.length)
     				major = MAJOR[major_id];
@@ -1423,8 +1423,10 @@ public class DataMan extends DataInterface {
 		
 		ArrayList<ListItemMap> list = new ArrayList<ListItemMap>();
 		
-		if (fiend_id == null)
+		if (fiend_id == null) {
+			list.add(new ListItemMap("暂无留言", KEY_FRIEND_ID, "-1"/* id */));
 			return list;
+		}
 		
 		// 从网络下载我的留言
 		Downloader.DownFile(URL_GET_MESSAGE + "?userid=" + UserMan.GetUserId() +
@@ -1462,7 +1464,12 @@ public class DataMan extends DataInterface {
         		list.add(map);
 			}
         }
-		
+
+		// 为了焦点问题，添加空留言（没有留言列表时，焦点无法切换到留言Tab）
+		if (list.size() == 0) {
+			list.add(new ListItemMap("暂无留言", KEY_FRIEND_ID, fiend_id/* id */));
+		}
+
 		return list;
 		
 		/*
