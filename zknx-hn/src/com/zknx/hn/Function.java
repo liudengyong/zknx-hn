@@ -30,6 +30,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
+import android.telephony.TelephonyManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -53,7 +54,18 @@ public class Function extends Activity {
 	@Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        
+
+        String deviceId = ((TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE)).getSimSerialNumber();
+
+        if (deviceId == null ||
+        	deviceId.length() == 0) {
+        	Dialog.Toast(this, "获取设备ID错误");
+        	finish();
+        	return;
+        }
+
+        //Dialog.Toast(this, "设备ID：" + deviceId);
+
         /*
         List<String> lines = DataMan.ReadLines("fake_user.txt");
 
@@ -342,19 +354,26 @@ public class Function extends Activity {
 		}
 		
 		// 中科农信或者红星党建
+		View focusedBtn = null;
 		for (int i = 0; i < btns.getChildCount(); ++i) {
 			RelativeLayout btnLayout = (RelativeLayout)btns.getChildAt(i);
 			View btn = btnLayout.getChildAt(0);
 			if (functionId == btn.getId()) {
-				btn.setBackgroundResource(R.drawable.bottom_button_focus);
-				btn.setEnabled(false); // 设置当前功能按钮背景，并禁用
+				btn.setBackgroundResource(R.drawable.bottom_button_actived);
+				//btn.setEnabled(false); // 设置当前功能按钮背景，并禁用
+				
+				focusedBtn = btn;
 			}
 		}
 
 		// 初始化功能视图
 		bottomBtns.addView(btns, UIConst.GetLayoutParams(L_LAYOUT_TYPE.H_WRAP));
+
+		// 底部功能按钮请求焦点
+		if (focusedBtn != null)
+			focusedBtn.requestFocus();
 	}
-	
+
 	OnClickListener mOnClickListener = new OnClickListener() {
 		@Override
 		public void onClick(View view) {
@@ -370,6 +389,8 @@ public class Function extends Activity {
 
 	    	// 功能参数
 	    	intent.replaceExtras(extras);
+	    	
+	    	UserMan.SetUserInfo("linshi", "linshi", "1", "北京市东城区东华门街道", "0100101", "18911939853");
 
 	    	if (isNeedLogin(id)) {
 	    		intent.setClass(context, Login.class);

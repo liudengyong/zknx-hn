@@ -5,10 +5,11 @@ import java.util.List;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.media.MediaPlayer;
 import android.net.Uri;
+import android.os.Handler;
+import android.os.Message;
 import android.os.StrictMode;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,6 +22,7 @@ import com.zknx.hn.R;
 import com.zknx.hn.common.Debug;
 import com.zknx.hn.common.UIConst;
 import com.zknx.hn.common.widget.Dialog;
+import com.zknx.hn.common.widget.WaitDialog;
 import com.zknx.hn.data.DataMan;
 import com.zknx.hn.data.FileUtils;
 import com.zknx.hn.data.ListItemMap;
@@ -56,6 +58,9 @@ public class AisView extends FunctionView {
 	
 	private static final String DEFAULT_TITLE = "内容";
 	private AisDoc.AisHeader mAisHeader = null;
+	
+	private String mAisTitle = null;
+	private List<ListItemMap> mListMap = null;
 	
 	// 播放器
 	private static MediaPlayer mPlayer;
@@ -102,12 +107,11 @@ public class AisView extends FunctionView {
 		if (mFrameResId == R.layout.func_frame_split) {
 			mAisListFrame = mContentFrame[0];
 			mAisContentFrame = mContentFrame[1];
-			initAisList(mTitle, "");
+			loadAisList(mTitle, "");
 		} else if (mFrameResId == R.layout.func_frame_triple) {
 			mAisListFrame = mContentFrame[1];
 			mAisContentFrame = mContentFrame[2];
 			initChildListData();
-			initChildListView();
 		} else {
 			Debug.Log("严重错误：AISView mFrameResId");
 		}
@@ -117,7 +121,18 @@ public class AisView extends FunctionView {
 	 * 初始化Ais分类
 	 */
 	protected void initChildListData() {
-		mAdapterClassList = new CommonListAdapter(mContext, DataMan.GetAisColumnChildList(mFunctionId));
+		WaitDialog.Show(mContext, new WaitDialog.Action() {
+			@Override
+			public String getMessage() {
+				return "正在加载资讯列表";
+			}
+
+			@Override
+			public void waitAction() {
+				mAdapterClassList = new CommonListAdapter(mContext, DataMan.GetAisColumnChildList(mFunctionId));
+				mHandler.sendEmptyMessage(MESSAGE_LOADED_AIS_CHILD_LIST);
+			}
+		});
 	}
 	
 	/**
@@ -162,7 +177,7 @@ public class AisView extends FunctionView {
 			child = mapItem.getString(DataMan.KEY_AIS_COLUMN_CHILD);
 		}
 		
-		initAisList(title, child);
+		loadAisList(title, child);
 	}
 	
 	/**
@@ -170,9 +185,20 @@ public class AisView extends FunctionView {
 	 * @param title
 	 * @param class_id
 	 */
-	private void initAisList(String title, String child) {
-		List<ListItemMap> listMap = DataMan.GetAisList(mFunctionId, child);
-		initAisList(title, listMap, null, null);
+	private void loadAisList(final String title, final String child) {
+		WaitDialog.Show(mContext, new WaitDialog.Action() {
+			@Override
+			public String getMessage() {
+				return "正在加载资讯列表";
+			}
+
+			@Override
+			public void waitAction() {
+				mAisTitle = title;
+				mListMap = DataMan.GetAisList(mFunctionId, child);
+				mHandler.sendEmptyMessage(MESSAGE_LOADED_AIS_LIST);
+			}
+		});
 	}
 
 	/**
@@ -425,13 +451,12 @@ public class AisView extends FunctionView {
 					String grades = DataMan.GetGrades(mAisHeader.getAisId());
 					if (grades == null || grades.length() == 0)
 						return;
-					//Dialog.MessageBox(mContext, grades);
 					
 					new AlertDialog.Builder(mContext)
 			        .setIcon(null)
 			        .setTitle(R.string.app_name)
 			        .setMessage(grades)
-			        .setPositiveButton("上传", new DialogInterface.OnClickListener() {
+			        /*.setPositiveButton("上传", new DialogInterface.OnClickListener() {
 						@Override
 						public void onClick(DialogInterface dialog, int which) {
 							String ret = DataMan.PostGrade();
@@ -439,7 +464,8 @@ public class AisView extends FunctionView {
 								Dialog.MessageBox(mContext, "返回：" + ret);
 							}
 						}
-			        })
+			        })*/
+			        .setPositiveButton("确定", null)
 			        .show();
 
 					break;
@@ -453,4 +479,23 @@ public class AisView extends FunctionView {
 			}
 		});
 	}
+	
+	private final static int MESSAGE_LOADED_AIS_CHILD_LIST = 1;
+	private final static int MESSAGE_LOADED_AIS_LIST = 2;
+
+	Handler mHandler = new Handler() {
+		@Override
+		public void handleMessage(Message msg){
+		   super.handleMessage(msg);
+
+		   switch (msg.what) {
+		   case MESSAGE_LOADED_AIS_CHILD_LIST:
+			   initChildListView();
+			   break;
+		   case MESSAGE_LOADED_AIS_LIST:
+			   initAisList(mAisTitle, mListMap, null, null);
+			   break;
+		   }
+		}
+	};
 }

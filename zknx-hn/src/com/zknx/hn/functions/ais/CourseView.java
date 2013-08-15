@@ -126,21 +126,21 @@ public class CourseView {
 	 */
 	private static int GetAnwserId(int i, char anwser) {
 		int index = anwser - ANWSERS[0];
-		return (1000 + (i * 100) + index);
+		return (10000 + (i * 100) + index);
 	}
 	
 	/**
 	 * ´ð°¸Í¼±êid
 	 */
 	private static int GetAnwserIconId(int i) {
-		return (2000 + i);
+		return (20000 + i);
 	}
 	
 	/**
 	 * ½âÎöid
 	 */
 	private static int GetNoteId(int i) {
-		return (3000 + i);
+		return (30000 + i);
 	}
 	
 	/**
