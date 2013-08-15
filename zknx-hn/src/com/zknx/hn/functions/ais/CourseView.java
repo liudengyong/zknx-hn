@@ -63,8 +63,14 @@ public class CourseView {
 			if (data == null)
 				continue;
 			
-			Bitmap bm = BitmapFactory.decodeByteArray(data, 0, data.length);
-			image.setImageBitmap(bm);
+			try {
+				Bitmap bm = BitmapFactory.decodeByteArray(data, 0, data.length);
+				image.setImageBitmap(bm);
+			} catch (Throwable e) {
+				Debug.Log("严重错误：内存不足，parseAisDoc");
+				if (context != null)
+					Dialog.Toast(context, "解析课件内存不足：" + (data.length / 1024) + "K");
+			}
 			
 			row1.addView(image);
 
