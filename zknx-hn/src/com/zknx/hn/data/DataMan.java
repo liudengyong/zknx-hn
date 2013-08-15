@@ -267,11 +267,11 @@ public class DataMan extends DataInterface {
 	    ArrayList<ListItemMap> list = new ArrayList<ListItemMap>();
 	    
 	    // 优化效率 省级地址
-	    if (FileUtils.IsFileExist(DataFile(FILE_NAME_ADDRESS_PROVINCE, true)))
-	    	return ReadCommonIdName(FILE_NAME_ADDRESS_PROVINCE, KEY_ADDRESS_ID, true);
+	    if (FileUtils.IsFileExist(DataFile("basedata/" + FILE_NAME_ADDRESS_PROVINCE, true)))
+	    	return ReadCommonIdName("basedata/" + FILE_NAME_ADDRESS_PROVINCE, KEY_ADDRESS_ID, true);
 
 	    String provinceLines = "";
-        List<String> lines = ReadLines(FILE_NAME_ADDRESS, true);
+        List<String> lines = ReadLines("basedata/" + FILE_NAME_ADDRESS, true);
         
         for (String line : lines) {
         	// id,名字
@@ -294,7 +294,7 @@ public class DataMan extends DataInterface {
         }
         
         if (lines.size() > 0)
-        	FileUtils.WriteGB2312Text(true, FILE_NAME_ADDRESS_PROVINCE, provinceLines);
+        	FileUtils.WriteGB2312Text(true, "basedata/" + FILE_NAME_ADDRESS_PROVINCE, provinceLines);
 
         return list;
 	}
@@ -305,7 +305,7 @@ public class DataMan extends DataInterface {
 	 */
 	public static List<ListItemMap> GetMarketListByArea(int address_id) {
 
-		String marketCacheFileName = "markets/market_" + address_id + ".txt";
+		String marketCacheFileName = "basedata/markets/market_" + address_id + ".txt";
         ArrayList<ListItemMap> list = new ArrayList<ListItemMap>();
         
         // 优化效率
@@ -313,7 +313,7 @@ public class DataMan extends DataInterface {
         	return ReadCommonIdName(marketCacheFileName, KEY_MARKET_ID, true);
         
         String marketLines = "";
-        List<String> lines = ReadLines(FILE_NAME_MARKETS, true);
+        List<String> lines = ReadLines("basedata/" + FILE_NAME_MARKETS, true);
         
         for (String line : lines)  
         {
@@ -599,7 +599,7 @@ public class DataMan extends DataInterface {
 
 		List<String> lines = null;
 		ArrayList<ListItemMap> list = new ArrayList<ListItemMap>();
-		String productMarketFileName = "markets/product_" + product_id + "_markets.txt";
+		String productMarketFileName = "basedata/markets/product_" + product_id + "_markets.txt";
 
 		if (product_id == null || product_id.length() == 0)
 			return list;
@@ -844,13 +844,13 @@ public class DataMan extends DataInterface {
 	public static List<ListItemMap> GetProductClassList() {
 
 		// 优化效率 产品分类
-		String productClassCacheFileName = "productClass.txt";
+		String productClassCacheFileName = "basedata/productClass.txt";
 	    if (FileUtils.IsFileExist(DataFile(productClassCacheFileName, true)))
 	    	return ReadCommonIdName(productClassCacheFileName, KEY_PRODUCT_CLASS_ID, true);
 
 	    String productClassLines = "";
 		ArrayList<ListItemMap> list = new ArrayList<ListItemMap>();
-        List<String> lines = ReadLines(FILE_NAME_COMMODITY, true);
+        List<String> lines = ReadLines("basedata/" + FILE_NAME_COMMODITY, true);
         
         for (String line : lines)  
         {
@@ -896,7 +896,7 @@ public class DataMan extends DataInterface {
 			String strDate = mDateFormater.format(date) + "/";
 
 			// 判断当天的是否已经处理过
-			String stampFileName = DataFile(date + "processedSDInfo.txt");
+			String stampFileName = DataFile(date + "processedSDInfo.txt", true);
 			if (!FileUtils.IsFileExist(stampFileName)) {
 				ProcessSupplyDemandInfo(date);
 			}
@@ -986,7 +986,7 @@ public class DataMan extends DataInterface {
 			String genFileName = GetGenSupplyDemandFileName(strDate, productId.substring(0, 2), 
 					supplyOrDemand.equals("0"));
 
-			Debug.Log(strDate + FILE_NAME_SUPPLY_DEMAND_INFO + "：第" + count++ + "行");
+			//Debug.Log(strDate + FILE_NAME_SUPPLY_DEMAND_INFO + "：第" + count++ + "行");
 
 			// 附加
 			FileUtils.AppendLine(DataFile(genFileName, true), line);
@@ -1337,12 +1337,12 @@ public class DataMan extends DataInterface {
 		if (myFriend) {
 			Downloader.DownFile(URLT_GET_FRIENDS + "?userid=" + UserMan.GetUserId() +
 					"&after=" + "1970-01-01",
-					DataFile("", true), FILE_NAME_FRIEND);
+					DataFile("basedata/", true), FILE_NAME_FRIEND);
 		}
 
         String fileName = (myFriend) ? FILE_NAME_FRIEND : FILE_NAME_USERS;
         ArrayList<ListItemMap> list = new ArrayList<ListItemMap>();
-        List<String> lines = ReadLines(fileName, true);
+        List<String> lines = ReadLines("basedata/" + fileName, true);
 
         for (String line : lines)  
         {
@@ -1431,9 +1431,9 @@ public class DataMan extends DataInterface {
 		// 从网络下载我的留言
 		Downloader.DownFile(URL_GET_MESSAGE + "?userid=" + UserMan.GetUserId() +
 				"&after=" + "1970-01-01",
-				DataFile("", true), FILE_NAME_NEW_MESSAGE);
+				DataFile("basedata/", true), FILE_NAME_NEW_MESSAGE);
 		
-		List<String> lines = ReadLines(FILE_NAME_NEW_MESSAGE, true);
+		List<String> lines = ReadLines("basedata/" + FILE_NAME_NEW_MESSAGE, true);
 		for (String line : lines) {
 			String[] token = GetToken(line);
 			// dengyong,test,ni hao a ge men, henhao ,0,201307222129
@@ -1534,7 +1534,7 @@ public class DataMan extends DataInterface {
 	 */
 	private static void GetUserInfo(String userId, ListItemMap info) {
 		
-		List<String> lines = ReadLines(FILE_NAME_USERS);
+		List<String> lines = ReadLines("basedata/" + FILE_NAME_USERS, true);
 		
 		for (String line : lines) {
 			// liye3,10,13800138000,‘注册默认地址’,注册默认备注信息
@@ -1833,7 +1833,7 @@ public class DataMan extends DataInterface {
 		String today = GetCurrentTime(false);
 		//String dataFileName = DataFile(today + ".zip");
 
-		List<String> line = ReadLines(TIME_STAMP_FILE_NAME, true);
+		List<String> line = ReadLines("basedata/" + TIME_STAMP_FILE_NAME, true);
 
 		// 没有时间戳，或者时间戳不匹配
 		boolean timStampNotMatch = (line.size() == 0) || (!line.get(0).equals(today));
@@ -1848,7 +1848,7 @@ public class DataMan extends DataInterface {
 	 * @return
 	 */
 	private static boolean WriteTimeStamp(String today) {
-		return FileUtils.WriteFile(DataFile(TIME_STAMP_FILE_NAME, true), today.getBytes());
+		return FileUtils.WriteFile(DataFile("basedata/" + TIME_STAMP_FILE_NAME, true), today.getBytes());
 	}
 
 	/**
@@ -1930,13 +1930,13 @@ public class DataMan extends DataInterface {
 
 		int ret = Downloader.DownFile(URL_GET_MESSAGE + "?userid=" + UserMan.GetUserId()
 				+ "&after=" + "1970-01-01",
-				DataFile("", true), FILE_NAME_NEW_MESSAGE);
+				DataFile("basedata/", true), FILE_NAME_NEW_MESSAGE);
 
 		// 下载错误
 		if (ret != 0)
 			return null;
 
-		List<String> lines = ReadLines(FILE_NAME_NEW_MESSAGE, true);
+		List<String> lines = ReadLines("basedata/" + FILE_NAME_NEW_MESSAGE, true);
 		
 		if (lines.size() == 0)
 			return null;
@@ -1957,7 +1957,7 @@ public class DataMan extends DataInterface {
 		
 		String message = null;
 		
-		List<String> lastTime = ReadLines(FILE_STAMP_LAST_MESSAGE, true);
+		List<String> lastTime = ReadLines("basedata/" + FILE_STAMP_LAST_MESSAGE, true);
 		if (lastTime == null ||
 			lastTime.size() == 0 ||
 			!lastTime.get(0).equals(time)) {
@@ -1965,7 +1965,7 @@ public class DataMan extends DataInterface {
 			message = token[0] + "：" + token[2];
 		}
 
-		FileUtils.WriteText(DataFile(FILE_STAMP_LAST_MESSAGE, true), time);
+		FileUtils.WriteText(DataFile("basedata/" + FILE_STAMP_LAST_MESSAGE, true), time);
 
 		return message;
 	}
@@ -2147,7 +2147,7 @@ public class DataMan extends DataInterface {
 	 * @return
 	 */
 	public static List<ListItemMap> GetExpertList() {
-		List<String> lines = ReadLines("expert/" + FILE_NAME_EXPERTS, true);
+		List<String> lines = ReadLines("basedata/expert/" + FILE_NAME_EXPERTS, true);
 		//return ReadCommonIdName(, KEY_EXPERT_ID);
 		
 		List<ListItemMap> list = new ArrayList<ListItemMap>();
@@ -2185,7 +2185,7 @@ public class DataMan extends DataInterface {
 	private static void SaveTodayLocalQuestion(String expertId, String subject,	String question) {
 		// 在列表的第一个
 		String questionLines = expertId + COMMON_TOKEN + subject + COMMON_TOKEN + question + ",0\n";
-        List<String> lines = ReadLines(LOCAL_QUESTION);
+        List<String> lines = ReadLines("basedata/" + LOCAL_QUESTION, true);
         
         for (String line : lines) {
         	//专家id,问题主题,问题内容,0
@@ -2205,16 +2205,16 @@ public class DataMan extends DataInterface {
         
         // append
         //FileUtils.WriteGB2312Text(false, LOCAL_QUESTION, questionLines);
-        FileUtils.AppendLine(DataFile(LOCAL_QUESTION, true), questionLines);
+        FileUtils.AppendLine(DataFile("basedata/" + LOCAL_QUESTION, true), questionLines);
 	}
 	
 	public static List<ListItemMap> GetExpertAnwserList(String expertId) {
 		List<ListItemMap> list = new ArrayList<ListItemMap>();
 		
 		// 读取广播问题列表
-		List<String> lines = ReadLines("expert/" + expertId + "/anwsers_list.txt", true);
+		List<String> lines = ReadLines("basedata/expert/" + expertId + "/anwsers_list.txt", true);
 		// 读取本地问题列表
-		List<String> localLines = ReadLines(LOCAL_QUESTION, true);
+		List<String> localLines = ReadLines("basedata/" + LOCAL_QUESTION, true);
 		lines.addAll(localLines);
 		
 		for (String line : lines) {
@@ -2250,7 +2250,7 @@ public class DataMan extends DataInterface {
 		String time = GetCurrentTimeId();
 		String line = time + COMMON_TOKEN + aisId + COMMON_TOKEN + resultPoint;
 
-		String fileName = DataMan.DataFile(FILE_NAME_GRADE, true);
+		String fileName = DataMan.DataFile("basedata/" + FILE_NAME_GRADE, true);
 		// 附加一行数据
 		FileUtils.AppendLine(fileName, line);
 	}
@@ -2260,7 +2260,7 @@ public class DataMan extends DataInterface {
 	 * @return
 	 */
 	public static String PostGrade() {
-		String filePathName = DataFile(FILE_NAME_GRADE);
+		String filePathName = DataFile("basedata/" + FILE_NAME_GRADE, true);
 		List<NameValuePair> params = new ArrayList<NameValuePair>();
 
 		//user_id：用户id；
@@ -2289,7 +2289,7 @@ public class DataMan extends DataInterface {
 		String user = UserMan.GetUserId();
 		
 		// 本地数据(待上传)
-		List<String> lines = ReadLinesWithEncoding(FILE_NAME_GRADE, "UTF8", true);
+		List<String> lines = ReadLinesWithEncoding("basedata/" + FILE_NAME_GRADE, "UTF8", true);
 		
 		for (String line : lines) {
 			String token[] = line.split(COMMON_TOKEN);
@@ -2309,7 +2309,7 @@ public class DataMan extends DataInterface {
 		}
 
 		// 历史数据
-		lines = ReadLines(FILE_NAME_GRADES);
+		lines = ReadLines("basedata/" + FILE_NAME_GRADES, true);
 		
 		for (String line : lines) {
 			String token[] = line.split(COMMON_TOKEN);
