@@ -2186,7 +2186,6 @@ public class DataMan extends DataInterface {
 		// 在列表的第一个
 		String questionLines = expertId + COMMON_TOKEN + subject + COMMON_TOKEN + question + ",0\n";
         List<String> lines = ReadLines(LOCAL_QUESTION);
-        boolean duplicated = false;
         
         for (String line : lines) {
         	//专家id,问题主题,问题内容,0
@@ -2195,22 +2194,18 @@ public class DataMan extends DataInterface {
 
         		String savedExpertId = token[0];
         		String savedSubject  = token[1];
-        		String savedQuestion = token[2];
+        		//String savedQuestion = token[2];
 
         		// 只需要省份
         		if (savedExpertId.equals(expertId) && savedSubject.equals(subject)) {
-        			duplicated = true;
-        			break;
-        		} else {
-        			questionLines += savedExpertId + COMMON_TOKEN + savedSubject + COMMON_TOKEN + savedQuestion + "\n";
+        			return;
         		}
         	}
         }
         
         // append
-        if (!duplicated) {
-        	FileUtils.WriteGB2312Text(false, LOCAL_QUESTION, questionLines);
-        }
+        //FileUtils.WriteGB2312Text(false, LOCAL_QUESTION, questionLines);
+        FileUtils.AppendLine(DataFile(LOCAL_QUESTION, true), questionLines);
 	}
 	
 	public static List<ListItemMap> GetExpertAnwserList(String expertId) {
@@ -2219,7 +2214,7 @@ public class DataMan extends DataInterface {
 		// 读取广播问题列表
 		List<String> lines = ReadLines("expert/" + expertId + "/anwsers_list.txt", true);
 		// 读取本地问题列表
-		List<String> localLines = ReadLines(LOCAL_QUESTION);
+		List<String> localLines = ReadLines(LOCAL_QUESTION, true);
 		lines.addAll(localLines);
 		
 		for (String line : lines) {

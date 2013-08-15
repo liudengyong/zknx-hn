@@ -31,8 +31,6 @@ import android.widget.Toast;
 
 public class Expert extends AisView {
 
-	// 提问等待进度条
-	private WaitDialog mWaitDialog;
 	// 提问的主题和问题
 	private EditText mAskSubject;
 	private EditText mAskQuestion;
@@ -45,8 +43,6 @@ public class Expert extends AisView {
 
 	public Expert(LayoutInflater inflater, LinearLayout frameRoot) {
 		super(inflater, frameRoot, UIConst.FUNCTION_ID_EXPERT_GUIDE, R.layout.func_frame_triple);
-
-		Instance = this;
 	}
 	
 	/**
@@ -54,7 +50,18 @@ public class Expert extends AisView {
 	 */
 	@Override
 	protected void initChildListData() {
-		mAdapterClassList = new CommonListAdapter(mContext, DataMan.GetExpertList());
+		WaitDialog.Show(mContext, new WaitDialog.Action() {
+			@Override
+			public String getMessage() {
+				return "正在加载专家列表";
+			}
+
+			@Override
+			public void waitAction() {
+				mAdapterClassList = new CommonListAdapter(mContext, DataMan.GetExpertList());
+				mHandler.sendEmptyMessage(MESSAGE_LOADED_AIS_CHILD_LIST);
+			}
+		});
 	}
 
 	/**
@@ -163,18 +170,6 @@ public class Expert extends AisView {
 		return askLayout;
 	}
 
-	// 为静态Handler保存实例
-	private static Expert Instance;
-	private static Handler mHandler = new Handler() {
-	    /**
-	     * 实现消息处理
-	     */
-	    @Override
-	    public void handleMessage(Message msg) {
-	    	Instance.processWaitMessage(msg);
-	    }
-	};
-
 	/**
 	 * 初始化提问视图
 	 * @param expertId
@@ -213,12 +208,16 @@ public class Expert extends AisView {
 				Dialog.Confirm(mContext, R.string.confirm_ask_question, new ConfirmListener() {
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
-						mWaitDialog = WaitDialog.Show(mContext, "提问", "正在提问", new WaitListener() {
+						WaitDialog.Show(mContext, new WaitDialog.Action() {
 							@Override
-							public void startWait() {
+							public String getMessage() {
+								return "正在提问";
+							}
 
+							@Override
+							public void waitAction() {
 								Message msg = new Message();
-								msg.what = MESSAGE_ASK_QUESTION;
+								msg.what = MESSAGE_CHILD;
 								
 								if (DataMan.AskExpert(UserMan.GetUserId(), expertId, subject, question))
 									msg.arg1 = MESSAGE_ARG_OK;
@@ -226,6 +225,7 @@ public class Expert extends AisView {
 									msg.arg1 = MESSAGE_ARG_FAILED;
 								
 								mHandler.sendMessage(msg);
+								//mHandler.sendEmptyMessage(MESSAGE_LOADED_AIS_LIST);
 							}
 						});
 					}
@@ -236,18 +236,14 @@ public class Expert extends AisView {
 		initContent("向" + expertName + "提问", askLayout, mContentFrame[2]);
 	}
 
-	// 提问专家的消息
-	private static final int MESSAGE_ASK_QUESTION = 1;
 	/**
 	 * 出题提问等待
 	 * @param what
 	 */
-	protected void processWaitMessage(Message msg) {
+	@Override
+	protected void processChildMessage(Message msg) {
 		
-		// 隐藏进度条
-		mWaitDialog.dismiss();
-		
-		if (msg.what == MESSAGE_ASK_QUESTION) {
+		if (msg.what == MESSAGE_CHILD) {
 			if (msg.arg1 == MESSAGE_ARG_OK) {
 				Toast.makeText(mContext, "提问成功，请等待专家解答", Toast.LENGTH_LONG).show();
 				// 重新初始化问题列表，加载本地

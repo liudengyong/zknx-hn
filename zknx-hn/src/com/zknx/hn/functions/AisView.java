@@ -480,8 +480,9 @@ public class AisView extends FunctionView {
 		});
 	}
 	
-	private final static int MESSAGE_LOADED_AIS_CHILD_LIST = 1;
-	private final static int MESSAGE_LOADED_AIS_LIST = 2;
+	protected final static int MESSAGE_LOADED_AIS_CHILD_LIST = 1;
+	private   final static int MESSAGE_LOADED_AIS_LIST = 2;
+	protected final static int MESSAGE_CHILD = 3;
 
 	Handler mHandler = new Handler() {
 		@Override
@@ -495,7 +496,17 @@ public class AisView extends FunctionView {
 		   case MESSAGE_LOADED_AIS_LIST:
 			   initAisList(mAisTitle, mListMap, null, null);
 			   break;
+		   case MESSAGE_CHILD:
+			   processChildMessage(msg);
+			   break;
 		   }
 		}
 	};
+	
+	/**
+	 * ×ÓÀà¸²¸Ç
+	 * @param msg
+	 */
+	protected void processChildMessage(Message msg) {
+	}
 }
