@@ -1,377 +1,167 @@
 package com.zknx.hn;
 
-import com.zknx.hn.common.widget.Dialog;
-import com.zknx.hn.common.widget.WaitDialog;
-import com.zknx.hn.common.widget.WaitDialog.WaitListener;
+import java.io.BufferedReader;
+import java.io.FileOutputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.List;
+
+import com.zknx.hn.common.Debug;
+import com.zknx.hn.data.DataMan;
 import com.zknx.hn.data.UserMan;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.SharedPreferences.Editor;
-import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
-import android.view.animation.AnimationUtils;
+import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.WindowManager;
-import android.webkit.WebSettings;
-import android.webkit.WebView;
-import android.webkit.WebViewClient;
-import android.widget.TextView;
-import android.widget.ViewFlipper;
+import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.EditText;
+import android.widget.ProgressBar;
+import android.widget.Toast;
 
 public class Login extends Activity {
-
-	// 登录和注册html资源路径
-	private static final String ASSET_HTML_LOGIN    = "file:///android_asset/login.html";
-	private static final String ASSET_HTML_REGISTER = "file:///android_asset/register.html";
-
-	// 登录和注册url
-	private static final String URL_LOGIN    = "http://login/todo/";
-	private static final String URL_REGISTER = "http:///android_asset/register.html";
-
+	
 	private static final String KEY_USER_INFO = "user_info";
 	private static final String KEY_USER = "user";
 	private static final String KEY_PASSWD = "passwd";
 	private static final String KEY_REM_PASSWD = "remember_passwd";
-
+	
+	private static final String USER_INFO_FILE_NAME = "userinfo.dat";
+	
+	private Button   mBtnLogin;
+	private EditText mEditUser;
+	private EditText mEditPasswd;
+	private CheckBox mCheckBoxRemPasswd;
+	
 	private SharedPreferences mPreferences;
-
-	// 盛放Login和Register的Flipper
-	private ViewFlipper mViewFlipper;
-	// 标题
-	private TextView mTitle;
-
-	// 等待对话框(不能同时登录和注册)
-	private WaitDialog mWaitDialog;
-	// 注册或者登录返回值
-	private String mWaitRet;
-	// 注册和返回消息
-	private static final int MESSAGE_LOGIN    = 1;
-	private static final int MESSAGE_REGISTER = 2;
-
-	// 为静态Handler保存实例
-	private static Login LoginInstance;
-	private static Handler mHandler = new Handler() {
-	    /**
-	     * 实现消息处理
-	     */
-	    @Override
-	    public void handleMessage(Message msg) {
-	    	LoginInstance.processWaitMessage(msg.what);
-	    }
-	};
-
+	private static String mRetValue = "";
+	
+	private ProgressBar mProgressBar;
+	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
-		setContentView(R.layout.activity_html5_login);
+		setContentView(R.layout.login);
 		
-		mTitle = (TextView) findViewById(R.id.login_title_tv);
+		getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN); 
 		
-		getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+	    mEditUser = (EditText)findViewById(R.id.login_user);
+	    mEditPasswd = (EditText)findViewById(R.id.login_passwd);
+	    mBtnLogin = (Button)findViewById(R.id.login_submitbt);
+	    mCheckBoxRemPasswd = (CheckBox)findViewById(R.id.longin_check_rem_passwd);
+	    mProgressBar = (ProgressBar)findViewById(R.id.login_secondBar);
+	    mProgressBar.setVisibility(View.GONE);
+
+	    // 初始化配置
+	    InitConfig();
+	    
+	    mCheckBoxRemPasswd.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+				mPreferences = getSharedPreferences(KEY_USER_INFO,0);
+				mPreferences.edit().putBoolean(KEY_REM_PASSWD,isChecked).commit();
+			}
+		});
+	     
+	      mBtnLogin.setOnClickListener(new OnClickListener() {
+			public void onClick(View v) {
+				LoginNow();
+			}
+		});
+/*
+	    TextView regLink = (TextView)findViewById(R.id.login_reg_link);
+	    regLink.setText(Html.fromHtml("<a href=\"" + UIConst.REG_ADDRESS + "\">注册账号</a>"));
+	    regLink.setMovementMethod(LinkMovementMethod.getInstance());
+*/
+		// TODO A 调试登录
+			{
+				//mEditUser.setText("linshi");
+				//mEditPasswd.setText("123456");
+				//LoginNow();
+			}
+	}
+	
+	private void LoginNow() {
+		mProgressBar.setVisibility(View.VISIBLE);
+
+		// 把网络请求放到这里来
+		Runnable getdata = new Runnable(){   
+            public void run() {
+            	get_data_fun();  
+            }  
+        };
+
+        Thread thread =  new Thread(null, getdata, "getdata");  
+        thread.start(); 
+	}
+
+	// 网络请求反应慢的地方1
+	private void get_data_fun()
+	{
+		String useridString =mEditUser.getText().toString();
+		String passwordString = mEditPasswd.getText().toString();
 		
-		// 添加子功能按钮
-        mViewFlipper = (ViewFlipper)findViewById(R.id.login_flipper);
-        
-        mPreferences = getSharedPreferences(KEY_USER_INFO, 0);
-
-        // 添加并初始化登录视图
-        mViewFlipper.addView(getLoginView());
-        // 添加并初始化注册视图
-        mViewFlipper.addView(getRegisterView());
-
-		// 调试登录
-        /*
-		if (App.mDebug) {
-			mJsInterface.user = "12345678";
-        	mJsInterface.passwd = "12345678";
+		try {
+			mRetValue = UserMan.Login(useridString, passwordString);
+		} catch (Exception e) {
+			//Log.e("BACKGROUND_PROC", e.getMessage());
 		}
-		*/
-		
-		LoginInstance = this;
-	}
 
-	/**
-	 * 初始化html5登录视图
-	 */
-	private WebView getLoginView() {
-		WebView webView = getWebView(ASSET_HTML_LOGIN);
-		return webView;
-	}
+		if (mRetValue != null) {
+			String token[] = mRetValue.split(DataMan.COMMON_TOKEN); 
 	
-	/**
-	 * 初始化html5注册视图
-	 */
-	private WebView getRegisterView() {
-		WebView webView = getWebView(ASSET_HTML_REGISTER);
-		return webView;
-	}
-
-	/**
-	 * 获取注册的WebView
-	 */
-	@SuppressLint("SetJavaScriptEnabled")
-	private WebView getWebView(String url) {
-
-		WebView webView = new WebView(this);
-
-		WebSettings settings = webView.getSettings();
-        settings.setSupportZoom(true);          // 支持缩放
-        settings.setBuiltInZoomControls(true);  // 启用内置缩放装置
-        settings.setJavaScriptEnabled(true);    // 启用JS脚本
-        settings.setDefaultTextEncodingName("GBK");
-        
-        // 添加JS接口
-        webView.addJavascriptInterface(mJsInterface, "zknx");
-        
-        webView.setWebViewClient(mWebViewClient);
-
-        // 加载assets中的html文件
-        webView.loadUrl(url);
-
-        return webView;
-	}
-	
-	/**
-	 * 处理注册/登录消息
-	 */
-	private void processWaitMessage(int message) {
-
-		// 隐藏等待进度条
-    	mWaitDialog.dismiss();
-    	
-    	// 登录和注册接口返回空表示成功，失败返回失败消息
-		if (mWaitRet == null) {
-	    	if (MESSAGE_LOGIN == message) {
-	    		// 登录成功保存信息
-	    		mJsInterface.saveConfig();
-				Dialog.Toast(this, R.string.login_success);
+			if (token != null && token.length == 6)
+			{
 				successLogin();
-	    	} else if (MESSAGE_REGISTER == message) {
-	    		// 注册成功后跳转到登录界面
-				Dialog.Toast(this, R.string.register_success);
-				switchLoginRegisterView(false);
-	    	}
-		} else {
-			String failedMessagePrefix = (MESSAGE_LOGIN == message) ? "登录失败：" : "注册失败：";
-
-			Dialog.MessageBox(this, failedMessagePrefix + mWaitRet);
+			}
 		}
+
+		runOnUiThread(returnRes);
 	}
 	
-	private JsInterface mJsInterface = new JsInterface();
-
-	/**
-	 * 本地JS接口，用于初始化，保存设置，登录，注册
-	 * @author Dengyong
-	 *
-	 */
-	class JsInterface {
-
-		// 上次登录信息
-		String user;
-		String passwd;
-		boolean remember;
-		
-		JsInterface() {
-		}
-
-	    /**
-	     * 初始化上次配置
-	     */
-	    public void initConfig() {
-	    	user     = mPreferences.getString(KEY_USER, null);
-	    	remember = mPreferences.getBoolean(KEY_REM_PASSWD, false);
-	    	
-	    	if (remember)
-	    		passwd = mPreferences.getString(KEY_PASSWD, null);
-	    }
-	    
-	    /**
-	     * 开始登录
-	     */
-	    public void login(String _user, String _passwd, boolean _remember) {
-	    	user = _user;
-	    	passwd = _passwd;
-	    	remember = _remember;
-	    	tryLogin();
-	    }
-	    
-	    /**
-	     * 保存配置
-	     */
-	    private void saveConfig() {
-	    	Editor editor = mPreferences.edit();
-
-	    	editor.putString(KEY_USER, user);
-	    	editor.putBoolean(KEY_REM_PASSWD, remember);
-
-	    	if (remember)
-	    		editor.putString(KEY_PASSWD, passwd);
-	    	else
-	    		editor.putString(KEY_PASSWD, "");
-
-	    	editor.commit();
-	    }
-
-	    /**
-	     * 开始登录：弹出等待进度条，启动新线程连接服务器登录
-	     */
-		private void startLogin() {
-
-			WaitListener loginThread = new WaitListener() {
-				/**
-				 * 开始登录
-				 */
-				@Override
-				public void startWait() {
-					//UserMan.SetUserInfo("dengyong", "dengyong", "01", "北京市双惠小区", "18911939853");
-					mWaitRet = UserMan.Login(mJsInterface.getUser(), mJsInterface.getPasswd());
-					mHandler.sendEmptyMessage(MESSAGE_LOGIN);
-				}
-			};
-
-			// 创建等待进度条
-			mWaitDialog = WaitDialog.Show(Login.this, null, "正在登录", loginThread);
-		}
-		
-	    /**
-	     * 开始注册：弹出等待进度条，启动新线程连接服务器注册
-	     */
-		private void startRegister() {
-			
-			WaitListener registerThread = new WaitListener() {
-				/**
-				 * 开始注册
-				 */
-				@Override
-				public void startWait() {
-					
-					//mWaitRet = UserMan.Register();
-					
-					mHandler.sendEmptyMessage(MESSAGE_REGISTER);
-				}
-			};
-			
-			// 创建等待进度条
-			mWaitDialog = WaitDialog.Show(Login.this, "注册", "正在注册", registerThread);
-		}
-		
-		/**
-		 * 获取用户名
-		 * @return
-		 */
-		public String getUser() {
-			return (user == null) ? "" : user;
-		}
-		
-		/**
-		 * 获取用户密码
-		 * @return
-		 */
-		public String getPasswd() {
-			return (!remember || passwd == null) ? "" : passwd;
-		}
-
-		/**
-		 * 获取是否记住密码
-		 * @return
-		 */
-		public boolean getRemember() {
-			return remember;
-		}
-	}
+	//网络请求反应慢的地方2
 	
-	private WebViewClient mWebViewClient = new WebViewClient() {
-		@Override
-    	public boolean shouldOverrideUrlLoading(WebView webView, String url) {
+	private Runnable returnRes = new Runnable() {
+		@SuppressLint({ "WorldReadableFiles", "WorldWriteableFiles" })
+		public void run() {
+			//在这里更新UI
 			
-			//Debug.Log("loadUrl:" + url);
+			mProgressBar.setVisibility(View.GONE);
 			
-    		//view.loadUrl(url);
+			//log.e("login", "登录成功"+arrayString[0]+arrayString[1]+arrayString[2]+arrayString[3]+arrayString[4]+arrayString[5]+arrayString[6]+arrayString[7]);
 
-    		//boolean currentLoginView = !url.startsWith(URL_REGISTER);
-    		
-    		// XXX 集成注册框
-    		//switchLoginRegisterView(currentLoginView);
-    		
-    		// 截获登录地址，避免出现WebView"网页找不到"提示
-    		if (url.startsWith(URL_LOGIN)) {
-    			//tryLogin(webView);
-    			webView.loadUrl("javascript:login()");
-    		} else if (url.startsWith(URL_REGISTER)) {
-    			mJsInterface.startRegister();
-    		} else {
-    			runBrowserActivity(url);
-    		}
-
-    		return true;
-    	}
-    	
-    	/**
-    	 * 页面加载完成事件
-    	 */
-		@Override
-    	public void onPageFinished(WebView webView, String url) {
-    	}
+			if (mRetValue != null) {
+				String token[] = mRetValue.split(DataMan.COMMON_TOKEN); 
+		
+				if (token != null && token.length == 6)
+				{
+					if (mCheckBoxRemPasswd.isChecked()) {
+						mPreferences=getSharedPreferences(KEY_USER_INFO, Context.MODE_WORLD_READABLE|Context.MODE_WORLD_WRITEABLE);
+						mPreferences.edit().putString(KEY_USER,mEditUser.getText().toString()).commit();
+						mPreferences.edit().putString(KEY_PASSWD,mEditPasswd.getText().toString()).commit();
+					}
+					
+					Toast.makeText(Login.this, "登录成功", Toast.LENGTH_LONG).show();
+					
+					successLogin();
+					return;
+				}
+			}
+			
+			Toast.makeText(Login.this, "登录失败", Toast.LENGTH_LONG).show();
+        }
     };
     
-    /**
-     * 尝试登录
-     */
-    private void tryLogin() {
-        
-    	if (mJsInterface.user == null || mJsInterface.user.length() == 0)
-    		Dialog.MessageBox(this, R.string.empty_username);
-    	else if (mJsInterface.passwd == null || mJsInterface.passwd.length() == 0)
-    		Dialog.MessageBox(this, R.string.empty_passwd);
-    	else
-    		mJsInterface.startLogin();
-    }
-    
-    /**
-     * 启动系统浏览器注册
-     */
-    void runBrowserActivity(final String url) {
-    	Runnable action = new Runnable() {
-            @Override
-            public void run() {
-            	// 跳转系统浏览器
-    			Intent intent= new Intent();        
-                intent.setAction(Intent.ACTION_VIEW);    
-                intent.setData(Uri.parse(url));           
-                startActivity(intent);
-            }
-    	};
-
-    	// 界面线程中运行
-		runOnUiThread(action);
-    }
-    
-    /**
-     * 切换登录和注册界面
-     */
-	private void switchLoginRegisterView(boolean currentLoginView) {
-    	
-    	if (currentLoginView) {
-    		// 设置标题为注册
-    		mTitle.setText(R.string.please_register);
-    		mViewFlipper.setInAnimation(AnimationUtils.loadAnimation(this, R.anim.zoom_in));
-    		mViewFlipper.setOutAnimation(AnimationUtils.loadAnimation(this, R.anim.zoom_out));
-    		mViewFlipper.showNext();
-    	} else {
-    		// 设置标题为登录
-    		mTitle.setText(R.string.please_login);
-    		mViewFlipper.setInAnimation(AnimationUtils.loadAnimation(this, R.anim.zoom_in));
-    		mViewFlipper.setOutAnimation(AnimationUtils.loadAnimation(this, R.anim.zoom_out));
-    		mViewFlipper.showPrevious();
-    	}
-    }
-
     /***
      * 登录成功，调出Pending的功能界面，退出登录界面
      */
@@ -388,4 +178,11 @@ public class Login extends Activity {
     	intent.setClass(this, Function.class);
     	startActivity(intent);
 	} 
+
+    private void InitConfig() {
+    	mPreferences = getSharedPreferences(KEY_USER_INFO, 0);
+    	mEditUser.setText(mPreferences.getString(KEY_USER,null));
+    	mEditPasswd.setText(mPreferences.getString(KEY_PASSWD, null));
+    	mCheckBoxRemPasswd.setChecked(mPreferences.getBoolean(KEY_REM_PASSWD, false));
+    }
 }

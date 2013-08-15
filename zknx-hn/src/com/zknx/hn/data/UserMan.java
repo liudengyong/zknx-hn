@@ -126,7 +126,7 @@ public class UserMan {
 					return "µÇÂ¼´íÎó£º" + ret;
 				}
 
-				return null;
+				return value;
 			} else {
 				return "ÓÃ»§Ãû»òÃÜÂë´íÎó£¡";
 			}

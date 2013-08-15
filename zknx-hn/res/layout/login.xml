@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+ <LinearLayout
+     xmlns:android="http://schemas.android.com/apk/res/android"
+     android:layout_width="400dip"
+     android:layout_height="fill_parent"
+     android:orientation="vertical"
+     android:background="#00000000" >
+
+     <TextView
+        android:textIsSelectable="true"
+        android:background="@drawable/button_normal"
+        android:text="@string/please_login"
+        android:layout_gravity="top"
+        style="@style/TitleText" />
+	
+	<LinearLayout
+	    android:layout_height="wrap_content"
+	    android:layout_width="fill_parent"
+	    android:orientation="vertical"
+	    android:background="#F0C0C0C0" >
+	
+	    <LinearLayout
+	        android:layout_width="fill_parent"
+	        android:layout_height="wrap_content"
+	        android:orientation="horizontal"
+	        android:layout_margin="4dip">
+	
+            <TextView
+                android:layout_width="0dip"
+                android:layout_height="fill_parent"
+                android:gravity="center"
+                android:text="用户名"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textColor="?android:attr/textColorSecondaryInverse"
+                android:layout_weight="0.7" />
+
+            <EditText
+                android:id="@+id/login_user"
+                android:layout_width="0dip"
+                android:layout_height="wrap_content"
+                android:hint="请输入用户名"
+                android:layout_weight="1"
+                android:background="@drawable/edit_text_holo_dark" >
+                <requestFocus />
+            </EditText>
+
+			<TextView
+	            android:id="@+id/login_reg_link"
+	            android:layout_width="0dip"
+	            android:layout_height="wrap_content"
+	            android:layout_weight="0.7"
+	            android:textAppearance="?android:attr/textAppearanceMedium"
+	            android:textColor="?android:attr/textColorSecondaryInverse"
+	            android:gravity="center"
+	            android:text="" />
+			
+			</LinearLayout>
+
+	    <LinearLayout
+	        android:layout_width="fill_parent"
+	        android:layout_height="wrap_content"
+	        android:orientation="horizontal"
+	        android:layout_marginLeft="4dip"
+	        android:layout_marginRight="4dip"
+	        android:layout_marginBottom="4dip" >
+
+            <TextView
+                android:layout_width="0dip"
+                android:layout_height="fill_parent"
+                android:layout_weight="0.7"
+                android:gravity="center"
+                android:text="密码"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textColor="?android:attr/textColorSecondaryInverse" />
+
+            <EditText
+                android:id="@+id/login_passwd"
+                android:layout_width="0dip"
+                android:layout_height="wrap_content"
+                android:inputType="textPassword"
+                android:layout_weight="1"
+                android:background="@drawable/edit_text_holo_dark" />
+
+			<CheckBox
+	            android:id="@+id/longin_check_rem_passwd"
+	            android:layout_width="0dip"
+	            android:layout_height="wrap_content"
+	            android:text="记住密码"
+	            android:textSize="16sp"
+	            android:textColor="?android:attr/textColorSecondaryInverse"
+	            android:textAppearance="?android:attr/textAppearanceMedium"
+	            android:layout_weight="0.7"
+	            android:button="@drawable/checkbox" />
+		</LinearLayout>
+	
+	    <LinearLayout
+	        android:layout_width="fill_parent"
+	        android:layout_height="wrap_content"
+	        android:orientation="horizontal">
+	        <!--Button
+	            android:id="@+id/login_resetbt"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:layout_weight="1.4"
+	            android:text="@string/reset" >
+	
+	        </Button-->
+	
+	        <Button
+	            android:id="@+id/login_submitbt"
+	            android:layout_width="fill_parent"
+	            android:layout_height="wrap_content"
+	            android:text="登陆"
+	            android:layout_margin="2dip"
+	            style="@style/ClassBtn" />
+	        
+	    </LinearLayout>
+	    
+	    <ProgressBar
+			android:id="@+id/login_secondBar"
+			style="?android:attr/progressBarStyle"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_gravity="center"
+			android:indeterminateDrawable="@drawable/progress_bar"
+			android:visibility="gone" />
+
+	    </LinearLayout>
+
+ </LinearLayout>
