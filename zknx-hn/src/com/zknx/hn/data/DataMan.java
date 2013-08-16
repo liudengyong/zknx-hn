@@ -695,8 +695,15 @@ public class DataMan extends DataInterface {
 	public static ProductPriceInfo GetHistoryPrice(String product_id, String market_id) {
 		
 		// 产品id或者市场id为空的话返回空
-		if (market_id == null || product_id == null)
+		if (market_id == null || product_id == null) {
+			/* CODE for TEST
+			ProductPriceInfo info = new ProductPriceInfo();
+			info.add("10-13", 10.0F);
+			info.add("10-14", 14.0F);
+			return info;
+			*/
 			return null;
+		}
 		
 		/* 测试用数据
 		
@@ -974,7 +981,7 @@ public class DataMan extends DataInterface {
 		if (lines.size() == 0)
 			return;
 
-		int count = 1;
+		//int count = 1;
 		for (String line : lines) {
 			String[] token = GetToken(line);
 			if (token.length != 16)
