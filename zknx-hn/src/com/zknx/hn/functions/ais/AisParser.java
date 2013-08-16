@@ -18,7 +18,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.webkit.WebView;
+import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 
 public class AisParser {
 
@@ -28,12 +30,18 @@ public class AisParser {
 	private AisItem mAudioItem;
 	private AisItem mVideoItem;
 	
+	private Button mAudioBtn;
+	private Button mVideoBtn;
+	
 	MediaPlayer mPlayer;
 
 	public AisParser(LayoutInflater inflater) {
 		mInflater = inflater;
 		
 		mPlayer = new MediaPlayer();
+		
+		mAudioItem = null;
+		mVideoBtn = null;
 	}
 	
 	/**
@@ -69,7 +77,7 @@ public class AisParser {
 		LinearLayout aisLayout = (LinearLayout) inflater.inflate(R.layout.ais_view, null);
 
 		// 音视频图标
-		LinearLayout mediaIconLayout = (LinearLayout) aisLayout.findViewById(R.id.ais_view_media_icon);
+		RelativeLayout mediaIconLayout = (RelativeLayout) aisLayout.findViewById(R.id.ais_view_media_icon);
 		
 		// Ais内容滚动视图
 		LinearLayout contentLayout = (LinearLayout) aisLayout.findViewById(R.id.ais_content_view);
@@ -124,7 +132,7 @@ public class AisParser {
 	 * @param root
 	 * @return
 	 */
-	private AisHeader parseAis(Context context, String date, String aisFileName, LinearLayout contentLayout, Object jsInterface, LinearLayout mediaIconLayout) {
+	private AisHeader parseAis(Context context, String date, String aisFileName, LinearLayout contentLayout, Object jsInterface, RelativeLayout mediaIconLayout) {
 		// 获取解析后的ais文档
 		AisDoc aisDoc = new AisDoc(context, aisFileName, false, date);
 		
@@ -132,8 +140,44 @@ public class AisParser {
 		mAudioItem = aisDoc.getAudioItem();
 		mVideoItem = aisDoc.getVideoItem();
 		
-		initMediaImage(mediaIconLayout, R.id.ais_view_audio_icon, mAudioItem);
-		initMediaImage(mediaIconLayout, R.id.ais_view_video_icon, mVideoItem);
+		mAudioItem = null;
+		mVideoBtn = null;
+
+		// 没有媒体就隐藏
+		if (mAudioItem == null &&
+			mVideoItem == null)
+			mediaIconLayout.setVisibility(View.GONE);
+		else {
+			mAudioBtn = (Button) mediaIconLayout.findViewById(R.id.ais_view_audio_icon_btn);
+			if (mAudioItem != null) {
+				// 音视频图标可点击
+				mAudioBtn.setOnClickListener(mClickMediaIcon);
+			} else {
+				mAudioBtn.setVisibility(View.GONE);
+			}
+
+			mVideoBtn = (Button) mediaIconLayout.findViewById(R.id.ais_view_video_icon_btn);
+			if (mVideoItem != null) {
+				// 音视频图标可点击
+				mVideoBtn.setOnClickListener(mClickMediaIcon);
+			} else {
+				mVideoBtn.setVisibility(View.GONE);
+			}
+
+			/*
+			mediaIconLayout.setOnFocusChangeListener(new OnFocusChangeListener() {
+				@Override
+				public void onFocusChange(View view, boolean focused) {
+					if (focused) {
+						if (mAudioBtn != null)
+							mAudioBtn.requestFocus();
+						else if (mVideoItem != null)
+							mVideoBtn.requestFocus();
+					}
+				}
+			});
+			*/
+		}
 
 		// Ais内容滚动视图
 		WebView webView = (WebView) contentLayout.findViewById(R.id.ais_webview);
@@ -151,20 +195,6 @@ public class AisParser {
 
 		return aisDoc.getHeader();
 	}
-	
-	
-	/**
-	 * 初始化音视频监听事件
-	 * @param mediaResId
-	 */
-	private void initMediaImage(LinearLayout mediaIconLayout, int mediaResId, AisItem mediaAisItem) {
-		if (mediaAisItem != null) {
-			mediaIconLayout.setVisibility(View.VISIBLE);
-			View mediaView = mediaIconLayout.findViewById(mediaResId);
-			mediaView.setVisibility(View.VISIBLE);
-			mediaView.setOnClickListener(mClickMediaIcon);
-		}
-	}
 
 	/**
 	 * 播放音视频
@@ -174,10 +204,10 @@ public class AisParser {
 		public void onClick(View view) {
 			
 			switch (view.getId()) {
-			case R.id.ais_view_audio_icon:
+			case R.id.ais_view_audio_icon_btn:
 				playAudio();
 				break;
-			case R.id.ais_view_video_icon:
+			case R.id.ais_view_video_icon_btn:
                 playVideo();
                 break;
 			default:

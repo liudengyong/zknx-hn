@@ -4,50 +4,25 @@
     android:orientation="vertical"
     android:padding="10sp" >
 
-    <LinearLayout
+    <RelativeLayout
         android:id="@+id/ais_view_media_icon"
-	    android:layout_width="wrap_content"
+	    android:layout_width="match_parent"
 	    android:layout_height="wrap_content"
 	    android:orientation="horizontal"
 	    android:layout_gravity="right"
-	    android:visibility="gone">
-	    
-        <LinearLayout
-	        android:id="@+id/ais_view_audio_icon"
-		    android:layout_width="wrap_content"
-		    android:layout_height="wrap_content"
-		    android:orientation="horizontal"
-		    android:paddingRight="10sp"
-		    android:visibility="gone" >
+	    android:paddingRight="10sp" >
 
-	        <ImageView
-			    android:layout_width="wrap_content"
+        	<Button android:id="@+id/ais_view_audio_icon_btn"
+        	    android:layout_width="wrap_content"
 			    android:layout_height="wrap_content"
-			    android:src="@drawable/ic_audio" />
-	        <TextView
-			    android:layout_width="wrap_content"
+			    android:layout_alignParentLeft="true"
+			    android:text="音频"/>
+        	<Button android:id="@+id/ais_view_video_icon_btn"
+        	    android:layout_width="wrap_content"
 			    android:layout_height="wrap_content"
-			    android:text="@string/audio" />
-	    </LinearLayout>
-
-        <LinearLayout
-	        android:id="@+id/ais_view_video_icon"
-		    android:layout_width="wrap_content"
-		    android:layout_height="wrap_content"
-		    android:orientation="horizontal"
-		    android:paddingRight="10sp"
-		    android:visibility="gone" >
-
-	        <ImageView
-			    android:layout_width="wrap_content"
-			    android:layout_height="wrap_content"
-			    android:src="@drawable/ic_video" />
-	        <TextView
-			    android:layout_width="wrap_content"
-			    android:layout_height="wrap_content"
-			    android:text="@string/video" />
-	    </LinearLayout>
-	</LinearLayout>
+			    android:layout_toRightOf="@+id/ais_view_audio_icon_btn"
+			    android:text="视频" />
+	</RelativeLayout>
 
     <ScrollView
         android:layout_width="match_parent"
