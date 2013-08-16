@@ -53,10 +53,13 @@ public class PriceChart extends View {
 
     // 配置常量
     // 走势图跟父视图之间的间隔
- 	static final int CHART_PADDING = 24;
+    // 垂直间隔
+ 	static final int CHART_PADDING_VERTICAL = 24;
+ 	// 水平间隔
+ 	static final int CHART_PADDING_HORIZON = 38;
 
  	// XXX 固定价格分辨率？ 水平网格固定数目 （8个格）
-	private static final int PRICE_GRID_COUNT = 8;
+	private static final int PRICE_GRID_COUNT = 4;
 	
 	// XXX 调整日期单位（字体大小和为位置）
     
@@ -122,28 +125,28 @@ public class PriceChart extends View {
 	 * 获取padding后的x坐标
 	 */
 	private float getRealX() {
-		return (getX() + CHART_PADDING);
+		return (getX() + CHART_PADDING_HORIZON);
 	}
 	
 	/**
 	 * 获取padding后的y坐标
 	 */
 	private float getRealY() {
-		return (getY() + CHART_PADDING);
+		return (getY() + CHART_PADDING_VERTICAL);
 	}
 	
 	/**
 	 * 获取padding后的宽度
 	 */
 	private int getRealWidth() {
-		return (getWidth() - 2* CHART_PADDING);
+		return (getWidth() - 2* CHART_PADDING_HORIZON);
 	}
 	
 	/**
 	 * 获取padding后的告诉
 	 */
 	private int getRealHeight() {
-		return (getHeight() - 2* CHART_PADDING);
+		return (getHeight() - 2* CHART_PADDING_VERTICAL);
 	}
 	
 	@Override  
@@ -224,11 +227,11 @@ public class PriceChart extends View {
         float fontHeight = (float) Math.ceil(fm.descent - fm.ascent);
 
         // 水平网格，画时间单位（月份？）
-        float fixedDateY = yStart + height + fontHeight;
+        float fixedDateY = yStart + height + fontHeight + 2/*padding bottom*/;
         for (int i = 0; i < points.points.length; ++i) {
         	// 画日期
         	if (i == points.points.length - 1)
-        		xStart -= 50; // 最后一个日期向左偏移
+        		xStart -= 4; // 最后一个日期向左偏移
         	
         	canvas.drawText(mPriceInfo.getDate(i), xStart, fixedDateY, mPaintAxisUnit);
 
@@ -249,7 +252,7 @@ public class PriceChart extends View {
         
         // 竖直网格（价格）固定数目？
         // 需要多画一个，需要画9个价格（包括最高和最低）
-        float fixedPriceX = getX(); // 右移padding
+        float fixedPriceX = getX() + 2; // 右移padding
         for (int i = 0; i <= PRICE_GRID_COUNT; ++i) {
         	
         	// 画价格单位以及网格价格值
@@ -274,7 +277,7 @@ public class PriceChart extends View {
         // 竖直网格
         for (int i = 0; i < points.points.length; ++i) {
         	float nextY = yStart + height;
-            mPathGrid.moveTo(xStart, yStart - CHART_PADDING); // 补全padding，竖直填满
+            mPathGrid.moveTo(xStart, yStart - CHART_PADDING_VERTICAL); // 补全padding，竖直填满
             mPathGrid.lineTo(xStart, nextY);
             
             xStart += points.dateStep;
@@ -290,7 +293,7 @@ public class PriceChart extends View {
         // 需要多画一个（包括最高和最低价格）
         for (int i = 0; i <= PRICE_GRID_COUNT; ++i) {
         	// 水平网格
-        	float nextX = xStart + width + CHART_PADDING;
+        	float nextX = xStart + width + CHART_PADDING_HORIZON;
         	
         	mPathGrid.moveTo(xStart, yStart); // 补全padding，水平填满
         	mPathGrid.lineTo(nextX, yStart);
