@@ -426,7 +426,7 @@ CString column_child16[]={"生产类","生活类","医疗类","教育类"};
 		if (rightAnwserBytes != null) {
 			for (byte a : rightAnwserBytes)
 				// 答案长度一定，如果不是全部正确则会余0
-				if (a != 0)
+				if (Character.isLetter(a))
 					rightAnwser += (char)a;
 		}
 		
@@ -449,11 +449,12 @@ CString column_child16[]={"生产类","生活类","医疗类","教育类"};
 	 * @return
 	 */
 	public String getQuestionNote(int i) {
+		String anwser = "答案" + getQuestionAnswer(i) + "。";
 		if (mQuestionList == null || mQuestionList.size() <= 0 ||
 			mQuestionList.get(i).note == null)
-			return "无";
+			return anwser + "无";
 		
-		return mQuestionList.get(i).note;
+		return anwser + mQuestionList.get(i).note;
 	}
 	
 	/**
