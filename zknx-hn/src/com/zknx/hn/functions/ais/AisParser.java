@@ -261,10 +261,14 @@ public class AisParser {
 	 */
 	private void playVideo() {
 		if (mVideoItem != null) {
-			String tmpFile = DataMan.DataFile("tmp.mp4");
-			FileUtils.WriteFile(tmpFile, mVideoItem.data);
+			// 播放保存好的视频文件
+			String tmpFile = mVideoItem.fileName;
+			String rmvbMimetype = "audio/x-pn-realaudio";
+			String mimetype = "video/mp4";
+			// TODO 测试rmvb视频
+
 			Intent it = new Intent(Intent.ACTION_VIEW);  
-	        it.setDataAndType(Uri.parse(tmpFile), "video/mp4");  
+	        it.setDataAndType(Uri.parse(tmpFile), mimetype);
 	        mInflater.getContext().startActivity(it);
 		}
 	}

@@ -1,6 +1,7 @@
 package com.zknx.hn.functions.ais;
 
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
@@ -133,6 +134,8 @@ CString column_child16[]={"生产类","生活类","医疗类","教育类"};
 	private AisItem mVideoItem;
 	// 图像Items
 	private AisItem[] mImageItems;
+	// 用于ais内图片计数
+	private int mImageIndex;
 
 	/**
 	 * 通过ais_id构造AisDoc
@@ -184,9 +187,16 @@ CString column_child16[]={"生产类","生活类","医疗类","教育类"};
 			type = _type;
 			data = _data;
 		}
+		
+		AisItem(ItemType _type, String _fileName) {
+			type = _type;
+			data = null;
+			fileName = _fileName;
+		}
 
 		ItemType type; // 类型
 		byte data[]; // 数据
+		String fileName;
 		
 		/**
 		 * 保存文字byte数组
@@ -252,6 +262,8 @@ CString column_child16[]={"生产类","生活类","医疗类","教育类"};
 			if (parseHeader)
 				return (mHeader != null);
 			
+			mImageIndex = 0;
+			
 			// 生成行树
 			mItemTree = new ArrayList<List<AisItem>>();
 			// 默认生成一个空行
@@ -292,45 +304,33 @@ CString column_child16[]={"生产类","生活类","医疗类","教育类"};
 
 				//Debug.Log("item长度：" + length);
 
-				byte[] data;
-				try {
-					data = new byte[length];
-				} catch (Throwable e) {
-					Debug.Log("严重错误：内存不足，parseAisDoc");
-					if (context != null)
-						Dialog.Toast(context, "解析AIS内存不足：" + (length / 1024) + "K");
-					return false;
-				}
-
-				if (length != file.read(data)) {
-					Debug.Log("严重错误：Ais解析，读取数据错误！");
-					return false;
-				}
-
 				switch (v) {
 				case DataMan.AIS_TOKEN:
 					Debug.Log("TODO:文字");
 					break;
 				case DataMan.AIS_TOKEN_FONT:
-					Debug.Log("字体结构：" + data);
+					Debug.Log("TODO：字体结构");
 					break;
 				case DataMan.AIS_TOKEN_COURSE_ANSWER:
 				case DataMan.AIS_TOKEN_COURSE_GRADE:
 				case DataMan.AIS_TOKEN_COURSE_NOTE:
-					if (isCourse())
-						addQuestion(v, data);
-					else
+					if (isCourse()) {
+						addQuestion(v, readAisData(context, file, length));
+					} else
 						Debug.Log("Ais结构错误：非试卷不应有答案结构，" + mHeader.column);
 					break;
 				case DataMan.AIS_TOKEN_IMAGE:
 					if (isCourse())
-						addQuestion(v, data);
+						addQuestion(v, readAisData(context, file, length));
 					else {
 						if (mImageItems == null)
 							mImageItems = new AisItem[3];
+						
+						// TODO 替换成readAisToFile
+						//String imageFileName = DataMan.DataFile("ais_image_" + mImageIndex + ".jpg", true);
 	
 						// 换行
-						AisItem imageItem = new AisItem(ItemType.IMAGE, data);
+						AisItem imageItem = new AisItem(ItemType.IMAGE, readAisData(context, file, length));
 						
 						if (mImageItems[0] == null)
 							mImageItems[0] = imageItem;
@@ -344,16 +344,19 @@ CString column_child16[]={"生产类","生活类","医疗类","教育类"};
 					break;
 				case DataMan.AIS_TOKEN_VIDEO:
 					// 只有一个视频Item
-					if (mVideoItem == null)
-						mVideoItem = new AisItem(ItemType.VIDEO, data);
-					else
+					if (mVideoItem == null) {
+						String fileName = DataMan.DataFile("ais_video.rmvb", true);
+						mVideoItem = new AisItem(ItemType.VIDEO, readAisToFile(context, fileName, file, length));
+					} else
 						Debug.Log("解析Ais警告：多余一个视频Item");
 					break;
 				case DataMan.AIS_TOKEN_AUDIO:
 					// 只有一个音频Item
-					if (mAudioItem == null)
-						mAudioItem = new AisItem(ItemType.AUDIO, data);
-					else
+					if (mAudioItem == null) {
+						// TODO 替换成readAisToFile
+						//String fileName = DataMan.DataFile("ais_audio.mp3", true);
+						mAudioItem = new AisItem(ItemType.AUDIO, readAisData(context, file, length));
+					} else
 						Debug.Log("解析Ais警告：多余一个音频Item");
 					break;
 				}
@@ -374,6 +377,79 @@ CString column_child16[]={"生产类","生活类","医疗类","教育类"};
 		
 		return true;
 	}
+	
+	/**
+	 * 保存AIS解析数据到临时file
+	 * @return
+	 * 正确保存数据后返回保存的文件名，否则返回null
+	 * @throws IOException 
+	 */
+	String readAisToFile(Context context, String fileName, FileInputStream aisFile, int length) throws IOException {
+		int bufferLength = 1024 * 1024; // 1MB
+
+		if (length < bufferLength)
+			bufferLength = length;
+
+		byte[] data;
+		try {
+			data = new byte[bufferLength];
+		} catch (Throwable e) {
+			if (context != null)
+				Dialog.Toast(context, "解析AIS内存不足：" + (bufferLength / 1024) + "K");
+			return null;
+		}
+
+		if (!FileUtils.IsFileExist(fileName))
+			FileUtils.CreateFile(fileName);
+
+        FileOutputStream fileWriter = new FileOutputStream(fileName);
+
+		int leftByte = length;
+		do {
+			int readed = aisFile.read(data);
+
+			if (bufferLength <= 0) {
+				Debug.Log("readAisToFile严重错误：Ais解析，读取数据错误！");
+				fileWriter.close();
+				return null;
+			}
+
+			// 保存解析ais的数据
+			fileWriter.write(data, 0, readed);
+
+			leftByte -= readed;
+		} while (leftByte > 0);
+		
+		fileWriter.close();
+		
+		// 保存成功
+		return fileName;
+	}
+	
+	/**
+	 * 保存AIS解析数据到内存
+	 * @return
+	 * 正确解析数据后返回data数据，否则返回null
+	 */
+	byte[] readAisData(Context context, FileInputStream file, int length) throws IOException {
+		byte[] data;
+		try {
+			data = new byte[length];
+		} catch (Throwable e) {
+			Debug.Log("严重错误：内存不足，parseAisDoc");
+			if (context != null)
+				Dialog.Toast(context, "解析AIS内存不足：" + (length / 1024) + "K");
+			return null;
+		}
+
+		if (length != file.read(data)) {
+			Debug.Log("严重错误：Ais解析，读取数据错误！");
+			return null;
+		}
+
+		return data;
+	}
+
 
 	/**
 	 * 添加答案到当前问题
@@ -474,6 +550,10 @@ CString column_child16[]={"生产类","生活类","医疗类","教育类"};
 	private void addQuestion(int v, byte[] data) throws IOException {
 		if (!isCourse()) {
 			throw new IOException("Ais结构错误：非试卷不应有答案结构，" + mHeader.column);
+		}
+		
+		if (data == null) {
+			throw new IOException("内存不足：Should hit in readAisData");
 		}
 
 		// 题干图片
