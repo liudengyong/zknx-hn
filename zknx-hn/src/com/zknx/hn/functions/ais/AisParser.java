@@ -30,9 +30,6 @@ public class AisParser {
 	private AisItem mAudioItem;
 	private AisItem mVideoItem;
 	
-	private Button mAudioBtn;
-	private Button mVideoBtn;
-	
 	MediaPlayer mPlayer;
 
 	public AisParser(LayoutInflater inflater) {
@@ -41,7 +38,7 @@ public class AisParser {
 		mPlayer = new MediaPlayer();
 		
 		mAudioItem = null;
-		mVideoBtn = null;
+		mVideoItem = null;
 	}
 	
 	/**
@@ -139,16 +136,13 @@ public class AisParser {
 		// 初始化音视频图标监听
 		mAudioItem = aisDoc.getAudioItem();
 		mVideoItem = aisDoc.getVideoItem();
-		
-		mAudioItem = null;
-		mVideoBtn = null;
 
 		// 没有媒体就隐藏
 		if (mAudioItem == null &&
 			mVideoItem == null)
 			mediaIconLayout.setVisibility(View.GONE);
 		else {
-			mAudioBtn = (Button) mediaIconLayout.findViewById(R.id.ais_view_audio_icon_btn);
+			Button mAudioBtn = (Button) mediaIconLayout.findViewById(R.id.ais_view_audio_icon_btn);
 			if (mAudioItem != null) {
 				// 音视频图标可点击
 				mAudioBtn.setOnClickListener(mClickMediaIcon);
@@ -156,27 +150,13 @@ public class AisParser {
 				mAudioBtn.setVisibility(View.GONE);
 			}
 
-			mVideoBtn = (Button) mediaIconLayout.findViewById(R.id.ais_view_video_icon_btn);
+			Button mVideoBtn = (Button) mediaIconLayout.findViewById(R.id.ais_view_video_icon_btn);
 			if (mVideoItem != null) {
 				// 音视频图标可点击
 				mVideoBtn.setOnClickListener(mClickMediaIcon);
 			} else {
 				mVideoBtn.setVisibility(View.GONE);
 			}
-
-			/*
-			mediaIconLayout.setOnFocusChangeListener(new OnFocusChangeListener() {
-				@Override
-				public void onFocusChange(View view, boolean focused) {
-					if (focused) {
-						if (mAudioBtn != null)
-							mAudioBtn.requestFocus();
-						else if (mVideoItem != null)
-							mVideoBtn.requestFocus();
-					}
-				}
-			});
-			*/
 		}
 
 		// Ais内容滚动视图

@@ -13,15 +13,15 @@
 	    android:paddingRight="10sp" >
 
         	<Button android:id="@+id/ais_view_audio_icon_btn"
-        	    android:layout_width="wrap_content"
-			    android:layout_height="wrap_content"
+        	    android:layout_width="64dp"
+			    android:layout_height="32dp"
 			    android:layout_alignParentLeft="true"
-			    android:text="音频"/>
+			    android:background="@drawable/ic_audio"/>
         	<Button android:id="@+id/ais_view_video_icon_btn"
-        	    android:layout_width="wrap_content"
-			    android:layout_height="wrap_content"
+        	    android:layout_width="64dp"
+			    android:layout_height="32dp"
 			    android:layout_toRightOf="@+id/ais_view_audio_icon_btn"
-			    android:text="视频" />
+			    android:background="@drawable/ic_video" />
 	</RelativeLayout>
 
     <ScrollView

@@ -307,9 +307,11 @@ CString column_child16[]={"生产类","生活类","医疗类","教育类"};
 				switch (v) {
 				case DataMan.AIS_TOKEN:
 					Debug.Log("TODO:文字");
+					file.skip(length);
 					break;
 				case DataMan.AIS_TOKEN_FONT:
 					Debug.Log("TODO：字体结构");
+					file.skip(length);
 					break;
 				case DataMan.AIS_TOKEN_COURSE_ANSWER:
 				case DataMan.AIS_TOKEN_COURSE_GRADE:
@@ -358,6 +360,10 @@ CString column_child16[]={"生产类","生活类","医疗类","教育类"};
 						mAudioItem = new AisItem(ItemType.AUDIO, readAisData(context, file, length));
 					} else
 						Debug.Log("解析Ais警告：多余一个音频Item");
+					break;
+				default:
+					Debug.Log("解析AIS错误，无此标志：" + v);
+					file.skip(length);
 					break;
 				}
 			}
