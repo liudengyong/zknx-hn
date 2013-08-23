@@ -30,6 +30,9 @@ public class AisParser {
 	private AisItem mAudioItem;
 	private AisItem mVideoItem;
 	
+	// 解析后的ais文档
+	private AisDoc mAisDoc;
+	
 	MediaPlayer mPlayer;
 
 	public AisParser(LayoutInflater inflater) {
@@ -69,7 +72,7 @@ public class AisParser {
 	 * @param context
 	 * @return
 	 */
-	public AisLayout GetAisLayout(String date, String aisFileName, LayoutInflater inflater, Object jsInterface) {
+	public AisLayout GetAisLayout(LayoutInflater inflater, Object jsInterface) {
 		
 		LinearLayout aisLayout = (LinearLayout) inflater.inflate(R.layout.ais_view, null);
 
@@ -79,7 +82,7 @@ public class AisParser {
 		// Ais内容滚动视图
 		LinearLayout contentLayout = (LinearLayout) aisLayout.findViewById(R.id.ais_content_view);
 
-		AisHeader header = parseAis(inflater.getContext(), date, aisFileName, contentLayout, jsInterface, mediaIconLayout);
+		AisHeader header = parseAis(contentLayout, jsInterface, mediaIconLayout);
 
 		if (header == null) {
 			Debug.Log("严重错误：AIS parse错误");
@@ -122,6 +125,17 @@ public class AisParser {
 		// ais header
 		private AisHeader header;
 	}
+	
+	/**
+	 * 解析ais文档
+	 * @return
+	 */
+	public boolean parseAisDoc(Context context, String date, String aisFileName) {
+		// 获取解析后的ais文档
+		mAisDoc = new AisDoc(context, aisFileName, false, date);
+		
+		return (mAisDoc != null);
+	}
 
 	/**
 	 * 如果成功，返回标题，并添加视图到root，否则返回null
@@ -129,13 +143,17 @@ public class AisParser {
 	 * @param root
 	 * @return
 	 */
-	private AisHeader parseAis(Context context, String date, String aisFileName, LinearLayout contentLayout, Object jsInterface, RelativeLayout mediaIconLayout) {
-		// 获取解析后的ais文档
-		AisDoc aisDoc = new AisDoc(context, aisFileName, false, date);
+	private AisHeader parseAis(LinearLayout contentLayout, Object jsInterface, RelativeLayout mediaIconLayout) {
+		
+		
+		if (mAisDoc == null) {
+			Debug.Log("严重错误：parseAis，aisDoc为空");
+			return null;
+		}
 		
 		// 初始化音视频图标监听
-		mAudioItem = aisDoc.getAudioItem();
-		mVideoItem = aisDoc.getVideoItem();
+		mAudioItem = mAisDoc.getAudioItem();
+		mVideoItem = mAisDoc.getVideoItem();
 
 		// 没有媒体就隐藏
 		if (mAudioItem == null &&
@@ -163,17 +181,17 @@ public class AisParser {
 		WebView webView = (WebView) contentLayout.findViewById(R.id.ais_webview);
 
 		// 是否课件
-		if (aisDoc.isCourse()) {
+		if (mAisDoc.isCourse()) {
 			webView.setVisibility(View.GONE);
 			//CourseWebView.GenHtml(ais_id, webView, aisDoc);
-			CourseView.InitView(mInflater, contentLayout, aisDoc);
+			CourseView.InitView(mInflater, contentLayout, mAisDoc);
 		} else {
-			AisWebView.Init(aisDoc, webView, jsInterface);
+			AisWebView.Init(mAisDoc, webView, jsInterface);
 		}
 		
 		webView.setBackgroundColor(0); // 设置透明
 
-		return aisDoc.getHeader();
+		return mAisDoc.getHeader();
 	}
 
 	/**

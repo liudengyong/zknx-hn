@@ -49,7 +49,7 @@ public class Expert extends AisView {
 	 * 初始化专家列表
 	 */
 	@Override
-	protected void initChildListData() {
+	protected void loadChildListData() {
 		WaitDialog.Show(mContext, new WaitDialog.Action() {
 			@Override
 			public String getMessage() {

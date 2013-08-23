@@ -56,6 +56,9 @@ public class AisView extends FunctionView {
 	private String mCurAisFileName;
 	private String mCurAisDate;
 	
+	// 解析后的ais排版
+	private AisParser.AisLayout mAisParsedLayout;
+	
 	private static final String DEFAULT_TITLE = "内容";
 	private AisDoc.AisHeader mAisHeader = null;
 	
@@ -111,7 +114,7 @@ public class AisView extends FunctionView {
 		} else if (mFrameResId == R.layout.func_frame_triple) {
 			mAisListFrame = mContentFrame[1];
 			mAisContentFrame = mContentFrame[2];
-			initChildListData();
+			loadChildListData();
 		} else {
 			Debug.Log("严重错误：AISView mFrameResId");
 		}
@@ -120,7 +123,7 @@ public class AisView extends FunctionView {
 	/**
 	 * 初始化Ais分类
 	 */
-	protected void initChildListData() {
+	protected void loadChildListData() {
 		WaitDialog.Show(mContext, new WaitDialog.Action() {
 			@Override
 			public String getMessage() {
@@ -228,24 +231,48 @@ public class AisView extends FunctionView {
 	void attachAisView(int position) {
 		String aisFileName = mAdapterAisList.getItemMapString(position, DataMan.KEY_AIS_FILE_NAME);
 		String aisDate = mAdapterAisList.getItemMapString(position, DataMan.KEY_AIS_DATE);
-		attachAisView(aisDate, aisFileName, mAisContentFrame);
+		parseAis(aisDate, aisFileName, mAisContentFrame);
+	}
+	
+	/**
+	 * 等待解析ais
+	 */
+	void parseAis(final String date, final String aisFileName, LinearLayout root) {
+		mAisViewRoot = root;
+
+		WaitDialog.Show(mContext, new WaitDialog.Action() {
+			@Override
+			public String getMessage() {
+				return "正在解析资讯文件";
+			}
+
+			@Override
+			public void waitAction() {
+				if (mAisParser.parseAisDoc(mContext, date, aisFileName)) {
+
+					// 保存当前信息
+					mCurAisFileName = aisFileName;
+					mCurAisDate = date;
+
+					mHandler.sendEmptyMessage(MESSAGE_PARSED_AIS);
+				}
+			}
+		});
 	}
 
-	void attachAisView(String date, String aisFileName, LinearLayout root) {
+	/**
+	 * 初始化解析后的ais视图
+	 */
+	void initAisView() {
 		LinearLayout layout = null;
-		Debug.Log("ais_file = " + aisFileName);
 		
 		AisView.StopPlaying();
 		
-		AisParser.AisLayout aisLayout = mAisParser.GetAisLayout(date, aisFileName, mInflater, getJsInterface());
-		
-		if (aisLayout != null) {
-			mAisHeader = aisLayout.getAisHeader();
-			layout = aisLayout.getLayout();
-			// 保存当前信息
-			mAisViewRoot = root;
-			mCurAisFileName = aisFileName;
-			mCurAisDate = date;
+		mAisParsedLayout = mAisParser.GetAisLayout(mInflater, getJsInterface());
+
+		if (mAisParsedLayout != null) {
+			mAisHeader = mAisParsedLayout.getAisHeader();
+			layout = mAisParsedLayout.getLayout();
 
 			// 如果有音频则播放音频
 			playAisAudio();
@@ -262,7 +289,7 @@ public class AisView extends FunctionView {
 		if (mAisHeader != null)
 			title = mAisHeader.getTitle();
 
-		initContent(title, layout, getCutomBottom(), root);
+		initContent(title, layout, getCutomBottom(), mAisViewRoot);
 	}
 	
 	/**
@@ -276,7 +303,7 @@ public class AisView extends FunctionView {
 			@Override
 			public void onClick(View v) {
 				// 返回Ais视图
-				attachAisView(mCurAisDate, mCurAisFileName, mAisViewRoot);
+				parseAis(mCurAisDate, mCurAisFileName, mAisViewRoot);
 			}
 		});
 
@@ -482,7 +509,8 @@ public class AisView extends FunctionView {
 	
 	protected final static int MESSAGE_LOADED_AIS_CHILD_LIST = 1;
 	private   final static int MESSAGE_LOADED_AIS_LIST = 2;
-	protected final static int MESSAGE_CHILD = 3;
+	private   final static int MESSAGE_PARSED_AIS = 3;
+	protected final static int MESSAGE_CHILD = 4;
 
 	Handler mHandler = new Handler() {
 		@Override
@@ -495,6 +523,9 @@ public class AisView extends FunctionView {
 			   break;
 		   case MESSAGE_LOADED_AIS_LIST:
 			   initAisList(mAisTitle, mListMap, null, null);
+			   break;
+		   case MESSAGE_PARSED_AIS:
+			   initAisView();
 			   break;
 		   case MESSAGE_CHILD:
 			   processChildMessage(msg);
