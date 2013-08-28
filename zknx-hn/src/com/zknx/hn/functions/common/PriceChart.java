@@ -33,7 +33,7 @@ public class PriceChart extends View {
 	// 网格单位字体宽度
 	private static final float AXIS_UNIT_WIDTH = 1;
 	// 网格单位字体颜色
-	private static final int AXIS_UNIT_STROKE_COLOR = Color.BLACK;
+	private static final int AXIS_UNIT_STROKE_COLOR = Color.WHITE;
 	// 网格单位字体大小
 	private static final int AXIS_UNIT_FONT_SIZE = 14;
 	
@@ -59,7 +59,7 @@ public class PriceChart extends View {
  	static final int CHART_PADDING_HORIZON = 38;
 
  	// XXX 固定价格分辨率？ 水平网格固定数目 （8个格）
-	private static final int PRICE_GRID_COUNT = 4;
+	private static final int PRICE_GRID_COUNT = 2;
 	
 	// XXX 调整日期单位（字体大小和为位置）
     
@@ -252,7 +252,7 @@ public class PriceChart extends View {
         
         // 竖直网格（价格）固定数目？
         // 需要多画一个，需要画9个价格（包括最高和最低）
-        float fixedPriceX = getX() + 2; // 右移padding
+        float fixedPriceX = getX() + 6; // 右移padding
         for (int i = 0; i <= PRICE_GRID_COUNT; ++i) {
         	
         	// 画价格单位以及网格价格值

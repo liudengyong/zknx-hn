@@ -756,7 +756,7 @@ public class DataMan extends DataInterface {
 		ProductPriceInfo info = new ProductPriceInfo();
 		
 		// 日期格式（月.日）
-		SimpleDateFormat simpleDate = new SimpleDateFormat("M.d", Locale.CHINA);
+		SimpleDateFormat simpleDate = new SimpleDateFormat("M月d日", Locale.CHINA);
 		// 向前减去7天
 		long today = System.currentTimeMillis();
 		for (int i = 0; i < 7; ++i) {
