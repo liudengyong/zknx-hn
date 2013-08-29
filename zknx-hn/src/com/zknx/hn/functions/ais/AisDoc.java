@@ -318,8 +318,14 @@ CString column_child16[]={"生产类","生活类","医疗类","教育类"};
 				case DataMan.AIS_TOKEN_COURSE_NOTE:
 					if (isCourse()) {
 						addQuestion(v, readAisData(context, file, length));
-					} else
+					} else {
 						Debug.Log("Ais结构错误：非试卷不应有答案结构，" + mHeader.column);
+						byte[] data = new byte[length];
+						if (length == file.read(data))
+							row.add(new AisItem(ItemType.TEXT, new String(data, 0, length, "GBK").getBytes("GBK")));
+						else
+							Debug.Log("Ais解析错误 length == file.read(data)");
+					}
 					break;
 				case DataMan.AIS_TOKEN_IMAGE:
 					if (isCourse())
@@ -412,7 +418,11 @@ CString column_child16[]={"生产类","生活类","医疗类","教育类"};
 
 		int leftByte = length;
 		do {
-			int readed = aisFile.read(data);
+			int readed;
+			if (leftByte >= bufferLength)
+				readed = aisFile.read(data);
+			else
+				readed = aisFile.read(data, 0, leftByte);
 
 			if (bufferLength <= 0) {
 				Debug.Log("readAisToFile严重错误：Ais解析，读取数据错误！");
