@@ -2239,7 +2239,7 @@ public class DataMan extends DataInterface {
         			map.put(KEY_EXPERT_QUESTION_CONTENT, savedQuestion);
         			map.put(KEY_EXPERT_QUESTION_ANWSER, savedAnwser);
         			map.put(KEY_AIS_FILE_NAME, savedAnwser);
-        			map.put(KEY_AIS_DATE, "expert/" + expertId + "/");
+        			map.put(KEY_AIS_DATE, "basedata/expert/" + expertId + "/");
         			list.add(map);
         		}
         	}
