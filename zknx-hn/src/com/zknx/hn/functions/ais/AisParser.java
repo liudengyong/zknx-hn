@@ -7,6 +7,7 @@ import com.zknx.hn.common.Debug;
 import com.zknx.hn.common.widget.Dialog;
 import com.zknx.hn.data.DataMan;
 import com.zknx.hn.data.FileUtils;
+import com.zknx.hn.functions.AisView;
 import com.zknx.hn.functions.ais.AisDoc.AisHeader;
 import com.zknx.hn.functions.ais.AisDoc.AisItem;
 
@@ -268,6 +269,10 @@ public class AisParser {
 	 */
 	private void playVideo() {
 		if (mVideoItem != null) {
+
+			// 如果有音频播放，先停止音频
+        	AisView.StopPlaying();
+
 			// 播放保存好的视频文件
 			String tmpFile = mVideoItem.fileName;
 			String rmvbMimetype = "audio/x-pn-realaudio";
