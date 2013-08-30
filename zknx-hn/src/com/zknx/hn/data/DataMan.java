@@ -2029,6 +2029,14 @@ public class DataMan extends DataInterface {
 	}
 	
 	/**
+	 * 获取中文日期
+	 * @return
+	 */
+	public static String GetCurrentHumanDate() {
+		return new SimpleDateFormat("yyyy年M月d日", Locale.CHINA).format(new java.util.Date());
+	}
+	
+	/**
 	 * 获取时间id
 	 * @return
 	 */

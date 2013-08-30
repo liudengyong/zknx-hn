@@ -48,18 +48,18 @@
 	</style>
     
     <!--=========================== 功能界面 ===========================-->
-	
+
     <!-- 标题文字 -->
     <style name="TitleText_Back">
 	    <item name="android:textSize">28sp</item>
 	    <item name="android:textIsSelectable">false</item>
 	    <item name="android:textColor">#FFFFFFFF</item>
-	    <item name="android:layout_width">fill_parent</item>
+	    <item name="android:layout_width">wrap_content</item>
 	    <item name="android:layout_height">fill_parent</item>
 	    <item name="android:gravity">left|center_vertical</item>
 	    <item name="android:focusable">false</item>
 	</style>
-	
+
     <!-- 二级标题文字 -->
     <style name="TitleText">
 	    <item name="android:textSize">18sp</item>

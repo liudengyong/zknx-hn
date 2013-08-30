@@ -303,13 +303,15 @@ public class Function extends Activity {
 	}
 	
 	/**
-	 * 设置标题
+	 * 设置标题以及日期
 	 * */
 	void setTitle(Bundle extras) {
 		
 		TextView title = (TextView)findViewById(R.id.function_title_text);
+		TextView date  = (TextView)findViewById(R.id.function_title_date);
 		
 		title.setText(Params.GetTitle(extras));
+		date.setText(DataMan.GetCurrentHumanDate());
 	}
 	
 	/**

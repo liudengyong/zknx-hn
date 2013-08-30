@@ -26,6 +26,12 @@
 	        android:id="@+id/function_title_text"
 	        style="@style/TitleText_Back">
 	    </TextView>
+	    
+	    <TextView
+	        android:id="@+id/function_title_date"
+	        style="@style/TitleText_Back"
+	        android:paddingLeft="880sp">
+	    </TextView>
 
      </LinearLayout>
      
@@ -37,7 +43,7 @@
 	    android:layout_above="@+id/function_frame_btns"
 	    android:layout_margin="10dip"
 	    android:orientation="horizontal" />
-	
+
 	<LinearLayout
 	    android:id="@+id/function_frame_btns"
 	    android:layout_width="fill_parent"
