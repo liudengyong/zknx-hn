@@ -25,6 +25,7 @@ public class AisWebView {
 	public static void Init(AisDoc aisDoc, WebView webView, Object jsInterface) {
 		webView.getSettings().setCacheMode(WebSettings.LOAD_NO_CACHE); // 禁用cache
 		webView.setScrollBarStyle(View.SCROLLBARS_INSIDE_OVERLAY);
+		webView.setScrollbarFadingEnabled(true); // 自动隐藏滚动条
 		webView.setBackgroundColor(0);
 
 		String htmlString = genAisWebview(aisDoc.getAisId(), webView, aisDoc);
@@ -78,11 +79,18 @@ public class AisWebView {
 					}
 			}
 		}
-		
+
+		if (imageItems != null &&
+			text.length() == 0) {
+			Debug.Log("没有图片，没有文字");
+			//webView.setVisibility(View.GONE);// 调用者会隐藏
+			return null;
+		}
+
 		String mediaTags = "";//genMediaIconTags(aisDoc);
 
 		String htmlStirng = mediaTags +
-				"<div style=\"margin-top:8px;font-size:20px;color:white;\">" +
+				"<div tabindex=\"0\" style=\"margin-top:8px;font-size:20px;color:white;\">" +
 					imageTags +
 					text.replaceAll("\r", "<div>") +
 				"</div>";

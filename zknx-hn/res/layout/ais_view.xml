@@ -24,9 +24,9 @@
 			    android:background="@drawable/ic_video" />
 	</RelativeLayout>
 
-    <ScrollView
+    <!--ScrollView
         android:layout_width="match_parent"
-	    android:layout_height="match_parent">
+	    android:layout_height="match_parent"-->
 	    <LinearLayout
 	        android:id="@+id/ais_content_view"
 		    android:layout_width="match_parent"
@@ -40,6 +40,6 @@
 			    android:layerType="software" />
 
 	    </LinearLayout>
-	</ScrollView>
+	<!--/ScrollView-->
 
 </LinearLayout>

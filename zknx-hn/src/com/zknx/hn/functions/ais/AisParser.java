@@ -12,6 +12,7 @@ import com.zknx.hn.functions.ais.AisDoc.AisItem;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.view.LayoutInflater;
@@ -155,6 +156,7 @@ public class AisParser {
 		mAudioItem = mAisDoc.getAudioItem();
 		mVideoItem = mAisDoc.getVideoItem();
 
+		Button videoBtn = null;
 		// 没有媒体就隐藏
 		if (mAudioItem == null &&
 			mVideoItem == null)
@@ -168,12 +170,12 @@ public class AisParser {
 				mAudioBtn.setVisibility(View.GONE);
 			}
 
-			Button mVideoBtn = (Button) mediaIconLayout.findViewById(R.id.ais_view_video_icon_btn);
+			videoBtn = (Button) mediaIconLayout.findViewById(R.id.ais_view_video_icon_btn);
 			if (mVideoItem != null) {
 				// 音视频图标可点击
-				mVideoBtn.setOnClickListener(mClickMediaIcon);
+				videoBtn.setOnClickListener(mClickMediaIcon);
 			} else {
-				mVideoBtn.setVisibility(View.GONE);
+				videoBtn.setVisibility(View.GONE);
 			}
 		}
 
@@ -188,8 +190,15 @@ public class AisParser {
 		} else {
 			AisWebView.Init(mAisDoc, webView, jsInterface);
 		}
-		
-		webView.setBackgroundColor(0); // 设置透明
+
+		// 没有文字和图片，有视频时焦点切换到视频
+		if (videoBtn != null &&
+			webView.getVisibility() == View.GONE)
+			videoBtn.requestFocus();
+		/*
+		else
+			webView.requestFocus();
+		*/
 
 		return mAisDoc.getHeader();
 	}
