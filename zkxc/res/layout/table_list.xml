@@ -43,7 +43,8 @@
             android:layout_height="50dp"
             android:layout_alignParentLeft="true"
             android:layout_alignParentBottom="true"
-            android:text="同步任务采集表">
+            android:text="同步任务采集表"
+            style="@style/TrackTextSize">
        </Button>
         
         <TextView
@@ -66,44 +67,48 @@
             android:id="@+id/btn_new_collection"
             android:layout_width="88dp"
             android:layout_height="fill_parent"
-            android:layout_toRightOf="@+id/table_list"
-            android:text="@string/new_collection" />
+            android:text="@string/new_collection"
+            style="@style/TrackTextSize" />
         
         <Button
             android:id="@+id/btn_sync_table"
             android:layout_width="88dp"
             android:layout_height="fill_parent"
             android:layout_toRightOf="@+id/btn_new_collection"
-            android:text="@string/sync" />
+            android:text="@string/sync"
+            style="@style/TrackTextSize" />
 
          <Button
             android:id="@+id/btn_table_record_sort_all"
             android:layout_width="88dp"
             android:layout_height="wrap_content"
             android:layout_toRightOf="@+id/btn_sync_table"
-            android:text="全部" />
+            android:text="全部"
+            style="@style/TrackTextSize" />
         
         <Button
             android:id="@+id/btn_table_record_sort_date"
             android:layout_width="88dp"
             android:layout_height="wrap_content"
             android:layout_toRightOf="@+id/btn_table_record_sort_all"
-            android:text="日期" />
+            android:text="日期"
+            style="@style/TrackTextSize" />
 
         <Button
             android:id="@+id/btn_add_table_note"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_toRightOf="@+id/btn_table_record_sort_date"
-            android:text="添加备注" />
+            android:text="添加备注"
+            style="@style/TrackTextSize" />
                 
         <Button
             android:id="@+id/btn_show_table_note"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_above="@+id/table_list"
             android:layout_toRightOf="@+id/btn_add_table_note"
-            android:text="查看备注" />
+            android:text="查看备注"
+            style="@style/TrackTextSize" />
 
         <TextView
             android:id="@+id/tv_record_table_name"

@@ -22,26 +22,29 @@
         android:layout_height="wrap_content"
         android:layout_marginLeft="12dp"
         android:layout_marginTop="10dp"
-        android:orientation="horizontal" >
+        android:orientation="vertical" >
 
         <Button
             android:id="@+id/track_history"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="历史轨迹"
-            android:enabled="false" />
+            android:enabled="false"
+            style="@style/TrackTextSize" />
 
         <Button
             android:id="@+id/track_today"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="当前位置" />
+            android:text="当前位置"
+            style="@style/TrackTextSize" />
 
         <Button
             android:id="@+id/track_upload"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="同步数据" />
+            android:text="同步数据"
+            style="@style/TrackTextSize" />
 
     </LinearLayout>
 
@@ -70,31 +73,36 @@
             android:id="@+id/btn_track_sort_all"
             android:layout_width="100dp"
             android:layout_height="wrap_content"
-            android:text="全部"/>
+            android:text="全部"
+            style="@style/TrackTextSize" />
 	     
         <Button
             android:id="@+id/btn_track_sort_picture"
             android:layout_width="100dp"
             android:layout_height="wrap_content"
-            android:text="图片"/>
+            android:text="图片"
+            style="@style/TrackTextSize" />
 
         <Button
             android:id="@+id/btn_track_sort_video"
             android:layout_width="100dp"
             android:layout_height="wrap_content"
-            android:text="视频" />
+            android:text="视频"
+            style="@style/TrackTextSize" />
 
         <Button
             android:id="@+id/btn_track_sort_audio"
             android:layout_width="100dp"
             android:layout_height="wrap_content"
-            android:text="音频" />
+            android:text="音频"
+            style="@style/TrackTextSize" />
         
         <Button
             android:id="@+id/btn_track_sort_file"
             android:layout_width="100dp"
             android:layout_height="wrap_content"
-            android:text="文件" />
+            android:text="文件"
+            style="@style/TrackTextSize" />
 
     </LinearLayout>
     
@@ -131,13 +139,15 @@
                     android:id="@+id/track_all"
                     android:layout_width="80dp"
                     android:layout_height="wrap_content"
-                    android:text="@string/all" />
+                    android:text="@string/all"
+                    style="@style/TrackTextSize" />
 
                 <Button
                     android:id="@+id/track_date"
                     android:layout_width="80dp"
                     android:layout_height="wrap_content"
-                    android:text="@string/date" />
+                    android:text="@string/date"
+                    style="@style/TrackTextSize" />
 
                 <!--CheckBox
                     android:id="@+id/track_record1"
@@ -172,7 +182,8 @@
         android:layout_alignLeft="@+id/ly_track_action"
         android:layout_below="@+id/ly_track_action"
         android:layout_marginTop="22dp"
-        android:text="开始记录" />
+        android:text="开始记录"
+        style="@style/TrackTextSize" />
 
     <Button
         android:id="@+id/btn_stop_record_track"
@@ -181,7 +192,8 @@
         android:layout_alignBaseline="@+id/btn_start_record_track"
         android:layout_alignBottom="@+id/btn_start_record_track"
         android:layout_toRightOf="@+id/btn_start_record_track"
-        android:text="停止记录" />
+        android:text="停止记录"
+        style="@style/TrackTextSize" />
 
 </RelativeLayout>
 
