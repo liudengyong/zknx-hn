@@ -659,6 +659,10 @@ public class Service implements Setting {
 		List<File> fileList = new ArrayList<File>(Arrays.asList(getRecordServerDir().listFiles()));
 		fileList.addAll(Arrays.asList(getRecordLocalDir().listFiles()));
 		
+		// 获取文字内容列表
+		fileList.addAll(Arrays.asList(getContentLocalDir().listFiles()));
+		fileList.addAll(Arrays.asList(getContentServerDir().listFiles()));
+		
 		File[] sortFiles = fileList.toArray(new File[0]);
 		Arrays.sort(sortFiles, new Comparator<File>() {
 			public int compare(File lhs, File rhs) {

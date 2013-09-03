@@ -456,6 +456,9 @@ public class ActMapTrack extends MapActivity implements Setting {
 	
 	private void showTrack(RecordFile recordFile) {
 		showTrack(recordFile,recordFile.getTitle().toString());
+		
+		// 刷新content图标
+		refreshMark();
 	}
 	/**
 	 * 根据文件显示路径
@@ -478,6 +481,13 @@ public class ActMapTrack extends MapActivity implements Setting {
 						// long time = Long.parseLong(line.substring(0,13));
 						Log.d("test",line);
 						String[] latLng = line.substring(14).split(",");
+						
+						String prefix = line.substring(0, 3);
+						
+						// content读取
+						if (prefix.equals("采集："))
+							continue;
+						
 						double lat = Double.parseDouble(latLng[0]);
 						double lng = Double.parseDouble(latLng[1]);
 						if (firstLatE6 == 0) {
