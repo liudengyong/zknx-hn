@@ -529,18 +529,6 @@ public class RecordMan {
 		}
 	}
 
-	public static void UploadLocationFile(Context context, File recordFile) {
-		
-		/*
-		File[] recordFiles = new File(GetLocationRecordPath()).listFiles();
-		
-		if (recordFiles == null || recordFiles.length == 0) return;
-		
-		for (File recordFile : recordFiles)
-		{*/
-	    
-	}
-	
 	static String GetLocationRecordPath()
 	{
 		return DataMan.GetDataForlder() + "/location";
