@@ -1935,6 +1935,7 @@ public class DataMan extends DataInterface {
 	private static final String FILE_STAMP_LAST_MESSAGE = "lastMessage.txt";
 	public static String GetNewMessages() {
 
+		/*
 		int ret = Downloader.DownFile(URL_GET_MESSAGE + "?userid=" + UserMan.GetUserId()
 				+ "&after=" + "1970-01-01",
 				DataFile("basedata/", true), FILE_NAME_NEW_MESSAGE);
@@ -1973,8 +1974,26 @@ public class DataMan extends DataInterface {
 		}
 
 		FileUtils.WriteText(DataFile("basedata/" + FILE_STAMP_LAST_MESSAGE, true), time);
+		*/
+		
+		File todayMessageFile = new File(DataMan.DataFile("message_" + UserMan.GetUserId() + ".txt"));
+		if (!todayMessageFile.exists())
+			return null;
 
-		return message;
+		long time = todayMessageFile.lastModified();
+		String timeStamp = FileUtils.ReadFirstLine(DataMan.DataFile(FILE_STAMP_LAST_MESSAGE));
+		if (timeStamp == null)
+			return null;
+
+		try {
+			long lastMessageTime = Long.parseLong(timeStamp);
+			if (time > lastMessageTime)
+				return "新留言";
+		} catch (Exception exp) {
+			Debug.Log("解析新留言时间错误");
+		}
+
+		return null;
 	}
 	
 	/**
@@ -2227,7 +2246,7 @@ public class DataMan extends DataInterface {
 		List<ListItemMap> list = new ArrayList<ListItemMap>();
 		
 		// 读取广播问题列表
-		List<String> lines = ReadLines("basedata/expert/" + expertId + "/anwsers_list.txt", true);
+		List<String> lines = ReadLines("basedata/expert/" + expertId + "/personal_answers_" + UserMan.GetUserId() + ".txt", true);
 		// 读取本地问题列表
 		List<String> localLines = ReadLines("basedata/" + LOCAL_QUESTION, true);
 		lines.addAll(localLines);

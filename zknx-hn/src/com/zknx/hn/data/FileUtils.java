@@ -2,9 +2,12 @@ package com.zknx.hn.data;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
@@ -207,6 +210,32 @@ public class FileUtils {
      */
     public static String WriteText(String path, String fileName, String text) {
     	return WriteText(path, fileName, text, null);
+    }
+    
+    /**
+     * 读取文本
+     * @param path
+     * @param fileName
+     * @param text
+     * @return
+     */
+    public static String ReadFirstLine(String filePathName) {
+    	String ret = null;
+
+    	try {
+    		 BufferedReader reader = new BufferedReader(new FileReader(new File(filePathName)));
+    		 // 只读取第一行
+    		 ret = reader.readLine();
+    		 reader.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+			ret = null;
+		} catch (IOException e) {
+			e.printStackTrace();
+			ret = null;
+		}
+
+    	return ret;
     }
     
     /**
