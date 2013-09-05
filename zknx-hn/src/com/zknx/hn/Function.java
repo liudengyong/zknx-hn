@@ -2,6 +2,7 @@ package com.zknx.hn;
 
 import java.util.List;
 
+import com.android.FCApiTool;
 import com.zknx.hn.R;
 import com.zknx.hn.common.Debug;
 import com.zknx.hn.common.UIConst;
@@ -55,7 +56,7 @@ public class Function extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        String deviceId = ((TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE)).getSimSerialNumber();
+        String deviceId = FCApiTool.getDeviceID();
 
         if (deviceId == null ||
         	deviceId.length() == 0) {
@@ -64,6 +65,7 @@ public class Function extends Activity {
         	return;
         }
 
+        // TODO 检查设备是否激活
         //Dialog.Toast(this, "设备ID：" + deviceId);
 
         /*
