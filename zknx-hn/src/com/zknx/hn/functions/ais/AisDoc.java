@@ -24,6 +24,8 @@ public class AisDoc {
 	private static final int INT_SIZE = 4;
 	// 字体结构大小
 	private static final int FONT_STRUCT_SIZE = 52;
+	// 村务公开表格HTML
+	private static final String AIS_TABLE_FILENAME = "table.html";
 
 	/*
 	typedef struct tagTextFont
@@ -74,7 +76,7 @@ BYTE bColumn
 11	先锋党员
 12	典型模范
 13	致富经验
-14	快乐农家
+14	快乐农家 => 村务公开
 15	法律法规
 16	惠农政策
 
@@ -99,6 +101,7 @@ CString column_child16[]={"生产类","生活类","医疗类","教育类"};
 	 */
 	
 	public static int COLUMN_COURSE = 12; // 课件column
+	public static int COLUMN_VILLAGE_TABLE = 14; // 村务公开column
 
 	/**
 	 * Ais文件头
@@ -135,7 +138,7 @@ CString column_child16[]={"生产类","生活类","医疗类","教育类"};
 	// 图像Items
 	private AisItem[] mImageItems;
 	// 用于ais内图片计数
-	private int mImageIndex;
+	//private int mImageIndex;
 
 	/**
 	 * 通过ais_id构造AisDoc
@@ -262,7 +265,7 @@ CString column_child16[]={"生产类","生活类","医疗类","教育类"};
 			if (parseHeader)
 				return (mHeader != null);
 			
-			mImageIndex = 0;
+			//mImageIndex = 0;
 			
 			// 生成行树
 			mItemTree = new ArrayList<List<AisItem>>();
@@ -366,6 +369,10 @@ CString column_child16[]={"生产类","生活类","医疗类","教育类"};
 						mAudioItem = new AisItem(ItemType.AUDIO, readAisData(context, file, length));
 					} else
 						Debug.Log("解析Ais警告：多余一个音频Item");
+					break;
+				case DataMan.AIS_TOKEN_TABLE:
+					String fileName = getTableHtmlFile();
+					readAisToFile(context, fileName, file, length);
 					break;
 				default:
 					Debug.Log("解析AIS错误，无此标志：" + v);
@@ -555,6 +562,11 @@ CString column_child16[]={"生产类","生活类","医疗类","教育类"};
 	 */
 	public boolean isCourse() {
 		return (mHeader != null) ? (mHeader.column == COLUMN_COURSE) : false;
+	}
+	
+	// 是否村务公开表格
+	public boolean isTable() {
+		return (mHeader != null) ? (mHeader.column == COLUMN_VILLAGE_TABLE) : false;
 	}
 
 	/**
@@ -792,5 +804,13 @@ CString column_child16[]={"生产类","生活类","医疗类","教育类"};
 	 */
 	public AisHeader getHeader() {
 		return  mHeader;
+	}
+
+	/**
+	 * 获取村务公开表格HTML路径
+	 * @return
+	 */
+	public String getTableHtmlFile() {
+		return DataMan.DataFile(AIS_TABLE_FILENAME, true);
 	}
 }

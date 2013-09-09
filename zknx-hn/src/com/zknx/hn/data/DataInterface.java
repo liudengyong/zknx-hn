@@ -96,6 +96,8 @@ public class DataInterface {
 	public static final char AIS_TOKEN_COURSE_GRADE = 'S';
 	// Ais问卷答案解析
 	public static final char AIS_TOKEN_COURSE_NOTE = 'K';
+	// 村务公开表格
+	public static final char AIS_TOKEN_TABLE = 'T';
 	
 	/**
 	 * market是否匹配（是否属当前区域）

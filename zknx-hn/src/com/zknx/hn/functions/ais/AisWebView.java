@@ -27,16 +27,28 @@ public class AisWebView {
 		webView.setScrollBarStyle(View.SCROLLBARS_INSIDE_OVERLAY);
 		webView.setScrollbarFadingEnabled(true); // 自动隐藏滚动条
 		webView.setBackgroundColor(0);
-
-		String htmlString = genAisWebview(aisDoc.getAisId(), webView, aisDoc);
 		
-		// 加载webview
-		if (htmlString != null) {
-			//webView.loadData(htmlString, "text/html", "GBK");
-			webView.loadDataWithBaseURL(null, htmlString, "text/html", "UTF-8", null);
-			webView.setVisibility(View.VISIBLE);
+		if (aisDoc.isTable()) {
+			
+			// 缩放开关
+			webView.getSettings().setSupportZoom(true);
+			// 设置是否可缩放
+			webView.getSettings().setBuiltInZoomControls(true);
+
+			String fileName = aisDoc.getTableHtmlFile();
+			webView.loadUrl("file:/" + fileName);
 		} else {
-			webView.setVisibility(View.GONE);
+
+			String htmlString = genAisWebview(aisDoc.getAisId(), webView, aisDoc);
+			
+			// 加载webview
+			if (htmlString != null) {
+				//webView.loadData(htmlString, "text/html", "GBK");
+				webView.loadDataWithBaseURL(null, htmlString, "text/html", "UTF-8", null);
+				webView.setVisibility(View.VISIBLE);
+			} else {
+				webView.setVisibility(View.GONE);
+			}
 		}
 	}
 	
