@@ -26,6 +26,9 @@ public class Functions {
 		id = UIConst.FUNCTION_CLASS_ID_PARTY;
 		subFunctionList.add(createBtnGroup(inflater, UIConst.FUNCTIONS_PARTY, id, listener));
 		
+		id = UIConst.FUNCTION_CLASS_ID_POLICY;
+		subFunctionList.add(createBtnGroup(inflater, UIConst.FUNCTIONS_POLICY, id, listener));
+		
 		return subFunctionList;
 	}
 	

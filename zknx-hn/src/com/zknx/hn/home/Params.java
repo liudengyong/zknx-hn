@@ -1,6 +1,7 @@
 package com.zknx.hn.home;
 
 import com.zknx.hn.R;
+import com.zknx.hn.common.Debug;
 import com.zknx.hn.common.UIConst;
 import com.zknx.hn.functions.*;
 import com.zknx.hn.functions.common.FunctionView;
@@ -15,10 +16,7 @@ public class Params {
 	static final String KEY_FUNCTION_ID = "function_id";
 	static final String KEY_FUNCTION_CLASS = "function_class";
 	static final String KEY_FRAME_ID= "frame_id";
-	
-	public static final int FUNCTION_CLASS_ZKNX = 1;
-	public static final int FUNCTION_CLASS_PARTY = 2;
-	
+
 	public static Bundle GetExtras(int id) {
 		return InitExtras(id);
 	}
@@ -78,8 +76,17 @@ public class Params {
 			return new AisView(inflater, frameRoot, function_id, R.layout.func_frame_triple);
 		case UIConst.FUNCTION_ID_EXPERT_GUIDE: // 专家指导
 			return new Expert(inflater, frameRoot);
-		case UIConst.FUNCTION_ID_SETTING:
-			return new Setting(inflater, frameRoot, R.layout.func_frame_split);
+	    // ==== 政务应用 ====
+		case UIConst.FUNCTION_ID_PARTRY_OPEN:
+		case UIConst.FUNCTION_ID_COUNTRY_POLICY:
+		case UIConst.FUNCTION_ID_VILLIGE_OPEN:
+		case UIConst.FUNCTION_ID_FINANCIAL_OPEN:
+		case UIConst.FUNCTION_ID_BIRTH_CONTROL_OPEN:
+		case UIConst.FUNCTION_ID_WORK_OPEN:
+		case UIConst.FUNCTION_ID_WORK_INTRO:
+		case UIConst.FUNCTION_ID_WORK_INFO:
+		// ==== 政务应用 ====
+			return new AisView(inflater, frameRoot, function_id, R.layout.func_frame_split);
 		default:
 			return null; // 返回错误
 		}
@@ -93,27 +100,29 @@ public class Params {
 	private static Bundle InitExtras(int id) {
 		Bundle extras = new Bundle();
 		
+		int index   = (id % 100) - 1;   // 取余数减一
+		int classId = (id / 100) * 100; // 取百位整数
+		
 		// 功能ID
 		extras.putInt(KEY_FUNCTION_ID, id);
-		
-		int index = id - UIConst.FUNCTION_CLASS_ID_PARTY - 1;
-		
-		// 标题
-		if (index >= 0 && index < UIConst.FUNCTIONS_PARTY.length) {
-			extras.putInt(KEY_FUNCTION_CLASS, FUNCTION_CLASS_PARTY);
+		// 功能栏目
+		extras.putInt(KEY_FUNCTION_CLASS, classId);
+
+		switch (classId) {
+		case UIConst.FUNCTION_CLASS_ID_ZKNX:
+			extras.putString(KEY_TITLE, UIConst.FUNCTIONS_ZKNX[index]);
+			break;
+		case UIConst.FUNCTION_CLASS_ID_PARTY:
 			extras.putString(KEY_TITLE, UIConst.FUNCTIONS_PARTY[index]);
+			break;
+		case UIConst.FUNCTION_CLASS_ID_POLICY:
+			extras.putString(KEY_TITLE, UIConst.FUNCTIONS_POLICY[index]);
+			break;
+		default:
+			Debug.Log("错误启动参数，function id " + id);
+			break;
 		}
-		else {
-			index = id - UIConst.FUNCTION_CLASS_ID_ZKNX - 1;
-			
-			if (index >= 0 && index < UIConst.FUNCTIONS_ZKNX.length) {
-				extras.putInt(KEY_FUNCTION_CLASS, FUNCTION_CLASS_ZKNX);
-				extras.putString(KEY_TITLE, UIConst.FUNCTIONS_ZKNX[index]);
-			}
-			else if (id == UIConst.FUNCTION_ID_SETTING)
-				extras.putString(KEY_TITLE, "设置");;
-		}
-		
+
 		return extras;
 	}
 }

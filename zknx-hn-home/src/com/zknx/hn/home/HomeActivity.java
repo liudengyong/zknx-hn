@@ -12,7 +12,6 @@ import android.view.View.OnClickListener;
 import android.view.animation.AnimationUtils;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
-import android.widget.Toast;
 import android.widget.ViewFlipper;
 
 public class HomeActivity extends Activity {
@@ -46,6 +45,7 @@ public class HomeActivity extends Activity {
         
         mViewFlipper.addView(mFunctionList.get(0), -1);
         mViewFlipper.addView(mFunctionList.get(1), -1);
+        mViewFlipper.addView(mFunctionList.get(2), -1);
         
         //Debug.ExtractTestDataFile(this);
     }
@@ -59,6 +59,10 @@ public class HomeActivity extends Activity {
     		mViewFlipper.setInAnimation(AnimationUtils.loadAnimation(this, R.anim.zoom_in));
     		mViewFlipper.setOutAnimation(AnimationUtils.loadAnimation(this, R.anim.zoom_out));
     		mViewFlipper.showPrevious();
+    	} else if (id == UIConst.FUNCTION_CLASS_ID_POLICY &&  mViewFlipper.getCurrentView() != mFunctionList.get(2)) {
+    		mViewFlipper.setInAnimation(AnimationUtils.loadAnimation(this, R.anim.zoom_in));
+    		mViewFlipper.setOutAnimation(AnimationUtils.loadAnimation(this, R.anim.zoom_out));
+    		mViewFlipper.showPrevious();
     	}
     }
 
@@ -67,11 +71,9 @@ public class HomeActivity extends Activity {
 		public void onClick(View view) {
 			int id = view.getId();
 			switch (id) {
-			case UIConst.FUNCTION_CLASS_ID_TV:
-				Toast.makeText(HomeActivity.this, "请第三方提供程序接口", Toast.LENGTH_LONG).show();
-				break;
 			case UIConst.FUNCTION_CLASS_ID_ZKNX:
 			case UIConst.FUNCTION_CLASS_ID_PARTY:
+			case UIConst.FUNCTION_CLASS_ID_POLICY:
 				switchFunctionClassView(id);
 				break;
 			default:

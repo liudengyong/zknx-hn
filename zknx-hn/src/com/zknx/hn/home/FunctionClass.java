@@ -22,11 +22,9 @@ public class FunctionClass {
 		
 		List<RelativeLayout> mainFunctionList = new ArrayList<RelativeLayout>();
 		
-		mainFunctionList.add(createMainFunctionBtn(inflater, UIConst.FUNCTION_CLASSES[0], UIConst.FUNCTION_CLASS_ID_TV, listener));
-		mainFunctionList.add(createMainFunctionBtn(inflater, UIConst.FUNCTION_CLASSES[1], UIConst.FUNCTION_CLASS_ID_ZKNX, listener));
-		mainFunctionList.add(createMainFunctionBtn(inflater, UIConst.FUNCTION_CLASSES[2], UIConst.FUNCTION_CLASS_ID_PARTY, listener));
-		
-		mainFunctionList.add(createMainFunctionBtn(inflater, "…Ë÷√", UIConst.FUNCTION_ID_SETTING, listener));
+		mainFunctionList.add(createMainFunctionBtn(inflater, UIConst.FUNCTION_CLASSES[0], UIConst.FUNCTION_CLASS_ID_ZKNX, listener));
+		mainFunctionList.add(createMainFunctionBtn(inflater, UIConst.FUNCTION_CLASSES[1], UIConst.FUNCTION_CLASS_ID_PARTY, listener));
+		mainFunctionList.add(createMainFunctionBtn(inflater, UIConst.FUNCTION_CLASSES[2], UIConst.FUNCTION_CLASS_ID_POLICY, listener));
 		
 		return mainFunctionList;
 	}

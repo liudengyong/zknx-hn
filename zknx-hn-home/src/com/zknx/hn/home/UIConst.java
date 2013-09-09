@@ -4,11 +4,9 @@ import android.widget.LinearLayout;
 
 public class UIConst {
 	
-	public static final int FUNCTION_CLASS_ID_TV    = 100;
-	public static final String[] FUNCTION_CLASSES = {"电视节目", "中科农信", "红星党建"};
-	public static final String[] FUNCTIONS_TV = {"com.android.phone"}; // 电视节目由第三方实现 
+	public static final String[] FUNCTION_CLASSES = {"中科农信", "红星党建", "政务应用"};
 	
-	public static final int FUNCTION_CLASS_ID_ZKNX       = 200;
+	public static final int FUNCTION_CLASS_ID_ZKNX       = 100;
 	public static final int FUNCTION_ID_MARKET           = FUNCTION_CLASS_ID_ZKNX + 1;
 	public static final int FUNCTION_ID_CUSTOM_PRODUCT   = FUNCTION_CLASS_ID_ZKNX + 2;
 	public static final int FUNCTION_ID_SUPPLY_DEMAND    = FUNCTION_CLASS_ID_ZKNX + 3;
@@ -20,7 +18,7 @@ public class UIConst {
 	public static final String[] FUNCTIONS_ZKNX = {"市场行情", "自选产品", "供求信息", "我的商圈", 
 		                                           "农业技术", "专家指导", "我的供求", "专家施肥"};
 	
-	public static final int FUNCTION_CLASS_ID_PARTY      = 300;
+	public static final int FUNCTION_CLASS_ID_PARTY      = 200;
 	public static final int FUNCTION_ID_CUR_POLITICS     = FUNCTION_CLASS_ID_PARTY + 1;
 	public static final int FUNCTION_ID_BEST_COUSE       = FUNCTION_CLASS_ID_PARTY + 2;
 	public static final int FUNCTION_ID_VANGUARD_PARTY   = FUNCTION_CLASS_ID_PARTY + 3;
@@ -29,11 +27,21 @@ public class UIConst {
 	public static final int FUNCTION_ID_HAPPAY           = FUNCTION_CLASS_ID_PARTY + 6;
 	public static final int FUNCTION_ID_LAW              = FUNCTION_CLASS_ID_PARTY + 7;
 	public static final int FUNCTION_ID_POLICY           = FUNCTION_CLASS_ID_PARTY + 8;
-	public static final String[] FUNCTIONS_PARTY = {"时政要闻", "精选课件", "先锋党员", "典型经验",
+	public static final String[] FUNCTIONS_PARTY = {"时政要闻", "精选课件", "优秀党员", "党建模范",
 		                                            "致富模范", "快乐农家", "法律法规", "惠农政策"};
 	
-	public static final int FUNCTION_CLASS_ID_SETTING    = 400;
-	public static final int FUNCTION_ID_SETTING          = FUNCTION_CLASS_ID_SETTING + 1;
+	// 政务应用
+	public static final int FUNCTION_CLASS_ID_POLICY    = 300;
+	public static final int FUNCTION_ID_PARTRY_OPEN      = FUNCTION_CLASS_ID_POLICY + 1;
+	public static final int FUNCTION_ID_COUNTRY_POLICY   = FUNCTION_CLASS_ID_POLICY + 2;
+	public static final int FUNCTION_ID_VILLIGE_OPEN     = FUNCTION_CLASS_ID_POLICY + 3;
+	public static final int FUNCTION_ID_FINANCIAL_OPEN   = FUNCTION_CLASS_ID_POLICY + 4;
+	public static final int FUNCTION_ID_BIRTH_CONTROL_OPEN = FUNCTION_CLASS_ID_POLICY + 5;
+	public static final int FUNCTION_ID_WORK_OPEN        = FUNCTION_CLASS_ID_POLICY + 6;
+	public static final int FUNCTION_ID_WORK_INTRO       = FUNCTION_CLASS_ID_POLICY + 7;
+	public static final int FUNCTION_ID_WORK_INFO        = FUNCTION_CLASS_ID_POLICY + 8;
+	public static final String[] FUNCTIONS_POLICY = {"党务公开", "国家政策", "村务公开", "财务公开",
+		                                            "计生公开", "办事公开", "办事指南", "用工信息"};
 	
 	// 注册账号地址
 	public static final String REG_ADDRESS = "http://218.106.254.101:8099/register.aspx";

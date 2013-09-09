@@ -16,10 +16,6 @@ import android.widget.RelativeLayout;
 public class Functions {
 	
 	public static List<LinearLayout> GetSubFunctionList(LayoutInflater inflater, OnClickListener listener) {
-		return initSubFunctionList(inflater, listener);
-	}
-	
-	static List<LinearLayout> initSubFunctionList(LayoutInflater inflater, OnClickListener listener) {
 		int id = UIConst.FUNCTION_CLASS_ID_ZKNX;
 		List<LinearLayout> subFunctionList = new ArrayList<LinearLayout>();
 
@@ -27,6 +23,9 @@ public class Functions {
 		
 		id = UIConst.FUNCTION_CLASS_ID_PARTY;
 		subFunctionList.add(createBtnGroup(inflater, UIConst.FUNCTIONS_PARTY, id, listener));
+		
+		id = UIConst.FUNCTION_CLASS_ID_POLICY;
+		subFunctionList.add(createBtnGroup(inflater, UIConst.FUNCTIONS_POLICY, id, listener));
 		
 		return subFunctionList;
 	}

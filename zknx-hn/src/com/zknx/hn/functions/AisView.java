@@ -98,7 +98,7 @@ public class AisView extends FunctionView {
 		
 		mFunctionId = function_id;
 		
-		mTitle = getTitle(mFunctionId);
+		mTitle = UIConst.GetFunctionTitle(mFunctionId);
 		
 		if (function_id == UIConst.FUNCTION_ID_BEST_COUSE) {
 			initCouseSubmitButtons();
@@ -313,35 +313,6 @@ public class AisView extends FunctionView {
 		initContent(mAisHeader.getTitle(), layout, mAisViewRoot);
 	}
 
-	/**
-	 * 获取标题
-	 * @param function_id
-	 * @return
-	 */
-	private String getTitle(int function_id) {
-		switch (function_id) {
-		// 中科农信
-		case UIConst.FUNCTION_ID_ARGRI_TECH:
-		case UIConst.FUNCTION_ID_EXPERT_GUIDE:
-		case UIConst.FUNCTION_ID_EXPERT_FERTILIZE:
-			return UIConst.FUNCTIONS_ZKNX[function_id - UIConst.FUNCTION_CLASS_ID_ZKNX - 1];
-		// 红星党建
-		case UIConst.FUNCTION_ID_BEST_COUSE:
-		case UIConst.FUNCTION_ID_MODEL:
-		case UIConst.FUNCTION_ID_VANGUARD_PARTY:
-		case UIConst.FUNCTION_ID_POLICY:
-		case UIConst.FUNCTION_ID_CUR_POLITICS:
-		case UIConst.FUNCTION_ID_CLASS_EXPERIENCE:
-		case UIConst.FUNCTION_ID_HAPPAY:
-		case UIConst.FUNCTION_ID_LAW:
-			return UIConst.FUNCTIONS_PARTY[function_id - UIConst.FUNCTION_CLASS_ID_PARTY - 1];
-		}
-		
-		Debug.Log("严重错误：AISView.getTitle " + function_id);
-
-		return "";
-	}
-	
 	// JS接口
 	private JsInterface mJsInterface = new JsInterface();
 	

@@ -31,7 +31,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
-import android.telephony.TelephonyManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -347,10 +346,12 @@ public class Function extends Activity {
 		LinearLayout btns = null;
 		List<LinearLayout> mFunctionList = Functions.GetSubFunctionList(inflater, mOnClickListener);
 		
-		if (functionClass == Params.FUNCTION_CLASS_ZKNX)
+		if (functionClass == UIConst.FUNCTION_CLASS_ID_ZKNX)
 			btns = mFunctionList.get(0);
-		else if (functionClass == Params.FUNCTION_CLASS_PARTY)
+		else if (functionClass == UIConst.FUNCTION_CLASS_ID_PARTY)
 			btns = mFunctionList.get(1);
+		else if (functionClass == UIConst.FUNCTION_CLASS_ID_POLICY)
+			btns = mFunctionList.get(2);
 		else {
 			// …Ë÷√
 			bottomBtns.setVisibility(View.GONE);

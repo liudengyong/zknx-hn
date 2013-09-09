@@ -16,7 +16,6 @@ import android.view.View.OnClickListener;
 import android.view.animation.AnimationUtils;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
-import android.widget.Toast;
 import android.widget.ViewFlipper;
 
 public class Home extends Activity {
@@ -78,22 +77,9 @@ public class Home extends Activity {
 		public void onClick(View view) {
 			int id = view.getId();
 			switch (id) {
-			case UIConst.FUNCTION_CLASS_ID_TV:
-				//startActivity(UIConst.FUNCTIONS_TV[0]);
-				/*
-				// 获取屏幕密度（方法2）  
-				DisplayMetrics dm = new DisplayMetrics();  
-				dm = getResources().getDisplayMetrics();  
-				
-				float density  = dm.density;        // 屏幕密度（像素比例：0.75/1.0/1.5/2.0）  
-				int densityDPI = dm.densityDpi;     // 屏幕密度（每寸像素：120/160/240/320） 
-				Toast.makeText(Home.this, "请第三方提供程序接口" + densityDPI + ", " + density, Toast.LENGTH_LONG).show();
-				*/
-				
-				Toast.makeText(Home.this, "请第三方提供程序接口", Toast.LENGTH_LONG).show();
-				break;
 			case UIConst.FUNCTION_CLASS_ID_ZKNX:
 			case UIConst.FUNCTION_CLASS_ID_PARTY:
+			case UIConst.FUNCTION_CLASS_ID_POLICY:
 				switchFunctionClassView(id);
 				break;
 			default:

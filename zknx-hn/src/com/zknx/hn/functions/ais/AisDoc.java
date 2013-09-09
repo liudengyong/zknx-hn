@@ -76,9 +76,19 @@ BYTE bColumn
 11	先锋党员
 12	典型模范
 13	致富经验
-14	快乐农家 => 村务公开
+14	快乐农家
 15	法律法规
 16	惠农政策
+
+增加“政务应用”一级栏目
+17  党务公开
+18  国家政策
+19  村务公开
+20  财务公开
+21  计生公开
+22  办事公开
+23  办事指南
+24  用工信息
 
 char child_column
 
@@ -101,7 +111,6 @@ CString column_child16[]={"生产类","生活类","医疗类","教育类"};
 	 */
 	
 	public static int COLUMN_COURSE = 12; // 课件column
-	public static int COLUMN_VILLAGE_TABLE = 14; // 村务公开column
 
 	/**
 	 * Ais文件头
@@ -139,6 +148,8 @@ CString column_child16[]={"生产类","生活类","医疗类","教育类"};
 	private AisItem[] mImageItems;
 	// 用于ais内图片计数
 	//private int mImageIndex;
+	// 是否是表格ais
+	private boolean mConmContainsTable = false;
 
 	/**
 	 * 通过ais_id构造AisDoc
@@ -254,6 +265,9 @@ CString column_child16[]={"生产类","生活类","医疗类","教育类"};
 		}
 		
 		Debug.Log("解析ais文件：" + filePathName);
+		
+		// 默认是图文ais
+		mConmContainsTable = false;
 		
 		try {
 			
@@ -371,6 +385,7 @@ CString column_child16[]={"生产类","生活类","医疗类","教育类"};
 						Debug.Log("解析Ais警告：多余一个音频Item");
 					break;
 				case DataMan.AIS_TOKEN_TABLE:
+					mConmContainsTable = true;
 					String fileName = getTableHtmlFile();
 					readAisToFile(context, fileName, file, length);
 					break;
@@ -566,7 +581,7 @@ CString column_child16[]={"生产类","生活类","医疗类","教育类"};
 	
 	// 是否村务公开表格
 	public boolean isTable() {
-		return (mHeader != null) ? (mHeader.column == COLUMN_VILLAGE_TABLE) : false;
+		return mConmContainsTable;
 	}
 
 	/**
