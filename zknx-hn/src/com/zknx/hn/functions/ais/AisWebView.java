@@ -27,9 +27,11 @@ public class AisWebView {
 		webView.setScrollBarStyle(View.SCROLLBARS_INSIDE_OVERLAY);
 		webView.setScrollbarFadingEnabled(true); // 自动隐藏滚动条
 		webView.setBackgroundColor(0);
-		
+
 		if (aisDoc.isTable()) {
-			
+
+			// JS 有效
+			webView.getSettings().setJavaScriptEnabled(true);     
 			// 缩放开关
 			webView.getSettings().setSupportZoom(true);
 			// 设置是否可缩放

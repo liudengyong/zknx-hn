@@ -88,6 +88,9 @@ public class DataService extends Service {
          	if (DataMan.ProcessBroadcastData())
          		mHandler.sendEmptyMessage(MESSAGE_NEW_DATA);
          		*/
+        	if (DataMan.NeedCleanOldData()) {
+        		DataMan.CleanOldData();
+        	}
 
         	if (!IsProcessingSupply()) {
         		SetProcessingSupply(true);

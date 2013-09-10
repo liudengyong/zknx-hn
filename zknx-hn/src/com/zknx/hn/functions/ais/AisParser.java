@@ -13,7 +13,6 @@ import com.zknx.hn.functions.ais.AisDoc.AisItem;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.view.LayoutInflater;

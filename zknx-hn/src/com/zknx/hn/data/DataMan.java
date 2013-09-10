@@ -2365,4 +2365,103 @@ public class DataMan extends DataInterface {
 		
 		return grades;
 	}
+	
+	/**
+	 * 检查是否今天
+	 * @param time
+	 * @return
+	 */
+	@SuppressWarnings("deprecation")
+	private static boolean IsToday(long time) {
+		if (time == 0)
+			return false;
+
+		Date today = new Date();
+		Date last  = new Date(time);
+		if (today.getYear()  == last.getYear()  &&
+			today.getMonth() == last.getMonth() &&
+			today.getDay()   == last.getDate())
+			return true;
+		else
+			return false;
+	}
+
+	/**
+	 * 是否需要清理数据
+	 * @return
+	 */
+	private static String TIME_STAMP_CLEAN_DATA = "clean_data.timestamp";
+	private static long lastTimeCleanData = 0;
+	public static boolean NeedCleanOldData() {
+		// 比较是否同一天
+		if (IsToday(lastTimeCleanData)) {
+			return false;
+		}
+
+		// 如果内存中没有上次的时间，则检查
+		String timestamp = FileUtils.ReadFirstLine(DataFile(TIME_STAMP_CLEAN_DATA, true));
+		if (timestamp == null || timestamp.length() == 0)
+			return true;
+
+		try {
+			long lasttime = Long.parseLong(timestamp);
+			
+			// 是否同一天
+			if (IsToday(lasttime)) {
+				return false;
+			}
+
+			lastTimeCleanData = System.currentTimeMillis();
+		} catch (Exception exp) {
+			Debug.Log("NeedCleanOldData解析错误");
+		}
+
+		return true;
+	}
+
+	/**
+	 * 开始清理数据
+	 */
+	public static void CleanOldData() {
+		// 开始清理30天以前的数据，以及其他临时数据，只保留需要的
+		File dir = new File(DataFile("", true));
+		for (File file : dir.listFiles()) {
+			if (!IsLast30DayData(file.getName())) {
+				boolean deleted = FileUtils.DeleteFile(file);
+				Debug.Log("删除文件：" + file.getName() + ", " + deleted);
+			}
+		}
+	}
+	
+	/**
+	 * 是否近30天數據
+	 * @return
+	 */
+	private static boolean IsLast30DayData(String fileName) {
+		List<String> list = new ArrayList<String>();
+		list.add("basedata");
+		list.add(TIME_STAMP_CLEAN_DATA);
+		list.add(TIME_STAMP_FILE_NAME);
+		list.add("TODO"); // TODO 檢查時間戳文件
+		
+		// TODO 測試
+		for (String name : list) {
+			// 是否应该删除
+			if (fileName.equals(name))
+				return true;
+		}
+
+		// 向前减去30天
+		long today = System.currentTimeMillis();
+		for (int i = 0; i < 30; ++i, today -= MILLIS_ONE_DAY) {
+
+			String date = mDateFormater.format(new Date(today));
+
+			if (fileName.equals(date))
+				return true;
+		}
+		
+		// 沒有在列表中的全部刪除
+		return true; // TODO 測試后才能刪除
+	}
 }

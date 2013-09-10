@@ -106,10 +106,15 @@ public class FileUtils {
         return file.exists();   
     }
     
+    /**
+     * 只刪除文件
+     * @param fileName
+     * @return
+     */
     public static boolean DeleteFile(String fileName)
-    {   
+    {
         File file = new File(fileName);
-        
+
         if (file.exists()) {
         	Debug.Log("删除文件:" + fileName);
         	return file.delete();
@@ -118,6 +123,59 @@ public class FileUtils {
         Debug.Log("删除文件, 没找到：" + fileName);
         
         return false;
+    }
+    
+    /**
+     * 按File刪除文件
+     * @param file
+     * @return
+     */
+    public static boolean DeleteFile(File file)
+    {
+    	if (file.exists()) {
+	        if (file.isDirectory()) {
+	        	// TODO 測試
+	        	return DeleteDir(file.getAbsolutePath());
+	        }
+    	}
+
+        Debug.Log("删除文件, 没找到：" + file.getAbsolutePath());
+        
+        return false;
+    }
+    
+    /**
+     * 删除目录
+     * TOOD 測試
+     * @param path
+     * @return
+     */
+    public static boolean DeleteDir(String path)
+    {
+		boolean success = true;
+		File file = new File(path);
+		if (file.exists()) {
+			File[] list = file.listFiles();
+			if (list != null) {
+				int len = list.length;
+				for (int i = 0; i < len; ++i) {
+					if (list[i].isDirectory()) {
+						DeleteDir(list[i].getPath());
+					} else {
+						boolean ret = list[i].delete();
+						if (!ret) {
+							success = false;
+						}
+					}
+				}
+			}
+		} else {
+			success = false;
+		}
+		if (success) {
+			file.delete();
+		}
+		return success;
     }
     
     public static boolean RenameFile(String fileName, String newFileName)

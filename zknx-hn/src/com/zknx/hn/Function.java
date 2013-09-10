@@ -27,6 +27,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -55,11 +56,15 @@ public class Function extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        String deviceId = FCApiTool.getDeviceID();
+        String deviceId = "TODO";
+
+        // 是否模拟器
+        if (!isEmulator())
+        	deviceId = FCApiTool.getDeviceID();
 
         if (deviceId == null ||
         	deviceId.length() == 0) {
-        	Dialog.Toast(this, "获取设备ID错误");
+        	Dialog.Toast(this, "激活错误：无法获取设备ID");
         	finish();
         	return;
         }
@@ -116,6 +121,14 @@ public class Function extends Activity {
         }
         */
 	}
+	
+	/**
+	 * 是否模拟器
+	 * @return
+	 */
+	private boolean isEmulator() {
+        return (Build.MODEL.equals("sdk")) || (Build.MODEL.equals("google_sdk"));
+    }
 	
 	/**
 	 * 检查后台服务是否运行
